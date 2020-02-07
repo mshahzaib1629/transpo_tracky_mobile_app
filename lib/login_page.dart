@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
-import 'package:transpo_tracky_mobile_app/passenger_pages.dart/passenger_home_page.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
@@ -76,27 +76,25 @@ class _LoginPageState extends State<LoginPage> {
         height: 45,
         width: double.infinity,
         decoration: BoxDecoration(
-            color: AppTheme.buttonColorDefalut,
+            color: Color(0xFFF0F55F),
             borderRadius:
                 BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
             boxShadow: [
-              BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0.0 * SizeConfig.heightMultiplier,
-                      0.23 * SizeConfig.heightMultiplier),
-                  blurRadius: 1.02 * SizeConfig.heightMultiplier,
-                  spreadRadius: 0.2 * SizeConfig.heightMultiplier),
-              BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0.28 * SizeConfig.heightMultiplier,
-                      0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 0.98 * SizeConfig.heightMultiplier,
-                  spreadRadius: 0.2 * SizeConfig.heightMultiplier),
-            ]),
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, 0.5),
+              blurRadius: 15,
+            ),
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, -0.5),
+              blurRadius: 15,
+            ),
+          ]),
         child: Center(
             child: Text(
           'LOGIN',
-          style: Theme.of(context).textTheme.button,
+          style: Theme.of(context).textTheme.button.copyWith(color: Colors.black),
         )),
       ),
     );
@@ -118,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                   _loginMode == LoginMode.Passenger
                       ? "Login as Driver?"
                       : "Login as Passenger?",
-                  style: Theme.of(context).textTheme.display2,
+                  style: Theme.of(context).textTheme.display2.copyWith(color: Colors.white),
                 ),
                 onPressed: () => _toggleLoginMode(),
                 padding: EdgeInsets.symmetric(
@@ -128,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
             FittedBox(
               child: FlatButton(
                 child: Text("Forgot Password?",
-                    style: Theme.of(context).textTheme.display2),
+                    style: Theme.of(context).textTheme.display2.copyWith(color: Colors.white)),
                 onPressed: () {},
                 padding:
                     EdgeInsets.only(left: 0.78 * SizeConfig.heightMultiplier),

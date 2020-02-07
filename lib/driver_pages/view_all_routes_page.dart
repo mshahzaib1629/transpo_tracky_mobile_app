@@ -7,9 +7,11 @@ class ViewAllRoutesPage extends StatelessWidget {
   const ViewAllRoutesPage({Key key}) : super(key: key);
 
   Widget circle(BuildContext context, {bool filled}) => Container(
-        width: 4.4 * SizeConfig.widthMultiplier,
-        height: 2.5 * SizeConfig.heightMultiplier,
-        padding: EdgeInsets.all(0.56 * SizeConfig.imageSizeMultiplier,),
+        width: 4.0 * SizeConfig.widthMultiplier,
+        height: 2.1 * SizeConfig.heightMultiplier,
+        padding: EdgeInsets.all(
+          0.56 * SizeConfig.imageSizeMultiplier,
+        ),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
@@ -29,7 +31,7 @@ class ViewAllRoutesPage extends StatelessWidget {
       );
 
   Widget verticalLLine(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 1.94 * SizeConfig.widthMultiplier),
+        margin: EdgeInsets.only(left: 1.82 * SizeConfig.widthMultiplier),
         width: 0.56 * SizeConfig.widthMultiplier,
         height: 1.87 * SizeConfig.heightMultiplier,
         color: Theme.of(context).accentColor,
@@ -44,7 +46,7 @@ class ViewAllRoutesPage extends StatelessWidget {
             vertical: 0.78 * SizeConfig.heightMultiplier,
             horizontal: 4.17 * SizeConfig.widthMultiplier,
           ),
-          height: 26.56 * SizeConfig.heightMultiplier,
+          height: 23.56 * SizeConfig.heightMultiplier,
           decoration: BoxDecoration(
             border: Border.all(color: Colors.black26),
             borderRadius:
@@ -102,13 +104,16 @@ class ViewAllRoutesPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                Container(
-                  margin: EdgeInsets.symmetric(
-                      vertical: 0.63 * SizeConfig.heightMultiplier),
-                  child: Divider(
-                    thickness: 0.16 * SizeConfig.heightMultiplier,
-                  ),
+                SizedBox(
+                  height: 10.0,
                 ),
+                // Container(
+                //   margin: EdgeInsets.symmetric(
+                //       vertical: 0.63 * SizeConfig.heightMultiplier),
+                //   child: Divider(
+                //     thickness: 0.16 * SizeConfig.heightMultiplier,
+                //   ),
+                // ),
                 Row(
                   children: <Widget>[
                     Container(
@@ -117,13 +122,14 @@ class ViewAllRoutesPage extends StatelessWidget {
                         vertical: 0.78 * SizeConfig.heightMultiplier,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor.withOpacity(0.4),
+                        color: Theme.of(context).indicatorColor,
                         borderRadius: BorderRadius.circular(
                             1.38 * SizeConfig.imageSizeMultiplier),
                       ),
                       child: Text(
                         'PICK UP: ' + route.pickUpTime,
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.body1,
                       ),
                     ),
                     SizedBox(width: 2.22 * SizeConfig.widthMultiplier),
@@ -133,13 +139,14 @@ class ViewAllRoutesPage extends StatelessWidget {
                         vertical: 0.78 * SizeConfig.heightMultiplier,
                       ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor.withOpacity(0.4),
+                        color: Theme.of(context).indicatorColor,
                         borderRadius: BorderRadius.circular(
                             1.38 * SizeConfig.imageSizeMultiplier),
                       ),
                       child: Text(
                         'DROP OFF: ' + route.dropOffTime,
                         textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.body1,
                       ),
                     ),
                   ],

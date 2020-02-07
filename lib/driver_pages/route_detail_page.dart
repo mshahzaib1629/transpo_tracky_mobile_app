@@ -32,10 +32,7 @@ class RouteDetailPage extends StatelessWidget {
                 width: 63.89 * SizeConfig.widthMultiplier,
                 child: Text(
                   stop.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .display3
-                      .copyWith(fontSize: 2.81 * SizeConfig.textMultiplier),
+                  style: Theme.of(context).textTheme.display3,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -46,7 +43,7 @@ class RouteDetailPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               Text(stop.timeToReach,
-                  style: Theme.of(context).textTheme.display1),
+                  style: Theme.of(context).textTheme.headline),
               Text(
                 'Est. Time',
                 style: Theme.of(context).textTheme.subtitle,

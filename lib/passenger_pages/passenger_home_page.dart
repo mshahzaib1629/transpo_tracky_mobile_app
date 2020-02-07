@@ -6,8 +6,7 @@ import '../styling.dart';
 class PassengerHomePage extends StatelessWidget {
   Widget _buildMap(BuildContext context) {
     return Container(
-      color: Colors.black12,
-      // height: 32.8125 * SizeConfig.heightMultiplier,
+      color: Colors.white,
       child: Center(
         child: Text('Google Map goes here'),
       ),
@@ -20,22 +19,30 @@ class PassengerHomePage extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.white,
           // border: Border.all(width: 1.0, color: Colors.black26),
-          borderRadius: BorderRadius.circular(5.0)),
+          borderRadius: BorderRadius.circular(5.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, 0.5),
+              blurRadius: 15,
+            ),
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, -0.5),
+              blurRadius: 15,
+            ),
+          ]),
       child: Row(
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.menu),
-            color: Colors.black,
+            color: Theme.of(context).iconTheme.color,
             onPressed: () {},
           ),
-          Expanded(
-            child: TextField(
-              // cursorWidth: ,
-              decoration: InputDecoration(
-                hintText: 'Select Route',
-                border: InputBorder.none,
-              ),
-              style: TextStyle(),
+          GestureDetector(
+            child: Text(
+              'Select Your Route',
+              style: Theme.of(context).textTheme.body2,
             ),
           )
         ],
@@ -43,27 +50,48 @@ class PassengerHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLoginButton(BuildContext context) {
+  Widget _buildCurrentLocationButton(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 25.0),
+      height: 45.0,
+      width: 45.0,
+      child: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        child: Icon(
+          Icons.location_searching,
+          color: Colors.black54,
+          size: 28,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGoButton(BuildContext context) {
     return GestureDetector(
       onTap: () {},
       child: Container(
         height: 45,
         width: double.infinity,
         decoration: BoxDecoration(
-            color: Theme.of(context).accentColor,
+            color: Theme.of(context).buttonColor,
             borderRadius:
                 BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0.0 * SizeConfig.heightMultiplier,
-                      0.23 * SizeConfig.heightMultiplier),
-                  blurRadius: 1.02 * SizeConfig.heightMultiplier,
-                  spreadRadius: 0.2 * SizeConfig.heightMultiplier),
+                color: Colors.black12,
+                offset: Offset(0.0, 0.5),
+                blurRadius: 15,
+              ),
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, -0.5),
+                blurRadius: 15,
+              ),
             ]),
         child: Center(
             child: Text(
-          'GO',
+          'LETS GO!',
           style: Theme.of(context).textTheme.button,
         )),
       ),
@@ -83,7 +111,13 @@ class PassengerHomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 _buildTopBar(context),
-                _buildLoginButton(context),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    _buildCurrentLocationButton(context),
+                    _buildGoButton(context),
+                  ],
+                ),
               ],
             ),
           )
