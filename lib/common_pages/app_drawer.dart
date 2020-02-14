@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:transpo_tracky_mobile_app/driver_pages/view_all_routes_page.dart';
+import './view_all_routes_page.dart';
 import 'package:transpo_tracky_mobile_app/login_page.dart';
 
-class DriverAppDrawer extends StatelessWidget {
-  const DriverAppDrawer({Key key}) : super(key: key);
+class AppDrawer extends StatelessWidget {
+  const AppDrawer({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

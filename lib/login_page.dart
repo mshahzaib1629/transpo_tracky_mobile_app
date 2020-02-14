@@ -4,6 +4,8 @@ import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.da
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
+import 'providers/enums.dart';
+
 class LoginPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -177,4 +179,3 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-enum LoginMode { Passenger, Driver }

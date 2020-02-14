@@ -3,99 +3,76 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
 import '../size_config.dart';
-import 'driver_app_drawer.dart';
+import '../common_pages/app_drawer.dart';
 
 class DriverHomePage extends StatelessWidget {
   const DriverHomePage({Key key}) : super(key: key);
 
-  Widget _topBar(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Row(
-          // mainAxisAlignment: MainAxisAlignment.,
-          children: <Widget>[
-            Icon(Icons.menu, color: AppTheme.iconThemeWithDarkBackground.color),
-            SizedBox(
-              width: 4.17 * SizeConfig.widthMultiplier,
+  Widget _buildMap(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: Text('Google Map goes here'),
+      ),
+    );
+  }
+
+  Widget _horizontalLLine(BuildContext context) => Container(
+        margin:
+            EdgeInsets.symmetric(vertical: 2.82 * SizeConfig.widthMultiplier),
+        width: 16.87 * SizeConfig.widthMultiplier,
+        height: 0.56 * SizeConfig.heightMultiplier,
+        color: Theme.of(context).accentColor,
+      );
+
+  Widget _onClickLocationButton(BuildContext context) {
+    // After getting current location of driver
+    showModalBottomSheet(
+        backgroundColor: Colors.black.withOpacity(0),
+        context: context,
+        builder: (context) => Container(
+              height: MediaQuery.of(context).size.height - (14.06 * SizeConfig.heightMultiplier),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
+                  topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
+                ),
+              ),
+              child: Column(
+                children: <Widget>[
+                  _horizontalLLine(context),
+                  Text(
+                    'CONFIGURATION',
+                    style: Theme.of(context).textTheme.display1.copyWith(letterSpacing: 0.15 * SizeConfig.textMultiplier),
+                  ),
+                  Divider(
+                    thickness: 0.15 * SizeConfig.heightMultiplier,
+                  )
+                ],
+              ),
             ),
-            Row(
-              children: <Widget>[
-                Text(
-                  '02-02-2020',
-                  style: Theme.of(context)
-                      .textTheme
-                      .title
-                      .copyWith(color: Colors.white),
-                ),
-                SizedBox(
-                  width: 1.67 * SizeConfig.widthMultiplier,
-                ),
-                Text(
-                  '|',
-                  style: Theme.of(context)
-                      .textTheme
-                      .title
-                      .copyWith(color: Colors.white),
-                ),
-                SizedBox(
-                  width: 1.67 * SizeConfig.widthMultiplier,
-                ),
-                Text(
-                  '10:30 AM',
-                  style: Theme.of(context)
-                      .textTheme
-                      .title
-                      .copyWith(color: Colors.white),
-                ),
-              ],
-            )
-          ],
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 2.2 * SizeConfig.widthMultiplier,
-            vertical: 2.2 * SizeConfig.heightMultiplier,
-          ),
-          child: Text(
-            'PICK UP MODE',
-            style:
-                Theme.of(context).textTheme.title.copyWith(color: Colors.white),
-          ),
-        )
-      ],
-    );
+        isScrollControlled: true,
+        );
   }
 
-  Widget _configurationButton(BuildContext context) {
-    return Container(
-      height: 120.0,
-      width: 120.0,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).buttonColor,
-      ),
-      child: Center(
-        child: Icon(
-          Icons.settings,
-          color: Colors.black54,
-          size: 90.0,
-        ),
-      ),
-    );
-  }
-
-  Widget _goButton(BuildContext context) {
-    return Container(
-      height: 120.0,
-      width: 120.0,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).buttonColor,
-      ),
-      child: Center(
-        child: Text(
-          'GO',
-          style: TextStyle(color: Colors.black54, fontSize: 30.0),
+  Widget _buildCurrentLocationButton(BuildContext context) {
+    return Positioned(
+      bottom: 5.46 * SizeConfig.heightMultiplier,
+      right: 9.72 * SizeConfig.widthMultiplier,
+      child: Container(
+        height: 7 * SizeConfig.heightMultiplier,
+        width: 12.5 * SizeConfig.widthMultiplier,
+        child: FloatingActionButton(
+          onPressed: () {
+            _onClickLocationButton(context);
+          },
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          child: Icon(
+            Icons.location_searching,
+            color: Colors.black54,
+            size: 7.78 * SizeConfig.imageSizeMultiplier,
+          ),
         ),
       ),
     );
@@ -104,35 +81,17 @@ class DriverHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: DriverAppDrawer(),
+      appBar: AppBar(
+        title: Text('Good Morning!'),
+      ),
+      drawer: AppDrawer(),
       backgroundColor: Theme.of(context).primaryColor,
       body: SafeArea(
-        child: Container(
-          margin: EdgeInsets.symmetric(
-              horizontal: 5.56 * SizeConfig.widthMultiplier,
-              vertical: 5.68 * SizeConfig.heightMultiplier),
-          alignment: Alignment.center,
-          child: Column(
-            children: <Widget>[
-              _topBar(context),
-              Expanded(
-                  child: Center(
-                child: Container(
-                  height: 46.8 * SizeConfig.heightMultiplier,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      _configurationButton(context),
-                      SizedBox(
-                        height: 7 * SizeConfig.heightMultiplier,
-                      ),
-                      _goButton(context),
-                    ],
-                  ),
-                ),
-              ))
-            ],
-          ),
+        child: Stack(
+          children: <Widget>[
+            _buildMap(context),
+            _buildCurrentLocationButton(context),
+          ],
         ),
       ),
     );

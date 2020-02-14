@@ -10,7 +10,7 @@ class AppTheme {
   static const Color subTitleTextColor = Color(0xFF9F988F);
   static const Color accentColor = Color(0xFF659759);
   static const Color buttonColorDefalut = Color(0xFF4caf50);
-  
+
   static final ThemeData lightTheme = ThemeData(
     primaryColor: primaryColor,
     scaffoldBackgroundColor: AppTheme.appBackgroundColor,
@@ -40,7 +40,6 @@ class AppTheme {
     headline: _headLineLight,
     body1: _bodyLight1,
     body2: _bodyLight2,
-    
   );
 
   static final TextStyle _titleLight = TextStyle(
@@ -85,8 +84,8 @@ class AppTheme {
     fontSize: 2 * SizeConfig.textMultiplier,
   );
 
-    // subHead is used for Tile Elements
-    static final TextStyle _subHeadLight = TextStyle(
+  // subHead is used for Tile Elements
+  static final TextStyle _subHeadLight = TextStyle(
     color: Colors.black54,
     fontSize: 2.5 * SizeConfig.textMultiplier,
   );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
-import 'package:transpo_tracky_mobile_app/testing_files_raw_data/theme_color_test.dart';
 
 import './login_page.dart';
 import 'styling.dart';

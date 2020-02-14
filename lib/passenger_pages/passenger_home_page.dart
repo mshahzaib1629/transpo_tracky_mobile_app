@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:transpo_tracky_mobile_app/common_pages/app_drawer.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
 
 import '../size_config.dart';
 import '../styling.dart';
@@ -15,21 +17,25 @@ class PassengerHomePage extends StatelessWidget {
 
   Widget _buildTopBar(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+      height: 8.59 * SizeConfig.heightMultiplier,
       decoration: BoxDecoration(
           color: Colors.white,
-          // border: Border.all(width: 1.0, color: Colors.black26),
-          borderRadius: BorderRadius.circular(5.0),
+          // border: Border.all(
+          // width: 0.28 * SizeConfig.widthMultiplier,
+          // color: Colors.black12,
+          // ),
+          borderRadius:
+              BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
-              offset: Offset(0.0, 0.5),
-              blurRadius: 15,
+              offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
             ),
             BoxShadow(
               color: Colors.black12,
-              offset: Offset(0.0, -0.5),
-              blurRadius: 15,
+              offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
             ),
           ]),
       child: Row(
@@ -39,10 +45,18 @@ class PassengerHomePage extends StatelessWidget {
             color: Theme.of(context).iconTheme.color,
             onPressed: () {},
           ),
-          GestureDetector(
-            child: Text(
-              'Select Your Route',
-              style: Theme.of(context).textTheme.body2,
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PassengerRouteSelectionPage()));
+              },
+              child: Text(
+                'Select Your Route',
+                style: Theme.of(context).textTheme.body2.copyWith(fontWeight: FontWeight.normal),
+              ),
             ),
           )
         ],
@@ -52,16 +66,16 @@ class PassengerHomePage extends StatelessWidget {
 
   Widget _buildCurrentLocationButton(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 25.0),
-      height: 45.0,
-      width: 45.0,
+      margin: EdgeInsets.only(bottom: 3.9 * SizeConfig.heightMultiplier),
+      height: 7.03 * SizeConfig.heightMultiplier,
+      width: 12.5 * SizeConfig.widthMultiplier,
       child: FloatingActionButton(
         onPressed: () {},
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         child: Icon(
           Icons.location_searching,
           color: Colors.black54,
-          size: 28,
+          size: 7.78 * SizeConfig.imageSizeMultiplier,
         ),
       ),
     );
@@ -71,22 +85,22 @@ class PassengerHomePage extends StatelessWidget {
     return GestureDetector(
       onTap: () {},
       child: Container(
-        height: 45,
+        height: 7.03 * SizeConfig.heightMultiplier,
         width: double.infinity,
         decoration: BoxDecoration(
             color: Theme.of(context).buttonColor,
             borderRadius:
-                BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
+                BorderRadius.circular(2.38 * SizeConfig.heightMultiplier),
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, 0.5),
-                blurRadius: 15,
+                offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
               ),
               BoxShadow(
                 color: Colors.black12,
-                offset: Offset(0.0, -0.5),
-                blurRadius: 15,
+                offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
               ),
             ]),
         child: Center(
@@ -101,12 +115,16 @@ class PassengerHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(),
       body: SafeArea(
           child: Stack(
         children: <Widget>[
           _buildMap(context),
           Padding(
-            padding: EdgeInsets.all(30.0),
+            padding: EdgeInsets.symmetric(
+              horizontal: 4.5 * SizeConfig.widthMultiplier,
+              vertical: 3.45 * SizeConfig.heightMultiplier,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
