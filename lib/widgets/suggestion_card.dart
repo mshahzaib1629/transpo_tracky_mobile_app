@@ -22,11 +22,11 @@ class SuggestionCard extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return _SuggestionCard();
+    return _SuggestionCardState();
   }
 }
 
-class _SuggestionCard extends State<SuggestionCard> {
+class _SuggestionCardState extends State<SuggestionCard> {
   bool _expanded = false;
 
   int _passengerStrength() {

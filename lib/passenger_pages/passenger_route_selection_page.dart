@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-import 'package:transpo_tracky_mobile_app/widgets/suggestionCard.dart';
-
+import 'package:transpo_tracky_mobile_app/widgets/suggestion_card.dart';
 import '../size_config.dart';
 
 class PassengerRouteSelectionPage extends StatelessWidget {

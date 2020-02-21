@@ -1,4 +1,3 @@
-
 import 'enums.dart';
 
 class Driver {
@@ -13,4 +12,16 @@ class Driver {
   String address;
   String password;
 
+  Driver({
+    this.id,
+    this.registrationID,
+    this.firstName,
+    this.lastName,
+    this.gender,
+    this.designationName,
+    this.cnic,
+    this.contactNum,
+    this.address,
+    this.password,
+  });
 }

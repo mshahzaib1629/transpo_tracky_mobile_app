@@ -4,6 +4,8 @@ class Stop {
   double longitude;
   double latitude;
   String timeToReach;
+  // timeReached attribute is only for record trips, it is not necessary for trip suggestion routes
+  String timeReached;
 
   Stop({
     this.id,
@@ -11,6 +13,7 @@ class Stop {
     this.longitude,
     this.latitude,
     this.timeToReach,
+    this.timeReached,
   });
 }
 
@@ -21,6 +24,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '6:45 AM',
+    timeReached: '6:50 AM',
   ),
   Stop(
     id: 1,
@@ -28,6 +32,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:00 AM',
+    timeReached: '6:55 AM',
   ),
   Stop(
     id: 1,
@@ -35,13 +40,14 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:15 AM',
+    timeReached: '7:10 AM',
   ),
   Stop(
     id: 1,
     name: 'Ahmed Travel',
     longitude: 123.4222,
     latitude: 4556.32,
-    timeToReach: '7:20 AM',
+    timeReached: '7:20 AM',
   ),
   Stop(
     id: 1,
@@ -49,6 +55,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:35 AM',
+    timeReached: '7:30 AM',
   ),
   Stop(
     id: 1,
@@ -56,6 +63,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:45 AM',
+    timeReached: '7:45 AM',
   ),
   Stop(
     id: 1,
@@ -63,6 +71,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:47 AM',
+    timeReached: '7:50 AM',
   ),
   Stop(
     id: 1,
@@ -70,6 +79,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:00 AM',
+    timeReached: '7:55 AM',
   ),
   Stop(
     id: 1,
@@ -77,6 +87,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:05 AM',
+    timeReached: '8:10 AM',
   ),
   Stop(
     id: 1,
@@ -84,6 +95,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:15 AM',
+    timeReached: '8:15 AM',
   ),
   Stop(
     id: 1,
@@ -91,6 +103,7 @@ List<Stop> dummy_stops_1 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:20 AM',
+    timeReached: '8:25 AM',
   ),
 ];
 
@@ -101,6 +114,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '6:45 AM',
+    timeReached: '6:45 AM',
   ),
   Stop(
     id: 1,
@@ -108,6 +122,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:00 AM',
+    timeReached: '6:55 AM',
   ),
   Stop(
     id: 1,
@@ -115,6 +130,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:15 AM',
+    timeReached: '7:15 AM',
   ),
   Stop(
     id: 1,
@@ -122,6 +138,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:20 AM',
+    timeReached: '7:20 AM',
   ),
   Stop(
     id: 1,
@@ -129,6 +146,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:35 AM',
+    timeReached: '7:30 AM',
   ),
   Stop(
     id: 1,
@@ -136,6 +154,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:45 AM',
+    timeReached: '7:50 AM',
   ),
   Stop(
     id: 1,
@@ -143,6 +162,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:47 AM',
+    timeReached: '7:55 AM',
   ),
   Stop(
     id: 1,
@@ -150,6 +170,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:00 AM',
+    timeReached: '7:58 AM',
   ),
   Stop(
     id: 1,
@@ -157,6 +178,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:05 AM',
+    timeReached: '8:10 AM',
   ),
   Stop(
     id: 1,
@@ -164,6 +186,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:15 AM',
+    timeReached: '8:20 AM',
   ),
   Stop(
     id: 1,
@@ -171,6 +194,7 @@ List<Stop> dummy_stops_2 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:20 AM',
+    timeReached: '8:25 AM',
   ),
 ];
 
@@ -181,6 +205,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '6:45 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -188,6 +213,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:00 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -195,6 +221,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:15 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -202,6 +229,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:20 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -209,6 +237,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:35 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -216,6 +245,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:45 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -223,6 +253,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:47 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -230,6 +261,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:00 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -237,6 +269,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:05 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -244,6 +277,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:15 AM',
+    timeReached: '8:25 AM',
   ),
   Stop(
     id: 1,
@@ -251,6 +285,7 @@ List<Stop> dummy_stops_3 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:20 AM',
+    timeReached: '8:25 AM',
   ),
 ];
 
@@ -261,6 +296,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '6:45 AM',
+    timeReached: '6:40 AM',
   ),
   Stop(
     id: 1,
@@ -268,6 +304,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:00 AM',
+    timeReached: '6:50 AM',
   ),
   Stop(
     id: 1,
@@ -275,6 +312,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:15 AM',
+    timeReached: '7:20 AM',
   ),
   Stop(
     id: 1,
@@ -282,6 +320,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:20 AM',
+    timeReached: '7:25 AM',
   ),
   Stop(
     id: 1,
@@ -289,6 +328,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:35 AM',
+    timeReached: '7:40 AM',
   ),
   Stop(
     id: 1,
@@ -296,6 +336,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:45 AM',
+    timeReached: '7:45 AM',
   ),
   Stop(
     id: 1,
@@ -303,6 +344,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '7:47 AM',
+    timeReached: '7:45 AM',
   ),
   Stop(
     id: 1,
@@ -310,6 +352,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:00 AM',
+    timeReached: '7:55 AM',
   ),
   Stop(
     id: 1,
@@ -317,6 +360,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:05 AM',
+    timeReached: '8:10 AM',
   ),
   Stop(
     id: 1,
@@ -324,6 +368,7 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:15 AM',
+    timeReached: '8:20 AM',
   ),
   Stop(
     id: 1,
@@ -331,6 +376,6 @@ List<Stop> dummy_stops_4 = [
     longitude: 123.4222,
     latitude: 4556.32,
     timeToReach: '8:20 AM',
+    timeReached: '8:25 AM',
   ),
 ];
-
