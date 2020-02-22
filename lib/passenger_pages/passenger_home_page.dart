@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/app_drawer.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_tracking_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 import '../size_config.dart';
 import '../styling.dart';
@@ -55,7 +57,10 @@ class PassengerHomePage extends StatelessWidget {
               },
               child: Text(
                 'Select Your Route',
-                style: Theme.of(context).textTheme.body2.copyWith(fontWeight: FontWeight.normal),
+                style: Theme.of(context)
+                    .textTheme
+                    .body2
+                    .copyWith(fontWeight: FontWeight.normal),
               ),
             ),
           )
@@ -83,7 +88,10 @@ class PassengerHomePage extends StatelessWidget {
 
   Widget _buildGoButton(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => PassengerTrackingPage(trip: dummy_selected_trip,)));
+      },
       child: Container(
         height: 7.03 * SizeConfig.heightMultiplier,
         width: double.infinity,
@@ -95,12 +103,12 @@ class PassengerHomePage extends StatelessWidget {
               BoxShadow(
                 color: Colors.black12,
                 offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
-              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+                blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
               ),
               BoxShadow(
                 color: Colors.black12,
                 offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
-              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+                blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
               ),
             ]),
         child: Center(

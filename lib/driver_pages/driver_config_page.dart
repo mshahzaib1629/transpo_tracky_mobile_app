@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 
 import '../size_config.dart';
@@ -167,7 +168,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
 
   Widget _buildBottomBar(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 2.5 * SizeConfig.heightMultiplier),
+      padding:
+          EdgeInsets.symmetric(vertical: 2.5 * SizeConfig.heightMultiplier),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
@@ -187,7 +189,23 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                     .copyWith(color: Theme.of(context).accentColor)),
           ),
           RaisedButton(
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  child: AlertDialog(
+                    content: Container(
+                      height: 67.0,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Initial Meter Reading'),
+                          TextFormField(keyboardType: TextInputType.number,),
+                        ],
+                      ),
+                    ),
+                    actions: <Widget>[FlatButton(onPressed: (){}, child: Text('press me'))],
+                  ));
+            },
             child: Text('LETS GO!',
                 style: Theme.of(context)
                     .textTheme

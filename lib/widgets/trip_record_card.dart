@@ -26,6 +26,7 @@ class _TripRecordCardState extends State<TripRecordCard> {
   Stop origin;
   Stop destination;
 
+// here setting pick & drop points according to passenger/driver & PickUp/DropOff Mode
   void setPoints(TripMode mode) {
     if (widget.loginMode == LoginMode.Passenger) {
       if (mode == TripMode.PICK_UP) {
