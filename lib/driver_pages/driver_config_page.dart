@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 
 import '../size_config.dart';
@@ -56,13 +57,13 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
-  Widget _buildConfigCard(BuildContext context, TripConfig config) {
+  Widget _buildAutoConfigCard(BuildContext context, TripConfig config) {
     return GestureDetector(
       onTap: () {
         print('hello');
       },
       child: Container(
-        width: 80.0,
+        width: 22.2 * SizeConfig.widthMultiplier,
         margin: EdgeInsets.only(right: 2.02 * SizeConfig.widthMultiplier),
         padding: EdgeInsets.symmetric(
           horizontal: 2.38 * SizeConfig.widthMultiplier,
@@ -75,7 +76,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         child: Center(
           child: Text(
             config.configName,
-            style: Theme.of(context).textTheme.body2,
+            style: Theme.of(context).textTheme.display2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -91,7 +92,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.only(
-              left: 3.33 * SizeConfig.widthMultiplier,
+              left: 0.8 * SizeConfig.widthMultiplier,
               top: 1.25 * SizeConfig.heightMultiplier,
               bottom: 0.625 * SizeConfig.heightMultiplier,
             ),
@@ -110,7 +111,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               itemCount: dummy_trip_configs.length,
               itemBuilder: (context, index) {
                 TripConfig config = dummy_trip_configs[index];
-                return _buildConfigCard(context, config);
+                return _buildAutoConfigCard(context, config);
               },
             ),
           ),
@@ -122,6 +123,21 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildForm(BuildContext context) {
     return Column(
       children: <Widget>[
+        Container(
+          color: Colors.pink,
+          height: 25.0,
+          margin: EdgeInsets.only(top: 10.0),
+        ),
+        Container(
+          color: Colors.pink,
+          height: 25.0,
+          margin: EdgeInsets.only(top: 10.0),
+        ),
+        Container(
+          color: Colors.pink,
+          height: 25.0,
+          margin: EdgeInsets.only(top: 10.0),
+        ),
         Container(
           color: Colors.pink,
           height: 25.0,
@@ -194,16 +210,28 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                   context: context,
                   child: AlertDialog(
                     content: Container(
-                      height: 67.0,
+                      height: 10.47 * SizeConfig.heightMultiplier,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('Initial Meter Reading'),
-                          TextFormField(keyboardType: TextInputType.number,),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                          ),
                         ],
                       ),
                     ),
-                    actions: <Widget>[FlatButton(onPressed: (){}, child: Text('press me'))],
+                    actions: <Widget>[
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        DriverNavigationPage()));
+                          },
+                          child: Text('Lets Go'))
+                    ],
                   ));
             },
             child: Text('LETS GO!',
@@ -247,19 +275,22 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
           ),
         ),
-        child: ListView(
+        child: Column(
           children: <Widget>[
             _buildTopBar(context),
             Padding(
               padding: EdgeInsets.symmetric(
-                  horizontal: 2.2 * SizeConfig.widthMultiplier),
-              child: Column(
-                children: <Widget>[
-                  _buildAutoConfigs(context),
-                  Divider(),
-                  _buildForm(context),
-                  _buildBottomBar(context),
-                ],
+                  horizontal: 3.6 * SizeConfig.widthMultiplier),
+              child: Container(
+                height: 75 * SizeConfig.heightMultiplier,
+                child: ListView(
+                  children: <Widget>[
+                    _buildAutoConfigs(context),
+                    Divider(),
+                    _buildForm(context),
+                    _buildBottomBar(context),
+                  ],
+                ),
               ),
             )
           ],

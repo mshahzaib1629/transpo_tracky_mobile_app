@@ -38,7 +38,13 @@ class LastTripsPage extends StatelessWidget {
           // For Fetching User's Location automatically
           IconButton(
             icon: Icon(FontAwesomeIcons.calendarAlt),
-            onPressed: () {},
+            onPressed: () {
+              showDatePicker(
+                  context: context,
+                  initialDate: DateTime(2020, 02, 24),
+                  firstDate: DateTime(2020, 01, 01),
+                  lastDate: DateTime(2060, 02, 29));
+            },
           ),
         ],
       ),

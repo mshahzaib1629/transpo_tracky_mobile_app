@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-import 'package:transpo_tracky_mobile_app/widgets/passenger_tracking_page_detail.dart';
+import 'package:transpo_tracky_mobile_app/widgets/driver_navigation_page_detail.dart';
 
 import '../size_config.dart';
 
-class PassengerTrackingPage extends StatefulWidget {
-// this is the user's selected trip
-  final Trip trip;
-
-  PassengerTrackingPage({@required this.trip});
+class DriverNavigationPage extends StatefulWidget {
   @override
-  _PassengerTrackingPageState createState() => _PassengerTrackingPageState();
+  _DriverNavigationPageState createState() => _DriverNavigationPageState();
 }
 
-class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
+class _DriverNavigationPageState extends State<DriverNavigationPage> {
   Widget _buildMap(BuildContext context) {
     return Container(
       color: Colors.white,
@@ -47,7 +42,7 @@ class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
       top: 0.0,
       left: 0.0,
       right: 0.0,
-      bottom: 22.2 * SizeConfig.heightMultiplier,
+      bottom: 20.2 * SizeConfig.heightMultiplier,
       child: Container(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -102,14 +97,16 @@ class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            _buildMap(context),
-            _buildFloatingButtons(context),
-            PassengerTrackingPageDetail(trip: widget.trip),
-          ],
+    return Container(
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              _buildMap(context),
+              _buildFloatingButtons(context),
+              DriverNavigationPageDetail()
+            ],
+          ),
         ),
       ),
     );

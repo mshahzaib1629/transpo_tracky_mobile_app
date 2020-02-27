@@ -9,11 +9,133 @@ class PassengerTrackingPageDetail extends StatefulWidget {
 
   PassengerTrackingPageDetail({@required this.trip});
   @override
-  _PassengerTrackingPageDetailState createState() => _PassengerTrackingPageDetailState();
+  _PassengerTrackingPageDetailState createState() =>
+      _PassengerTrackingPageDetailState();
 }
 
-class _PassengerTrackingPageDetailState extends State<PassengerTrackingPageDetail> {
+class _PassengerTrackingPageDetailState
+    extends State<PassengerTrackingPageDetail> {
   bool _isExpanded = false;
+
+  Widget _buildTopBarLead(BuildContext context) {
+    return Positioned(
+      top: 0.0,
+      left: 8.33 * SizeConfig.widthMultiplier,
+      child: Center(
+        heightFactor: 0.0,
+        child: Container(
+          padding: EdgeInsets.symmetric(
+            horizontal: 2.22 * SizeConfig.widthMultiplier,
+            vertical: 1.25 * SizeConfig.heightMultiplier,
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius:
+                BorderRadius.circular(8.33 * SizeConfig.imageSizeMultiplier),
+          ),
+          width: 36.11 * SizeConfig.widthMultiplier,
+          alignment: Alignment.center,
+          child: Text(
+            widget.trip.route.name,
+            style:
+                Theme.of(context).textTheme.body2.copyWith(color: Colors.white),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBusDetail(BuildContext context) {
+    return Padding(
+      padding:
+          EdgeInsets.symmetric(vertical: 1.56 * SizeConfig.heightMultiplier),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            Icons.directions_bus,
+            color: Theme.of(context).accentColor,
+          ),
+          SizedBox(
+            width: 5.56 * SizeConfig.widthMultiplier,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                widget.trip.bus.plateNumber,
+                style: Theme.of(context)
+                    .textTheme
+                    .body2
+                    .copyWith(color: Theme.of(context).accentColor),
+              ),
+              Container(
+                width: 43.1 * SizeConfig.widthMultiplier,
+                child: Text(
+                  widget.trip.bus.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.subhead,
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopBarBody(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: 8.3 * SizeConfig.imageSizeMultiplier,
+        // vertical: 6.3 * SizeConfig.imageSizeMultiplier,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            padding: EdgeInsets.only(top: 4.68 * SizeConfig.heightMultiplier),
+            width: 74.88 * SizeConfig.widthMultiplier,
+            child: Text(
+              widget.trip.passengerStop.name,
+              style: TextStyle(
+                fontSize: 5.44 * SizeConfig.widthMultiplier,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              _buildBusDetail(context),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text(
+                    // ----------------------------------------------------------------------------
+                    // Here goes the calculated time by the google to reach the bus on current stop
+                    '12 mins',
+                    // ----------------------------------------------------------------------------
+                    style: Theme.of(context)
+                        .textTheme
+                        .title
+                        .copyWith(color: Theme.of(context).accentColor),
+                  ),
+                  Text('are left'),
+                ],
+              ),
+            ],
+          ),
+          // ---------------------------------------------------------------------------
+          // Here goes the estimated time defined by the institute to reach current stop
+          Text('Estimated Time: ' + widget.trip.passengerStop.timeToReach),
+          // ---------------------------------------------------------------------------
+        ],
+      ),
+    );
+  }
 
   Widget _buildTopBar(BuildContext context) {
     return GestureDetector(
@@ -22,50 +144,14 @@ class _PassengerTrackingPageDetailState extends State<PassengerTrackingPageDetai
           _isExpanded = !_isExpanded;
         });
       },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
-                width: 36.11 * SizeConfig.widthMultiplier,
-                child: Text(
-                  widget.trip.route.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(color: Theme.of(context).accentColor),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                Container(
-                alignment: Alignment.topRight,
-                width: 38.88 * SizeConfig.widthMultiplier,
-                child: Text(
-                  widget.trip.passengerStop.name,
-                  style: TextStyle(
-                    fontSize: 4.44 * SizeConfig.widthMultiplier,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              ],)
-            ],
-          ),
-          ListTile(
-            contentPadding: EdgeInsets.all(0),
-            leading: CircleAvatar(
-              backgroundColor: Theme.of(context).accentColor,
-            ),
-            title: Text(widget.trip.bus.plateNumber),
-            subtitle: Text(widget.trip.bus.name),
-          ),
-          Text('Estimated Time: ' + widget.trip.passengerStop.timeToReach),
-        ],
+      child: Container(
+        color: Theme.of(context).accentColor.withOpacity(0.0),
+        child: Stack(
+          children: <Widget>[
+            _buildTopBarBody(context),
+            _buildTopBarLead(context),
+          ],
+        ),
       ),
     );
   }
@@ -98,46 +184,42 @@ class _PassengerTrackingPageDetailState extends State<PassengerTrackingPageDetai
 
   Widget _buildExpandedDetail(BuildContext context) {
     return Container(
-        child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Drivers on Board',
-            style: Theme.of(context)
-                .textTheme
-                .body2
-                .copyWith(color: Theme.of(context).accentColor)),
-        SizedBox(
-          height: 1.78 * SizeConfig.heightMultiplier,
+        height: 34.37 * SizeConfig.heightMultiplier,
+        padding: EdgeInsets.symmetric(
+          horizontal: 8.3 * SizeConfig.widthMultiplier,
         ),
-        Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Icon(
-              Icons.person_pin,
-              color: Theme.of(context).accentColor,
-            ),
             SizedBox(
-              width: 5.56 * SizeConfig.widthMultiplier,
+              height: 1.78 * SizeConfig.heightMultiplier,
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: getDriversList(context, widget.trip.drivers),
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.person_pin,
+                  color: Theme.of(context).accentColor,
+                ),
+                SizedBox(
+                  width: 5.56 * SizeConfig.widthMultiplier,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: getDriversList(context, widget.trip.drivers),
+                ),
+              ],
             ),
           ],
-        ),
-      ],
-    ));
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
       top: _isExpanded
-          ? 50.8 * SizeConfig.heightMultiplier
-          : 72.8 * SizeConfig.heightMultiplier,
+          ? 55.8 * SizeConfig.heightMultiplier
+          : 74.8 * SizeConfig.heightMultiplier,
       child: Container(
-        padding: EdgeInsets.symmetric(
-            horizontal: 8.3 * SizeConfig.imageSizeMultiplier,
-            vertical: 8.3 * SizeConfig.imageSizeMultiplier),
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           color: Colors.white,
