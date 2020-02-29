@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -127,27 +128,30 @@ class PassengerRouteSelectionPage extends StatelessWidget {
             height: 0.78 * SizeConfig.heightMultiplier,
           ),
           Container(
-            height: 8.59 * SizeConfig.heightMultiplier,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: dummy_favorite_routes.length,
-              itemBuilder: (context, index) {
-                FavoriteRoute route = dummy_favorite_routes[index];
-                return _buildFavoriteRouteCard(context, route);
-              },
-            ),
-          ),
+              height: 8.59 * SizeConfig.heightMultiplier,
+              child: Consumer<RouteProvider>(
+                builder: (context, routeConsumer, child) => ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: routeConsumer.dummy_favorite_routes.length,
+                  itemBuilder: (context, index) {
+                    FavoriteRoute route =
+                        routeConsumer.dummy_favorite_routes[index];
+                    return _buildFavoriteRouteCard(context, route);
+                  },
+                ),
+              )),
         ],
       ),
     );
   }
 
   Widget _buildSuggestedRoutes(BuildContext context) {
+    final tripProvider = Provider.of<TripProvider>(context);
     return Expanded(
       child: ListView.builder(
-        itemCount: dummy_trips_suggested.length,
+        itemCount: tripProvider.dummy_trips_suggested.length,
         itemBuilder: (context, index) {
-          Trip trip = dummy_trips_suggested[index];
+          Trip trip = tripProvider.dummy_trips_suggested[index];
           // Add searching logics here
           // Pass the nearest stop and times to reach them accordingly in future
           return SuggestionCard(
@@ -156,7 +160,8 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 id: trip.route.stopList[0].id,
                 name: trip.route.stopList[0].name,
                 latitude: trip.route.stopList[0].latitude,
-                longitude: trip.route.stopList[0].longitude),
+                longitude: trip.route.stopList[0].longitude,
+                timeToReach: trip.route.stopList[0].timeToReach),
             approxTime: '12 mins',
             walkingTime: '10 mins',
           );

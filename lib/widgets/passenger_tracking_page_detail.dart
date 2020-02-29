@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
@@ -215,6 +216,9 @@ class _PassengerTrackingPageDetailState
 
   @override
   Widget build(BuildContext context) {
+
+    final tripProvider = Provider.of<TripProvider>(context);
+    
     return Positioned(
       top: _isExpanded
           ? 55.8 * SizeConfig.heightMultiplier

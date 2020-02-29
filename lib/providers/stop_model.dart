@@ -47,6 +47,7 @@ List<Stop> dummy_stops_1 = [
     name: 'Ahmed Travel',
     longitude: 123.4222,
     latitude: 4556.32,
+        timeToReach: '7:18 AM',
     timeReached: '7:20 AM',
   ),
   Stop(

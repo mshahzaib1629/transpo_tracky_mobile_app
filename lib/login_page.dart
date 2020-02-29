@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector(
       onTap: () {
         if (_loginMode == LoginMode.Driver) {
-          Navigator.pushReplacement(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => DriverHomePage()));
         } else {
           Navigator.push(context,

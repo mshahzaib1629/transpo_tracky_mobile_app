@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -60,68 +61,74 @@ class _SuggestionCardState extends State<SuggestionCard> {
       );
 
   Widget _buildHead(BuildContext context) {
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+
     return GestureDetector(
       onTap: () {
-        print('do something!');
+        tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip, selectedStop: widget.prefStop);
+        Navigator.pop(context);
       },
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                width: 61.1 * SizeConfig.widthMultiplier,
-                child: Text(
-                  widget.prefTrip.route.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(fontSize: 2.8 * SizeConfig.textMultiplier),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    widget.approxTime != null
-                        ? widget.approxTime
-                        : widget.prefTrip.route.stopList
-                            .where((stop) => stop.id == widget.prefStop.id)
-                            .elementAt(0)
-                            .timeToReach,
-                    style: Theme.of(context).textTheme.headline,
-                  ),
-                  Text(
-                    widget.approxTime != null ? '' : 'Est. Time',
-                    style: Theme.of(context).textTheme.subtitle,
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-                right: 5.56 * SizeConfig.widthMultiplier,
-                top: 0.93 * SizeConfig.heightMultiplier),
-            child: Row(
+      child: Container(
+        color: Colors.transparent,
+        child: Column(
+          children: <Widget>[
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
                   width: 61.1 * SizeConfig.widthMultiplier,
                   child: Text(
-                    widget.prefStop.name,
-                    maxLines: 2,
+                    widget.prefTrip.route.name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .body2
+                        .copyWith(fontSize: 2.8 * SizeConfig.textMultiplier),
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.display3,
                   ),
                 ),
-                _liveStatus(context, live: widget.prefTrip.shareLiveLocation),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      widget.approxTime != null
+                          ? widget.approxTime
+                          : widget.prefTrip.route.stopList
+                              .where((stop) => stop.id == widget.prefStop.id)
+                              .elementAt(0)
+                              .timeToReach,
+                      style: Theme.of(context).textTheme.headline,
+                    ),
+                    Text(
+                      widget.approxTime != null ? '' : 'Est. Time',
+                      style: Theme.of(context).textTheme.subtitle,
+                    ),
+                  ],
+                ),
               ],
             ),
-          )
-        ],
+            Padding(
+              padding: EdgeInsets.only(
+                  right: 5.56 * SizeConfig.widthMultiplier,
+                  top: 0.93 * SizeConfig.heightMultiplier),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    width: 61.1 * SizeConfig.widthMultiplier,
+                    child: Text(
+                      widget.prefStop.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.display3,
+                    ),
+                  ),
+                  _liveStatus(context, live: widget.prefTrip.shareLiveLocation),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

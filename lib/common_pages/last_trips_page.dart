@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/last_trips_detail_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
@@ -52,12 +53,13 @@ class LastTripsPage extends StatelessWidget {
   }
 
   Widget _buildTripsList(BuildContext context) {
+    final tripProvider = Provider.of<TripProvider>(context);
     return Container(
       child: Expanded(
         child: ListView.builder(
-            itemCount: dummy_trips_record.length,
+            itemCount: tripProvider.dummy_trips_record.length,
             itemBuilder: (context, index) {
-              Trip trip = dummy_trips_record[index];
+              Trip trip = tripProvider.dummy_trips_record[index];
               return GestureDetector(
                   onTap: () {
                     Navigator.push(

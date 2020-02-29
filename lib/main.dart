@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/last_trips_page.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 
 import './login_page.dart';
@@ -32,10 +35,15 @@ class _MyAppState extends State<MyApp> {
       builder: (context, constraints) =>
           OrientationBuilder(builder: (context, orientation) {
         SizeConfig().init(constraints, orientation);
-        return MaterialApp(
-          home: LoginPage(),
-          theme: AppTheme.lightTheme,
-        );
+        return MultiProvider(providers: [
+          ChangeNotifierProvider.value(
+            value: TripProvider(), 
+          ),
+          ChangeNotifierProvider.value(value: RouteProvider()),
+        ], child: MaterialApp(
+            home: LoginPage(),
+            theme: AppTheme.lightTheme,
+          ),);
       }),
     );
   }

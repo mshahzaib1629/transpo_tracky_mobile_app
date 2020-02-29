@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './route_detail_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart' as r;
 import 'package:transpo_tracky_mobile_app/size_config.dart';
@@ -213,12 +214,15 @@ class ViewAllRoutesPage extends StatelessWidget {
             children: <Widget>[
               _buildTopBar(context),
               Expanded(
-                child: ListView.builder(
-                    itemCount: r.dummy_routes.length,
+                child: Consumer<r.RouteProvider>(
+                  builder: (context, routeConsumer, child) => ListView.builder(
+                    itemCount: routeConsumer.dummy_routes.length,
                     itemBuilder: (context, index) {
-                      r.Route route = r.dummy_routes[index];
+                      r.Route route = routeConsumer.dummy_routes[index];
                       return _buildCard(context, route);
-                    }),
+                    },
+                  ),
+                ),
               ),
             ],
           ),

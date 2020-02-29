@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -6,10 +7,7 @@ import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../size_config.dart';
 
 class DriverNavigationPageDetail extends StatefulWidget {
-  final Trip trip = dummy_selected_trip;
-
-  // DriverNavigationPageDetail({this.trip});
-
+  
   @override
   _DriverNavigationPageDetailState createState() =>
       _DriverNavigationPageDetailState();
@@ -17,6 +15,8 @@ class DriverNavigationPageDetail extends StatefulWidget {
 
 class _DriverNavigationPageDetailState
     extends State<DriverNavigationPageDetail> {
+
+  Trip currentTrip;
   bool _isExpanded = false;
 
   Widget _buildBusDetail(BuildContext context) {
@@ -34,7 +34,7 @@ class _DriverNavigationPageDetailState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              widget.trip.bus.plateNumber,
+              currentTrip.bus.plateNumber,
               style: Theme.of(context)
                   .textTheme
                   .body2
@@ -43,7 +43,7 @@ class _DriverNavigationPageDetailState
             Container(
               width: 61.1 * SizeConfig.widthMultiplier,
               child: Text(
-                widget.trip.bus.name,
+                currentTrip.bus.name,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.subhead,
@@ -93,7 +93,7 @@ class _DriverNavigationPageDetailState
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: getDriversList(context, widget.trip.drivers),
+          children: getDriversList(context, currentTrip.drivers),
         ),
       ],
     );
@@ -158,7 +158,7 @@ class _DriverNavigationPageDetailState
           height: 0.78 * SizeConfig.heightMultiplier,
         ),
         Column(
-          children: getStopList(context, widget.trip.route.stopList),
+          children: getStopList(context, currentTrip.route.stopList),
         )
       ],
     );
@@ -188,7 +188,7 @@ class _DriverNavigationPageDetailState
               child: Text(
                 // -------------------------------------
                 // here should come the next stop's name
-                widget.trip.route.stopList[0].name,
+                currentTrip.route.stopList[0].name,
                 // --------------------------------------
                 style: TextStyle(
                     color: Colors.white,
@@ -203,7 +203,7 @@ class _DriverNavigationPageDetailState
               alignment: Alignment.center,
               width: 30.56 * SizeConfig.widthMultiplier,
               child: Text(
-                widget.trip.route.name,
+                currentTrip.route.name,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 1.73 * SizeConfig.textMultiplier,
@@ -234,7 +234,7 @@ class _DriverNavigationPageDetailState
                   Text(
                     // --------------------------------------------------------
                     // here should come the next stop's estimated time to reach
-                    widget.trip.route.stopList[0].timeToReach,
+                    currentTrip.route.stopList[0].timeToReach,
                     // --------------------------------------------------------
                     style: Theme.of(context).textTheme.title,
                   ),
@@ -318,6 +318,12 @@ class _DriverNavigationPageDetailState
 
   @override
   Widget build(BuildContext context) {
+    
+    final selectedTrip = Provider.of<TripProvider>(context).selected_trip;
+    setState(() {
+      this.currentTrip = selectedTrip;
+    });
+
     return Positioned(
       top: _isExpanded
           ? 20.8 * SizeConfig.heightMultiplier

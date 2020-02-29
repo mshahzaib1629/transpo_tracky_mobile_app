@@ -224,7 +224,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                     actions: <Widget>[
                       FlatButton(
                           onPressed: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
