@@ -115,32 +115,41 @@ class PassengerRouteSelectionPage extends StatelessWidget {
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
-    return Container(
-      height: 13.28 * SizeConfig.heightMultiplier,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Favorite Routes',
-            style: Theme.of(context).textTheme.display3,
-          ),
-          SizedBox(
-            height: 0.78 * SizeConfig.heightMultiplier,
-          ),
-          Container(
-              height: 8.59 * SizeConfig.heightMultiplier,
-              child: Consumer<RouteProvider>(
-                builder: (context, routeConsumer, child) => ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: routeConsumer.dummy_favorite_routes.length,
-                  itemBuilder: (context, index) {
-                    FavoriteRoute route =
-                        routeConsumer.dummy_favorite_routes[index];
-                    return _buildFavoriteRouteCard(context, route);
-                  },
-                ),
-              )),
-        ],
+    return Consumer<RouteProvider>(
+      builder: (context, routeConsumer, child) => Container(
+        // height: 15.28 * SizeConfig.heightMultiplier,
+        child: routeConsumer.passengerFavoriteRoutes.length == 0
+            ? SizedBox(
+                height: 0.0,
+                width: 0.0,
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Favorite Routes',
+                    style: Theme.of(context).textTheme.display3,
+                  ),
+                  SizedBox(
+                    height: 0.78 * SizeConfig.heightMultiplier,
+                  ),
+                  Container(
+                    height: 8.59 * SizeConfig.heightMultiplier,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: routeConsumer.passengerFavoriteRoutes.length,
+                      itemBuilder: (context, index) {
+                        FavoriteRoute route =
+                            routeConsumer.passengerFavoriteRoutes[index];
+                        return _buildFavoriteRouteCard(context, route);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 1.56 * SizeConfig.heightMultiplier,
+                  ),
+                ],
+              ),
       ),
     );
   }
@@ -187,9 +196,6 @@ class PassengerRouteSelectionPage extends StatelessWidget {
               height: 1.56 * SizeConfig.heightMultiplier,
             ),
             _buildFavoriteRoutes(context),
-            SizedBox(
-              height: 1.56 * SizeConfig.heightMultiplier,
-            ),
             _buildSuggestedRoutes(context),
           ],
         ),

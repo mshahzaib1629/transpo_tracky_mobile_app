@@ -73,7 +73,7 @@ class _TripRecordCardState extends State<TripRecordCard> {
       );
 
   Widget verticalLLine(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 17.32 * SizeConfig.widthMultiplier),
+        margin: EdgeInsets.only(left: 16.45 * SizeConfig.widthMultiplier),
         width: 0.56 * SizeConfig.widthMultiplier,
         height: 1.87 * SizeConfig.heightMultiplier,
         color: Theme.of(context).accentColor,

@@ -108,7 +108,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                 height: 0.93 * SizeConfig.heightMultiplier,
               ),
               Container(
-                width: 66.6 * SizeConfig.widthMultiplier,
+                width: 66.5 * SizeConfig.widthMultiplier,
                 padding: EdgeInsets.symmetric(
                     vertical: 0.78 * SizeConfig.heightMultiplier,
                     horizontal: 1.38 * SizeConfig.widthMultiplier),
@@ -142,8 +142,14 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   bool _showMarkFavoriteOpt = false;
   @override
   Widget build(BuildContext context) {
+    final tripProvider = Provider.of<TripProvider>(context);
+    if(tripProvider.selected_trip != null) setState(() {
+          _showMarkFavoriteOpt = true;
+        });
+        print('showMarkFav value: '+ _showMarkFavoriteOpt.toString());
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) {
+        
         return Container(
           decoration: BoxDecoration(
               color: Colors.white,
@@ -191,7 +197,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                       )
                     ],
                   ),
-                  // if (_showMarkFavoriteOpt == true)
+                  if (_showMarkFavoriteOpt == true)
                   Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).accentColor.withOpacity(0.1),
