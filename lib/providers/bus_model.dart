@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
+
 class Bus {
   int id;
   String plateNumber;
@@ -10,6 +13,29 @@ class Bus {
     this.name,
     this.capacity,
   });
+}
+
+class BusProvider with ChangeNotifier {
+  List<Bus> dummy_avalialbeBuses = [
+    Bus(
+      id: 1,
+      plateNumber: 'LEZ 2327',
+      name: 'HINO Coaster',
+      capacity: 45,
+    ),
+    Bus(
+      id: 2,
+      plateNumber: 'LOY 2135',
+      name: 'HINO Bus',
+      capacity: 65,
+    ),
+    Bus(
+      id: 1,
+      plateNumber: 'LZF 8218',
+      name: 'Hiace Coaster',
+      capacity: 50,
+    ),
+  ];
 }
 
 // ----------- For Meter Readings -----------

@@ -1,14 +1,15 @@
+import 'package:flutter/cupertino.dart';
+import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/route_model.dart' as r;
+
 import 'bus_model.dart';
 import 'enums.dart';
 
 class TripConfig {
   String configName;
-  int routeID;
-  String routeName;
-  int currentDriverID;
-  int partnerDriverID;
-  String partnerDriverReg;
-  String partnerDriverName;
+  r.Route route;
+  Driver currentDriver;
+  Driver partnerDriver;
   Bus bus;
   BusMeterReading meter;
   String mapTraceKey;
@@ -17,12 +18,9 @@ class TripConfig {
 
   TripConfig(
       {this.configName,
-      this.routeID,
-      this.routeName,
-      this.currentDriverID,
-      this.partnerDriverID,
-      this.partnerDriverReg,
-      this.partnerDriverName,
+      this.route,
+      this.currentDriver,
+      this.partnerDriver,
       this.bus,
       this.meter,
       this.mapTraceKey,
@@ -30,35 +28,41 @@ class TripConfig {
       this.startTime});
 }
 
-List<TripConfig> dummy_trip_configs = [
-  TripConfig(
-    configName: 'Morning',
-    routeID: 1,
-    routeName: 'Route# 1',
-    currentDriverID: 1,
-    partnerDriverID: 2,
-    partnerDriverReg: 'EMP-DR-2',
-    partnerDriverName: 'Mushtaq',
-    bus: Bus(
-      id: 1,
-      plateNumber: 'LEZ 2327',
-      name: 'HINO',
+class TripConfigProvider with ChangeNotifier {
+  List<TripConfig> _dummyTripConfigs = [
+    TripConfig(
+      configName: 'Morning',
+      route: r.Route(id: 1),
+      currentDriver: Driver(id: 1),
+      partnerDriver: Driver(id: 2),
+      bus: Bus(
+        id: 1,
+      ),
+      mode: TripMode.PICK_UP,
     ),
-    mode: TripMode.PICK_UP,
-  ),
-  TripConfig(
-    configName: 'Evening',
-    routeID: 1,
-    routeName: 'Route# 1',
-    currentDriverID: 1,
-    partnerDriverID: 2,
-    partnerDriverReg: 'EMP-DR-2',
-    partnerDriverName: 'Mushtaq',
-    bus: Bus(
-      id: 1,
-      plateNumber: 'LEZ 2327',
-      name: 'HINO',
+    TripConfig(
+      configName: 'Evening',
+      route: r.Route(id: 1),
+      currentDriver: Driver(id: 1),
+      partnerDriver: Driver(id: 2),
+      bus: Bus(id: 1),
+      mode: TripMode.DROP_OFF,
     ),
-    mode: TripMode.DROP_OFF,
-  ),
-];
+  ];
+
+  List<TripConfig> get dummyTripConfigs {
+    return [..._dummyTripConfigs];
+  }
+
+  void addTripConfig(TripConfig newTripConfig) {
+    dummyTripConfigs.forEach((config) {
+      print(config.configName +
+          ' ' +
+          config.bus.id.toString() +
+          ' ' +
+          config.mode.toString());
+    });
+    _dummyTripConfigs.add(newTripConfig);
+    notifyListeners();
+  }
+}

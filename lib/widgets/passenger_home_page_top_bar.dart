@@ -78,61 +78,65 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
           SizedBox(
             width: 2.78 * SizeConfig.widthMultiplier,
           ),
-          Column(
-            children: <Widget>[
-              Container(
-                width: 66.6 * SizeConfig.widthMultiplier,
-                padding: EdgeInsets.symmetric(
-                    vertical: 0.78 * SizeConfig.heightMultiplier,
-                    horizontal: 1.38 * SizeConfig.widthMultiplier),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    width: 0.28 * SizeConfig.widthMultiplier,
-                    color: Colors.black12,
+          Expanded(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: 66.6 * SizeConfig.widthMultiplier,
+                  padding: EdgeInsets.symmetric(
+                      vertical: 0.78 * SizeConfig.heightMultiplier,
+                      horizontal: 1.38 * SizeConfig.widthMultiplier),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      width: 0.28 * SizeConfig.widthMultiplier,
+                      color: Colors.black12,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                        1.38 * SizeConfig.imageSizeMultiplier),
                   ),
-                  borderRadius: BorderRadius.circular(
-                      1.38 * SizeConfig.imageSizeMultiplier),
-                ),
-                child: Text(
-                  selectedTrip.mode == TripMode.PICK_UP
-                      ? selectedTrip.passengerStop.name
-                      : selectedTrip.route.stopList[0].name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(fontWeight: FontWeight.normal),
-                ),
-              ),
-              SizedBox(
-                height: 0.93 * SizeConfig.heightMultiplier,
-              ),
-              Container(
-                width: 66.5 * SizeConfig.widthMultiplier,
-                padding: EdgeInsets.symmetric(
-                    vertical: 0.78 * SizeConfig.heightMultiplier,
-                    horizontal: 1.38 * SizeConfig.widthMultiplier),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(
-                    width: 0.28 * SizeConfig.widthMultiplier,
-                    color: Colors.black12,
+                  child: Text(
+                    selectedTrip.mode == TripMode.PICK_UP
+                        ? selectedTrip.passengerStop.name
+                        : selectedTrip.route.stopList[0].name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .body2
+                        .copyWith(fontWeight: FontWeight.normal),
                   ),
-                  borderRadius: BorderRadius.circular(
-                      1.38 * SizeConfig.imageSizeMultiplier),
                 ),
-                child: Text(
-                  selectedTrip.mode == TripMode.PICK_UP
-                      ? selectedTrip.route
-                          .stopList[selectedTrip.route.stopList.length - 1].name
-                      : selectedTrip.passengerStop.name,
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(fontWeight: FontWeight.normal),
+                SizedBox(
+                  height: 0.93 * SizeConfig.heightMultiplier,
                 ),
-              ),
-            ],
+                Container(
+                  width: 66.5 * SizeConfig.widthMultiplier,
+                  padding: EdgeInsets.symmetric(
+                      vertical: 0.78 * SizeConfig.heightMultiplier,
+                      horizontal: 1.38 * SizeConfig.widthMultiplier),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      width: 0.28 * SizeConfig.widthMultiplier,
+                      color: Colors.black12,
+                    ),
+                    borderRadius: BorderRadius.circular(
+                        1.38 * SizeConfig.imageSizeMultiplier),
+                  ),
+                  child: Text(
+                    selectedTrip.mode == TripMode.PICK_UP
+                        ? selectedTrip
+                            .route
+                            .stopList[selectedTrip.route.stopList.length - 1]
+                            .name
+                        : selectedTrip.passengerStop.name,
+                    style: Theme.of(context)
+                        .textTheme
+                        .body2
+                        .copyWith(fontWeight: FontWeight.normal),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -142,14 +146,15 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   bool _showMarkFavoriteOpt = false;
   @override
   Widget build(BuildContext context) {
+    final routeProvider = Provider.of<RouteProvider>(context);
     final tripProvider = Provider.of<TripProvider>(context);
-    if(tripProvider.selected_trip != null) setState(() {
-          _showMarkFavoriteOpt = true;
-        });
-        print('showMarkFav value: '+ _showMarkFavoriteOpt.toString());
+
+    setState(() {
+      _showMarkFavoriteOpt =
+          !routeProvider.isFavoriteFound(trip: tripProvider.selected_trip);
+    });
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) {
-        
         return Container(
           decoration: BoxDecoration(
               color: Colors.white,
@@ -179,7 +184,9 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                       IconButton(
                         icon: Icon(Icons.menu),
                         color: Theme.of(context).iconTheme.color,
-                        onPressed: () {},
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
                       ),
                       Expanded(
                         child: GestureDetector(
@@ -198,45 +205,56 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                     ],
                   ),
                   if (_showMarkFavoriteOpt == true)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).accentColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(
-                          2.78 * SizeConfig.imageSizeMultiplier,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).accentColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(
+                            2.78 * SizeConfig.imageSizeMultiplier,
+                          ),
+                          bottomRight: Radius.circular(
+                              2.78 * SizeConfig.imageSizeMultiplier),
                         ),
-                        bottomRight: Radius.circular(
-                            2.78 * SizeConfig.imageSizeMultiplier),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          IconButton(
+                              icon: Icon(
+                                FontAwesomeIcons.times,
+                                color: Theme.of(context).accentColor,
+                                size: 5 * SizeConfig.imageSizeMultiplier,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _showMarkFavoriteOpt = false;
+                                });
+                              }),
+                          FlatButton(
+                              onPressed: () {
+                                Provider.of<RouteProvider>(context,
+                                        listen: false)
+                                    .addFavorite(
+                                        trip: tripConsumer.selected_trip);
+                                Scaffold.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                        '${tripConsumer.selected_trip.passengerStop.name} added to favorites'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                '+ Mark Favorite',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .body2
+                                    .copyWith(
+                                        color: Theme.of(context).accentColor),
+                              ))
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                            icon: Icon(
-                              FontAwesomeIcons.times,
-                              color: Theme.of(context).accentColor,
-                              size: 16.0,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _showMarkFavoriteOpt = false;
-                              });
-                            }),
-                        FlatButton(
-                            onPressed: () {
-                              Provider.of<RouteProvider>(context, listen: false)
-                                  .addFavorite(
-                                      trip: tripConsumer.selected_trip);
-                            },
-                            child: Text(
-                              '+ Mark Favorite',
-                              style: Theme.of(context).textTheme.body2.copyWith(
-                                  color: Theme.of(context).accentColor),
-                            ))
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ],

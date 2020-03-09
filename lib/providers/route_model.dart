@@ -35,10 +35,8 @@ class FavoriteRoute {
 }
 
 class RouteProvider with ChangeNotifier {
-
-  
   List<FavoriteRoute> passengerFavoriteRoutes = [];
-  
+
   List<Route> dummy_routes = [
     Route(
       id: 1,
@@ -75,7 +73,7 @@ class RouteProvider with ChangeNotifier {
       id: trip.passengerStop.id,
       name: trip.passengerStop.name,
       // --------------------------------------------------------------------------------
-      // Modification required here, set timeToReach of the stop as it is on PickUp Mode, 
+      // Modification required here, set timeToReach of the stop as it is on PickUp Mode,
       // but on DropOff Mode, set time to reach that stop estimated by google maps api
       timeToReach: trip.passengerStop.timeToReach,
       // --------------------------------------------------------------------------------
@@ -90,5 +88,15 @@ class RouteProvider with ChangeNotifier {
         favoriteStop: favoriteStop);
     passengerFavoriteRoutes.add(favoriteRoute);
     notifyListeners();
+  }
+
+  bool isFavoriteFound({Trip trip}) {
+    if (trip == null) return true;
+    for (int i = 0; i < passengerFavoriteRoutes.length; i++) {
+      FavoriteRoute currentRoute = passengerFavoriteRoutes[i];
+      if (currentRoute.routeId == trip.route.id &&
+          currentRoute.favoriteStop.id == trip.passengerStop.id) return true;
+    }
+    return false;
   }
 }

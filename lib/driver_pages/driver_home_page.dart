@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_config_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
 import '../size_config.dart';
@@ -14,7 +18,7 @@ class DriverHomePage extends StatefulWidget {
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-  bool _expandConfig = false;
+  bool _expandConfig = true;
 
   Widget _buildMap(BuildContext context) {
     return Container(
@@ -64,21 +68,34 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Good Morning!'),
-      ),
-      drawer: AppDrawer(),
-      backgroundColor: Theme.of(context).primaryColor,
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            _buildMap(context),
-            _buildCurrentLocationButton(context),
-            DriverConfigurationPage(
-              isExpanded: _expandConfig,
-            )
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(
+          value: BusProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: DriverProvider(),
+        ),
+        ChangeNotifierProvider.value(
+          value: TripConfigProvider(),
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Good Morning!'),
+        ),
+        drawer: AppDrawer(),
+        backgroundColor: Theme.of(context).primaryColor,
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              _buildMap(context),
+              _buildCurrentLocationButton(context),
+              DriverConfigurationPage(
+                isExpanded: _expandConfig,
+              )
+            ],
+          ),
         ),
       ),
     );
