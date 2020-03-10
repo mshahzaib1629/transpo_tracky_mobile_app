@@ -29,40 +29,22 @@ class TripConfig {
 }
 
 class TripConfigProvider with ChangeNotifier {
-  List<TripConfig> _dummyTripConfigs = [
-    TripConfig(
-      configName: 'Morning',
-      route: r.Route(id: 1),
-      currentDriver: Driver(id: 1),
-      partnerDriver: Driver(id: 2),
-      bus: Bus(
-        id: 1,
-      ),
-      mode: TripMode.PICK_UP,
-    ),
-    TripConfig(
-      configName: 'Evening',
-      route: r.Route(id: 1),
-      currentDriver: Driver(id: 1),
-      partnerDriver: Driver(id: 2),
-      bus: Bus(id: 1),
-      mode: TripMode.DROP_OFF,
-    ),
-  ];
+  List<TripConfig> _savedTripConfigs = [];
 
-  List<TripConfig> get dummyTripConfigs {
-    return [..._dummyTripConfigs];
+  List<TripConfig> get savedTripConfigs {
+    return [..._savedTripConfigs];
   }
 
-  void addTripConfig(TripConfig newTripConfig) {
-    dummyTripConfigs.forEach((config) {
-      print(config.configName +
-          ' ' +
-          config.bus.id.toString() +
-          ' ' +
-          config.mode.toString());
-    });
-    _dummyTripConfigs.add(newTripConfig);
+  void addTripConfig(TripConfig config) {
+    TripConfig newTripConfig = TripConfig(
+      configName: config.configName,
+      route: config.route,
+      bus: config.bus,
+      mode: config.mode,
+      currentDriver: config.currentDriver,
+      partnerDriver: config.partnerDriver,
+    );
+    _savedTripConfigs.add(newTripConfig);
     notifyListeners();
   }
 }

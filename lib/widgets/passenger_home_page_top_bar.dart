@@ -15,6 +15,9 @@ class PassengerHomePageTopBar extends StatefulWidget {
 }
 
 class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
+  bool _isInit = true;
+  bool _showFavoriteOption = false;
+
   Widget _topBarShrinked(BuildContext context) {
     return Text(
       'Select Your Route',
@@ -67,6 +70,10 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   }
 
   Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {
+    final routeProvider = Provider.of<RouteProvider>(context);
+    final tripProvider = Provider.of<TripProvider>(context);
+
+    showFavoriteOption(routeProvider, tripProvider);
     return Padding(
       padding: EdgeInsets.only(
           top: 1.56 * SizeConfig.heightMultiplier,
@@ -143,16 +150,70 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
     );
   }
 
-  bool _showMarkFavoriteOpt = false;
+  void showFavoriteOption(routeProvider, tripProvider) {
+    if (_isInit) {
+      _showFavoriteOption =
+          !routeProvider.isFavoriteFound(trip: tripProvider.selected_trip);
+    }
+    _isInit = false;
+  }
+
+  Widget _favoriteOptionBar(BuildContext context) {
+    return Consumer<TripProvider>(
+      builder: (context, tripConsumer, child) => Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).accentColor.withOpacity(0.1),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(
+              2.78 * SizeConfig.imageSizeMultiplier,
+            ),
+            bottomRight: Radius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+                icon: Icon(
+                  FontAwesomeIcons.times,
+                  color: Theme.of(context).accentColor,
+                  size: 5 * SizeConfig.imageSizeMultiplier,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showFavoriteOption = false;
+                  });
+                }),
+            FlatButton(
+                onPressed: () {
+                  Provider.of<RouteProvider>(context, listen: false)
+                      .addFavorite(trip: tripConsumer.selected_trip);
+                  setState(() {
+                    _showFavoriteOption = false;
+                  });
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          '${tripConsumer.selected_trip.passengerStop.name} added to favorites'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                },
+                child: Text(
+                  '+ Mark Favorite',
+                  style: Theme.of(context)
+                      .textTheme
+                      .body2
+                      .copyWith(color: Theme.of(context).accentColor),
+                ))
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final routeProvider = Provider.of<RouteProvider>(context);
-    final tripProvider = Provider.of<TripProvider>(context);
-
-    setState(() {
-      _showMarkFavoriteOpt =
-          !routeProvider.isFavoriteFound(trip: tripProvider.selected_trip);
-    });
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) {
         return Container(
@@ -204,57 +265,8 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                       )
                     ],
                   ),
-                  if (_showMarkFavoriteOpt == true)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(
-                            2.78 * SizeConfig.imageSizeMultiplier,
-                          ),
-                          bottomRight: Radius.circular(
-                              2.78 * SizeConfig.imageSizeMultiplier),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          IconButton(
-                              icon: Icon(
-                                FontAwesomeIcons.times,
-                                color: Theme.of(context).accentColor,
-                                size: 5 * SizeConfig.imageSizeMultiplier,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _showMarkFavoriteOpt = false;
-                                });
-                              }),
-                          FlatButton(
-                              onPressed: () {
-                                Provider.of<RouteProvider>(context,
-                                        listen: false)
-                                    .addFavorite(
-                                        trip: tripConsumer.selected_trip);
-                                Scaffold.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                        '${tripConsumer.selected_trip.passengerStop.name} added to favorites'),
-                                    duration: Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                '+ Mark Favorite',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .body2
-                                    .copyWith(
-                                        color: Theme.of(context).accentColor),
-                              ))
-                        ],
-                      ),
-                    ),
+                  if (_showFavoriteOption == true)
+                    _favoriteOptionBar(context),
                 ],
               ),
             ],

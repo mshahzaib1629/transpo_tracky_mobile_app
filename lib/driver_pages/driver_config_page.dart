@@ -21,10 +21,10 @@ class DriverConfigurationPage extends StatefulWidget {
 }
 
 class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
-  r.Route selectedRoute;
-  TripMode selectedMode = TripMode.PICK_UP;
-  Bus selectedBus;
-  Driver partnerDriver;
+  // r.Route selectedRoute;
+  // TripMode selectedMode = TripMode.PICK_UP;
+  // Bus selectedBus;
+  // Driver partnerDriver;
   bool takingParnterDriver = false;
 
   var _tripConfig = TripConfig(
@@ -34,21 +34,32 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       bus: null,
       meter: null,
       mapTraceKey: null,
-      mode: null,
+      mode: TripMode.PICK_UP,
       startTime: null);
+
+// this object is used to initialize the values from autoconfigs (which are created by the users)
+  var _autoConfig = TripConfig(
+    route: null,
+    currentDriver: null,
+    partnerDriver: null,
+    bus: null,
+    mode: null,
+  );
 
   final _driverConfigKey = GlobalKey<FormState>();
   final _driverFocusNode = FocusNode();
 
+  final busPlateController = TextEditingController();
+  final partnerIdController = TextEditingController();
+
   void initState() {
     super.initState();
-    selectedRoute =
+    _tripConfig.route =
         Provider.of<RouteProvider>(context, listen: false).dummy_routes[0];
   }
 
   void _saveForm() {
     _driverConfigKey.currentState.save();
-    _tripConfig.mode = selectedMode;
   }
 
   Widget _horizontalLLine(BuildContext context) => Container(
@@ -97,7 +108,19 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildAutoConfigCard(BuildContext context, TripConfig config) {
     return GestureDetector(
       onTap: () {
-        print(config.configName + ' ' + config.bus.id.toString() + ' ' + config.mode.toString());
+        _autoConfig = config;
+        _tripConfig.route = _autoConfig.route;
+        _tripConfig.mode = _autoConfig.mode;
+        // setting bus & partner driver as null here bcz they will be automatically re-assigned on submitting the form
+        _tripConfig.bus = null;
+        _tripConfig.partnerDriver  = null;
+        busPlateController.text = _autoConfig.bus.plateNumber;
+        if (_autoConfig.partnerDriver != null) {
+          _toggleTakingPartnerDriver(true);
+          partnerIdController.text = _autoConfig.partnerDriver.registrationID;
+        } else {
+          _toggleTakingPartnerDriver(false);
+        }
       },
       child: Container(
         width: 22.2 * SizeConfig.widthMultiplier,
@@ -123,39 +146,44 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
 
   Widget _buildAutoConfigs(BuildContext context) {
     return Consumer<TripConfigProvider>(
-      builder: (context, configConsumer, child) => Container(
-        height: 13.28 * SizeConfig.heightMultiplier,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(
-                left: 0.8 * SizeConfig.widthMultiplier,
-                top: 1.25 * SizeConfig.heightMultiplier,
-                bottom: 0.625 * SizeConfig.heightMultiplier,
-              ),
-              child: Text(
-                'AUTO-FILLS',
-                style: Theme.of(context).textTheme.display2,
-              ),
-            ),
-            SizedBox(
-              height: 0.78 * SizeConfig.heightMultiplier,
-            ),
-            Container(
-              height: 6.59 * SizeConfig.heightMultiplier,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: configConsumer.dummyTripConfigs.length,
-                itemBuilder: (context, index) {
-                  TripConfig config = configConsumer.dummyTripConfigs[index];
-                  return _buildAutoConfigCard(context, config);
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+      builder: (context, configConsumer, child) =>
+          configConsumer.savedTripConfigs.length != 0
+              ? Container(
+                  height: 14.78 * SizeConfig.heightMultiplier,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(
+                          left: 0.8 * SizeConfig.widthMultiplier,
+                          top: 1.25 * SizeConfig.heightMultiplier,
+                          bottom: 0.625 * SizeConfig.heightMultiplier,
+                        ),
+                        child: Text(
+                          'AUTO-FILLS',
+                          style: Theme.of(context).textTheme.display2,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 0.78 * SizeConfig.heightMultiplier,
+                      ),
+                      Container(
+                        height: 6.59 * SizeConfig.heightMultiplier,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: configConsumer.savedTripConfigs.length,
+                          itemBuilder: (context, index) {
+                            TripConfig config =
+                                configConsumer.savedTripConfigs[index];
+                            return _buildAutoConfigCard(context, config);
+                          },
+                        ),
+                      ),
+                      Divider(),
+                    ],
+                  ),
+                )
+              : Container(),
     );
   }
 
@@ -169,7 +197,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               border: InputBorder.none,
             ),
             hint: Text('Select Route'),
-            value: selectedRoute.name,
+            value: _tripConfig.route.name,
             items:
                 availableRoutes.map<DropdownMenuItem<String>>((r.Route route) {
               return DropdownMenuItem<String>(
@@ -177,21 +205,23 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 child: Text(route.name),
               );
             }).toList(),
-            onChanged: (String newValue) {
+            onChanged: (String value) {
               setState(() {
-                selectedRoute = availableRoutes.firstWhere((r.Route route) {
-                  return route.name == newValue;
+                _tripConfig.route = availableRoutes.firstWhere((r.Route route) {
+                  return route.name == value;
                 });
               });
-              print(selectedRoute.name);
+              print(_tripConfig.route.name);
             },
-            onSaved: (_) {
-              _tripConfig.route = selectedRoute;
+            onSaved: (value) {
+              _tripConfig.route = availableRoutes.firstWhere((r.Route route) {
+                return route.name == value;
+              });
             }));
   }
 
   Widget _toggleMode(BuildContext context) => Container(
-      alignment: selectedMode == TripMode.PICK_UP
+      alignment: _tripConfig.mode == TripMode.PICK_UP
           ? Alignment.topCenter
           : Alignment.bottomCenter,
       width: 5.4 * SizeConfig.widthMultiplier,
@@ -217,10 +247,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          if (selectedMode == TripMode.PICK_UP)
-            selectedMode = TripMode.DROP_OFF;
+          if (_tripConfig.mode == TripMode.PICK_UP)
+            _tripConfig.mode = TripMode.DROP_OFF;
           else
-            selectedMode = TripMode.PICK_UP;
+            _tripConfig.mode = TripMode.PICK_UP;
         });
       },
       child: Container(
@@ -233,7 +263,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               children: <Widget>[
                 Text(
                   'PICK UP',
-                  style: selectedMode == TripMode.PICK_UP
+                  style: _tripConfig.mode == TripMode.PICK_UP
                       ? TextStyle(
                           color: Theme.of(context).accentColor,
                           fontSize: 2.81 * SizeConfig.textMultiplier,
@@ -245,7 +275,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 ),
                 Text(
                   'DROP OFF',
-                  style: selectedMode == TripMode.DROP_OFF
+                  style: _tripConfig.mode == TripMode.DROP_OFF
                       ? TextStyle(
                           color: Theme.of(context).accentColor,
                           fontSize: 2.81 * SizeConfig.textMultiplier,
@@ -267,6 +297,20 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  void _toggleTakingPartnerDriver(bool taking) {
+    if (taking == true) {
+      setState(() {
+        takingParnterDriver = true;
+      });
+    }else {
+      setState(() {
+        takingParnterDriver = false;
+        partnerIdController.text = '';
+        _tripConfig.partnerDriver = null;
+      });
+    }
+  }
+
   Widget _partnerDriverDetail(BuildContext context) {
     final driverProvider = Provider.of<DriverProvider>(context, listen: false);
     return Column(
@@ -275,42 +319,28 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         SizedBox(
           height: 10.0,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Checkbox(
-                  value: takingParnterDriver,
-                  onChanged: (val) {
-                    setState(() {
-                      takingParnterDriver = !takingParnterDriver;
-                    });
-                  },
-                ),
-                Text(
-                  'Partner Driver?',
-                  style: Theme.of(context).textTheme.body2,
-                ),
-              ],
-            ),
-          ],
-        ),
         if (takingParnterDriver == true)
-          Column(
-            children: <Widget>[
-              Container(
-                child: TextFormField(
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 1.0, color: Colors.black12),
+                borderRadius: BorderRadius.circular(8.0)),
+            padding: EdgeInsets.all(5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextFormField(
+                  controller: partnerIdController,
                   style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(0),
                     labelText: 'Parner ID',
                     border: InputBorder.none,
                   ),
                   focusNode: _driverFocusNode,
                   onFieldSubmitted: (value) {
                     setState(() {
-                      partnerDriver = driverProvider.dummy_available_drivers
+                      _tripConfig.partnerDriver = driverProvider
+                          .dummy_available_drivers
                           .firstWhere((Driver driver) {
                         return driver.registrationID == value;
                       });
@@ -318,29 +348,40 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                   },
                   onSaved: (value) {
                     setState(() {
-                      partnerDriver = driverProvider.dummy_available_drivers
+                      _tripConfig.partnerDriver = driverProvider
+                          .dummy_available_drivers
                           .firstWhere((Driver driver) {
                         return driver.registrationID == value;
                       });
                     });
-                    _tripConfig.partnerDriver = partnerDriver;
                   },
                 ),
-              ),
-            ],
-          ),
-        if (takingParnterDriver == true && partnerDriver != null)
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1.0, color: Colors.black54),
-                borderRadius: BorderRadius.circular(8.0)),
-            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-            child: Text(
-              partnerDriver.firstName + ' ' + partnerDriver.lastName,
-              style: Theme.of(context).textTheme.body2,
+                if (takingParnterDriver == true &&
+                    _tripConfig.partnerDriver != null)
+                  Text(
+                    _tripConfig.partnerDriver.firstName +
+                        ' ' +
+                        _tripConfig.partnerDriver.lastName,
+                    style: Theme.of(context).textTheme.body2,
+                  ),
+              ],
             ),
           ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Checkbox(
+              value: takingParnterDriver,
+              onChanged: (val) {
+               _toggleTakingPartnerDriver(!takingParnterDriver);
+              },
+            ),
+            Text(
+              'Partner Driver?',
+              style: Theme.of(context).textTheme.body2,
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -348,15 +389,23 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _busDetail(BuildContext context) {
     final busProvider = Provider.of<BusProvider>(context, listen: false);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          width: 120,
-          child: TextFormField(
+    return Container(
+      // width: 120,
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(width: 1.0, color: Colors.black12),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            controller: busPlateController,
             cursorColor: Colors.black,
             style: TextStyle(color: Colors.black),
             decoration: InputDecoration(
+              contentPadding:
+                  EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
               border: InputBorder.none,
               labelText: 'Bus Plate',
             ),
@@ -365,7 +414,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 : TextInputAction.done,
             onFieldSubmitted: (value) {
               setState(() {
-                selectedBus =
+                _tripConfig.bus =
                     busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 });
@@ -374,33 +423,26 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             },
             onSaved: (value) {
               setState(() {
-                selectedBus =
+                _tripConfig.bus =
                     busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 });
               });
-              _tripConfig.bus = selectedBus;
             },
           ),
-        ),
-        if (selectedBus != null)
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-                border: Border.all(width: 1.0, color: Colors.black54),
-                borderRadius: BorderRadius.circular(8.0)),
-            padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-            child: Text(
-              selectedBus.name,
+          if (_tripConfig.bus != null)
+            Text(
+              _tripConfig.bus.name,
               style: Theme.of(context).textTheme.body2,
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildForm(BuildContext context) {
     return Form(
+      autovalidate: true,
       key: _driverConfigKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,7 +495,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     _saveForm();
     final configProvider =
         Provider.of<TripConfigProvider>(context, listen: false);
-    String _autofillName;
+
     final configNameController = TextEditingController();
     showDialog(
         context: context,
@@ -462,10 +504,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               controller: configNameController,
               decoration: InputDecoration(labelText: 'Auto-Fill Name'),
               onSubmitted: (value) {
-                setState(() {
-                  _autofillName = value;
-                });
-                _tripConfig.configName = _autofillName;
+                _tripConfig.configName = configNameController.text;
                 configProvider.addTripConfig(_tripConfig);
                 Navigator.pop(context);
               }),
@@ -568,7 +607,6 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 child: ListView(
                   children: <Widget>[
                     _buildAutoConfigs(context),
-                    Divider(),
                     _buildForm(context),
                     _buildBottomBar(context),
                   ],
