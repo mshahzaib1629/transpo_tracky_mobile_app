@@ -219,7 +219,8 @@ class _PassengerTrackingPageDetailState
 
     final tripProvider = Provider.of<TripProvider>(context);
     
-    return Positioned(
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 250),
       top: _isExpanded
           ? 55.8 * SizeConfig.heightMultiplier
           : 74.8 * SizeConfig.heightMultiplier,

@@ -8,7 +8,6 @@ import 'package:transpo_tracky_mobile_app/providers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-import 'package:transpo_tracky_mobile_app/widgets/custom_text_form_field.dart';
 import '../providers/route_model.dart' as r;
 
 import '../size_config.dart';
@@ -20,7 +19,8 @@ class DriverConfigurationPage extends StatefulWidget {
   createState() => _DriverConfigurationPageState();
 }
 
-class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
+class _DriverConfigurationPageState extends State<DriverConfigurationPage>  {
+
   bool takingParnterDriver = false;
 
   var _tripConfig = TripConfig(
@@ -53,6 +53,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     _tripConfig.route =
         Provider.of<RouteProvider>(context, listen: false).dummy_routes[0];
   }
+
+  
 
   void _saveForm() {
     _driverConfigKey.currentState.save();
@@ -620,7 +622,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 250),
       top: widget.isExpanded
           ? 3.125 * SizeConfig.heightMultiplier
           : 77.8 * SizeConfig.heightMultiplier,

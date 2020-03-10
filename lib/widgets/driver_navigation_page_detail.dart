@@ -19,6 +19,7 @@ class _DriverNavigationPageDetailState
   Trip currentTrip;
   bool _isExpanded = false;
 
+
   Widget _buildBusDetail(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -324,7 +325,8 @@ class _DriverNavigationPageDetailState
       this.currentTrip = selectedTrip;
     });
 
-    return Positioned(
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 250),
       top: _isExpanded
           ? 20.8 * SizeConfig.heightMultiplier
           : 78.8 * SizeConfig.heightMultiplier,
