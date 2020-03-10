@@ -319,7 +319,7 @@ class _DriverNavigationPageDetailState
   @override
   Widget build(BuildContext context) {
     
-    final selectedTrip = Provider.of<TripProvider>(context).selected_trip;
+    final selectedTrip = Provider.of<TripProvider>(context).driverCreatedTrip;
     setState(() {
       this.currentTrip = selectedTrip;
     });

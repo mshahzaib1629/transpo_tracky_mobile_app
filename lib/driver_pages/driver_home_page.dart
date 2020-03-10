@@ -18,7 +18,7 @@ class DriverHomePage extends StatefulWidget {
 }
 
 class _DriverHomePageState extends State<DriverHomePage> {
-  bool _expandConfig = true;
+  bool _expandConfig = false;
 
   Widget _buildMap(BuildContext context) {
     return Container(

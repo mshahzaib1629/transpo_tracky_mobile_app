@@ -21,10 +21,6 @@ class DriverConfigurationPage extends StatefulWidget {
 }
 
 class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
-  // r.Route selectedRoute;
-  // TripMode selectedMode = TripMode.PICK_UP;
-  // Bus selectedBus;
-  // Driver partnerDriver;
   bool takingParnterDriver = false;
 
   var _tripConfig = TripConfig(
@@ -60,6 +56,14 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
 
   void _saveForm() {
     _driverConfigKey.currentState.save();
+    // -----------------------------------------
+    // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
+    _tripConfig.currentDriver = Driver(
+        id: 1,
+        registrationID: 'EMP-DR-1',
+        firstName: 'Mushtaq',
+        lastName: 'Ahmed');
+    // -----------------------------------------
   }
 
   Widget _horizontalLLine(BuildContext context) => Container(
@@ -113,7 +117,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         _tripConfig.mode = _autoConfig.mode;
         // setting bus & partner driver as null here bcz they will be automatically re-assigned on submitting the form
         _tripConfig.bus = null;
-        _tripConfig.partnerDriver  = null;
+        _tripConfig.partnerDriver = null;
         busPlateController.text = _autoConfig.bus.plateNumber;
         if (_autoConfig.partnerDriver != null) {
           _toggleTakingPartnerDriver(true);
@@ -302,7 +306,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       setState(() {
         takingParnterDriver = true;
       });
-    }else {
+    } else {
       setState(() {
         takingParnterDriver = false;
         partnerIdController.text = '';
@@ -343,6 +347,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                           .dummy_available_drivers
                           .firstWhere((Driver driver) {
                         return driver.registrationID == value;
+                      }, orElse: () {
+                        return null;
                       });
                     });
                   },
@@ -352,18 +358,27 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                           .dummy_available_drivers
                           .firstWhere((Driver driver) {
                         return driver.registrationID == value;
+                      }, orElse: () {
+                        return null;
                       });
                     });
                   },
                 ),
-                if (takingParnterDriver == true &&
-                    _tripConfig.partnerDriver != null)
-                  Text(
-                    _tripConfig.partnerDriver.firstName +
-                        ' ' +
-                        _tripConfig.partnerDriver.lastName,
-                    style: Theme.of(context).textTheme.body2,
-                  ),
+                if (takingParnterDriver == true)
+                  _tripConfig.partnerDriver != null
+                      ? Text(
+                          _tripConfig.partnerDriver.firstName +
+                              ' ' +
+                              _tripConfig.partnerDriver.lastName,
+                          style: Theme.of(context).textTheme.body2,
+                        )
+                      : Text(
+                          'No driver found',
+                          style: Theme.of(context)
+                              .textTheme
+                              .body2
+                              .copyWith(color: Colors.red),
+                        ),
               ],
             ),
           ),
@@ -373,7 +388,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             Checkbox(
               value: takingParnterDriver,
               onChanged: (val) {
-               _toggleTakingPartnerDriver(!takingParnterDriver);
+                _toggleTakingPartnerDriver(!takingParnterDriver);
               },
             ),
             Text(
@@ -417,6 +432,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 _tripConfig.bus =
                     busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
+                }, orElse: () {
+                  return null;
                 });
               });
               FocusScope.of(context).requestFocus(_driverFocusNode);
@@ -426,15 +443,24 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 _tripConfig.bus =
                     busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
+                }, orElse: () {
+                  return null;
                 });
               });
             },
           ),
-          if (_tripConfig.bus != null)
-            Text(
-              _tripConfig.bus.name,
-              style: Theme.of(context).textTheme.body2,
-            ),
+          _tripConfig.bus != null
+              ? Text(
+                  _tripConfig.bus.name,
+                  style: Theme.of(context).textTheme.body2,
+                )
+              : Text(
+                  'No bus found',
+                  style: Theme.of(context)
+                      .textTheme
+                      .body2
+                      .copyWith(color: Colors.red),
+                ),
         ],
       ),
     );
@@ -462,17 +488,26 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   void _showGoDialog(BuildContext context) {
+    final meterReadingController = TextEditingController();
     showDialog(
         context: context,
         child: AlertDialog(
           content: Container(
-            height: 10.47 * SizeConfig.heightMultiplier,
+            height: 14.47 * SizeConfig.heightMultiplier,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Initial Meter Reading'),
                 TextFormField(
+                  controller: meterReadingController,
                   keyboardType: TextInputType.number,
+                  autovalidate: true,
+                  validator: (value) {
+                    if (value.isEmpty) return 'Reading must not be empty';
+                    return null;
+                  },
+                  decoration: InputDecoration(
+                      labelText: 'Initial Meter Reading',
+                      contentPadding: EdgeInsets.all(0)),
                 ),
               ],
             ),
@@ -481,6 +516,12 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             FlatButton(
                 onPressed: () {
                   _saveForm();
+                  print(meterReadingController.text);
+                  _tripConfig.meter = BusMeterReading(
+                      initialReading:
+                          double.parse(meterReadingController.text));
+                  Provider.of<TripProvider>(context, listen: false)
+                      .startTrip(config: _tripConfig);
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
@@ -537,7 +578,13 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           FlatButton(
               onPressed: () {
                 setState(() {
+                  busPlateController.text = '';
+                  takingParnterDriver = false;
+                  partnerIdController.text = '';
                   widget.isExpanded = false;
+                  _tripConfig.bus = null;
+                  _tripConfig.partnerDriver = null;
+                  _tripConfig.mode = TripMode.PICK_UP;
                 });
               },
               child: Text('CANCEL', style: Theme.of(context).textTheme.body1)),
@@ -553,7 +600,12 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           ),
           RaisedButton(
             onPressed: () {
-              _showGoDialog(context);
+              _saveForm();
+              if (_tripConfig.bus != null &&
+                  (takingParnterDriver == false ||
+                      (takingParnterDriver == true &&
+                          _tripConfig.partnerDriver != null)))
+                _showGoDialog(context);
             },
             child: Text('LETS GO!',
                 style: Theme.of(context)

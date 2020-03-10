@@ -153,7 +153,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   void showFavoriteOption(routeProvider, tripProvider) {
     if (_isInit) {
       _showFavoriteOption =
-          !routeProvider.isFavoriteFound(trip: tripProvider.selected_trip);
+          !routeProvider.isFavoriteFound(trip: tripProvider.passengerSelectedTrip);
     }
     _isInit = false;
   }
@@ -187,14 +187,14 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
             FlatButton(
                 onPressed: () {
                   Provider.of<RouteProvider>(context, listen: false)
-                      .addFavorite(trip: tripConsumer.selected_trip);
+                      .addFavorite(trip: tripConsumer.passengerSelectedTrip);
                   setState(() {
                     _showFavoriteOption = false;
                   });
                   Scaffold.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                          '${tripConsumer.selected_trip.passengerStop.name} added to favorites'),
+                          '${tripConsumer.passengerSelectedTrip.passengerStop.name} added to favorites'),
                       duration: Duration(seconds: 1),
                     ),
                   );
@@ -238,7 +238,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
               Column(
                 children: <Widget>[
                   Row(
-                    crossAxisAlignment: tripConsumer.selected_trip == null
+                    crossAxisAlignment: tripConsumer.passengerSelectedTrip == null
                         ? CrossAxisAlignment.center
                         : CrossAxisAlignment.start,
                     children: <Widget>[
@@ -258,10 +258,10 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                                       builder: (context) =>
                                           PassengerRouteSelectionPage()));
                             },
-                            child: tripConsumer.selected_trip == null
+                            child: tripConsumer.passengerSelectedTrip == null
                                 ? _topBarShrinked(context)
                                 : _topBarExpanded(
-                                    context, tripConsumer.selected_trip)),
+                                    context, tripConsumer.passengerSelectedTrip)),
                       )
                     ],
                   ),

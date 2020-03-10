@@ -50,7 +50,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) => GestureDetector(
         onTap: () {
-          if (tripConsumer.selected_trip == null) {
+          if (tripConsumer.passengerSelectedTrip == null) {
             showDialog(
                 context: context,
                 child: AlertDialog(
@@ -66,7 +66,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => PassengerTrackingPage(
-                          trip: tripConsumer.selected_trip,
+                          trip: tripConsumer.passengerSelectedTrip,
                         )));
           }
         },

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 
 import 'driver_model.dart';
 import 'enums.dart';
@@ -38,28 +39,16 @@ class Trip {
 }
 
 class TripProvider with ChangeNotifier {
-  Trip selected_trip;
-  // Trip selected_trip = Trip(
-  //     id: 1,
-  //     route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-  //     mode: TripMode.PICK_UP,
-  //     bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-  //     drivers: [
-  //       Driver(
-  //           registrationID: 'EMP-DR-107',
-  //           firstName: 'Mushtaq',
-  //           lastName: 'Sidique'),
-  //       Driver(
-  //         registrationID: 'EMP-CD-108',
-  //         firstName: 'Shakeel',
-  //         lastName: 'Ahmed',
-  //       )
-  //     ],
-  //     passengersOnBoard: 45,
-  //     shareLiveLocation: true,
-  //     mapTraceKey: 'ABC321e2',
-  //     passengerStop: dummy_stops_1[0],
-  //   );
+  Trip _passengerSelectedTrip;
+  Trip _driverCreatedTrip;
+
+  Trip get passengerSelectedTrip {
+    return _passengerSelectedTrip;
+  }
+
+  Trip get driverCreatedTrip {
+    return _driverCreatedTrip;
+  }
 
   List<Trip> dummy_trips_suggested = [
     Trip(
@@ -391,9 +380,42 @@ class TripProvider with ChangeNotifier {
     ),
   ];
 
+// for passenger
   void setSelectedTrip({Trip selectedTrip, Stop selectedStop}) {
-    this.selected_trip = selectedTrip;
-    selected_trip.passengerStop = selectedStop;
+    this._passengerSelectedTrip = selectedTrip;
+    _passengerSelectedTrip.passengerStop = selectedStop;
     notifyListeners();
+  }
+
+// for driver
+  void startTrip({TripConfig config}) {
+    List<Driver> driversList = [];
+    driversList.add(config.currentDriver);
+    if (config.partnerDriver != null) driversList.add(config.partnerDriver);
+    _driverCreatedTrip = Trip(
+        route: config.route,
+        bus: config.bus,
+        meter: config.meter,
+        mode: config.mode,
+        drivers: driversList);
+    // ---------------------
+    // add server notify logic here
+    // ---------------------
+  }
+
+  // for passenger
+  void passengerEndTrip() {
+    // ---------------------
+    // add server notify / review logic here
+    // ---------------------
+    _passengerSelectedTrip = null;
+  }
+
+  void driverEndTrip(BusMeterReading reading) {
+    _driverCreatedTrip.meter.finalReading = reading.finalReading;
+    // ---------------------
+    // add server notify logic here
+    // ---------------------
+    _driverCreatedTrip = null;
   }
 }
