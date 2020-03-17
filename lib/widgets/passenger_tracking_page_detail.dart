@@ -216,8 +216,6 @@ class _PassengerTrackingPageDetailState
 
   @override
   Widget build(BuildContext context) {
-
-    final tripProvider = Provider.of<TripProvider>(context);
     
     return AnimatedPositioned(
       duration: Duration(milliseconds: 250),

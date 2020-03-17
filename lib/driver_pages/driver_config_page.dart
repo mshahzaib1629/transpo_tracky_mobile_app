@@ -19,8 +19,7 @@ class DriverConfigurationPage extends StatefulWidget {
   createState() => _DriverConfigurationPageState();
 }
 
-class _DriverConfigurationPageState extends State<DriverConfigurationPage>  {
-
+class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   bool takingParnterDriver = false;
 
   var _tripConfig = TripConfig(
@@ -53,8 +52,6 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage>  {
     _tripConfig.route =
         Provider.of<RouteProvider>(context, listen: false).dummy_routes[0];
   }
-
-  
 
   void _saveForm() {
     _driverConfigKey.currentState.save();
@@ -198,31 +195,27 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage>  {
     List<r.Route> availableRoutes = routeProvider.dummy_routes;
     return Container(
         width: 180,
-        child: DropdownButtonFormField(
+        child: DropdownButtonFormField<r.Route>(
             decoration: InputDecoration(
               border: InputBorder.none,
             ),
             hint: Text('Select Route'),
-            value: _tripConfig.route.name,
+            value: _tripConfig.route,
             items:
-                availableRoutes.map<DropdownMenuItem<String>>((r.Route route) {
-              return DropdownMenuItem<String>(
-                value: route.name,
+                availableRoutes.map<DropdownMenuItem<r.Route>>((r.Route route) {
+              return DropdownMenuItem<r.Route>(
+                value: route,
                 child: Text(route.name),
               );
             }).toList(),
-            onChanged: (String value) {
+            onChanged: (r.Route value) {
               setState(() {
-                _tripConfig.route = availableRoutes.firstWhere((r.Route route) {
-                  return route.name == value;
-                });
+                _tripConfig.route = value;
               });
               print(_tripConfig.route.name);
             },
             onSaved: (value) {
-              _tripConfig.route = availableRoutes.firstWhere((r.Route route) {
-                return route.name == value;
-              });
+              _tripConfig.route = value;
             }));
   }
 
@@ -540,34 +533,37 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage>  {
         Provider.of<TripConfigProvider>(context, listen: false);
 
     final configNameController = TextEditingController();
-    showDialog(
-        context: context,
-        child: AlertDialog(
-          content: TextField(
-              controller: configNameController,
-              decoration: InputDecoration(labelText: 'Auto-Fill Name'),
-              onSubmitted: (value) {
-                _tripConfig.configName = configNameController.text;
-                configProvider.addTripConfig(_tripConfig);
-                Navigator.pop(context);
-              }),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('CANCEL'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            FlatButton(
-              child: Text('CREATE'),
-              onPressed: () {
-                _tripConfig.configName = configNameController.text;
-                configProvider.addTripConfig(_tripConfig);
-                Navigator.pop(context);
-              },
-            )
-          ],
-        ));
+    if (_tripConfig.bus != null &&
+        (takingParnterDriver == false ||
+            (takingParnterDriver == true && _tripConfig.partnerDriver != null)))
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            content: TextField(
+                controller: configNameController,
+                decoration: InputDecoration(labelText: 'Auto-Fill Name'),
+                onSubmitted: (value) {
+                  _tripConfig.configName = configNameController.text;
+                  configProvider.addTripConfig(_tripConfig);
+                  Navigator.pop(context);
+                }),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('CANCEL'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('CREATE'),
+                onPressed: () {
+                  _tripConfig.configName = configNameController.text;
+                  configProvider.addTripConfig(_tripConfig);
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ));
   }
 
   Widget _buildBottomBar(BuildContext context) {

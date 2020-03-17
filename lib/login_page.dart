@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
@@ -82,21 +85,22 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius:
                 BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
             boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              offset: Offset(0.0, 0.5),
-              blurRadius: 15,
-            ),
-            BoxShadow(
-              color: Colors.black12,
-              offset: Offset(0.0, -0.5),
-              blurRadius: 15,
-            ),
-          ]),
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, 0.5),
+                blurRadius: 15,
+              ),
+              BoxShadow(
+                color: Colors.black12,
+                offset: Offset(0.0, -0.5),
+                blurRadius: 15,
+              ),
+            ]),
         child: Center(
             child: Text(
           'LOGIN',
-          style: Theme.of(context).textTheme.button.copyWith(color: Colors.black),
+          style:
+              Theme.of(context).textTheme.button.copyWith(color: Colors.black),
         )),
       ),
     );
@@ -118,7 +122,10 @@ class _LoginPageState extends State<LoginPage> {
                   _loginMode == LoginMode.Passenger
                       ? "Login as Driver?"
                       : "Login as Passenger?",
-                  style: Theme.of(context).textTheme.display2.copyWith(color: Colors.white),
+                  style: Theme.of(context)
+                      .textTheme
+                      .display2
+                      .copyWith(color: Colors.white),
                 ),
                 onPressed: () => _toggleLoginMode(),
                 padding: EdgeInsets.symmetric(
@@ -128,13 +135,65 @@ class _LoginPageState extends State<LoginPage> {
             FittedBox(
               child: FlatButton(
                 child: Text("Forgot Password?",
-                    style: Theme.of(context).textTheme.display2.copyWith(color: Colors.white)),
+                    style: Theme.of(context)
+                        .textTheme
+                        .display2
+                        .copyWith(color: Colors.white)),
                 onPressed: () {},
                 padding:
                     EdgeInsets.only(left: 0.78 * SizeConfig.heightMultiplier),
               ),
             ),
           ],
+        ),
+        FlatButton(
+          padding: EdgeInsets.only(bottom: 20, top: 10),
+          onPressed: () {
+            final _sessionProvider =
+                Provider.of<SessionProvider>(context, listen: false);
+            showDialog(
+                context: context,
+                child: AlertDialog(
+                  title: Text('Sign up as?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {},
+                      child: Text('Driver'),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _sessionProvider.currentSession != null
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PassengerSignUpPage()))
+                            : showDialog(
+                                context: context,
+                                child: AlertDialog(
+                                  content: Text('No Active Session found.'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('OK'),
+                                    )
+                                  ],
+                                ));
+                      },
+                      child: Text('Passenger'),
+                    )
+                  ],
+                ));
+          },
+          child: Text('SIGN UP',
+              style: Theme.of(context)
+                  .textTheme
+                  .display2
+                  .copyWith(color: Colors.white)),
+        ),
+        SizedBox(
+          height: 50.0,
         )
       ],
     );
@@ -178,4 +237,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

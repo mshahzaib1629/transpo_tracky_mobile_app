@@ -8,6 +8,7 @@ import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.da
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 
@@ -44,6 +45,9 @@ class _MyAppState extends State<MyApp> {
             ),
             ChangeNotifierProvider.value(
               value: RouteProvider(),
+            ),
+            ChangeNotifierProvider.value(
+              value: SessionProvider(),
             ),
           ],
           child: MaterialApp(
