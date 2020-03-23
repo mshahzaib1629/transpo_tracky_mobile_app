@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_signup_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_signup_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
@@ -157,7 +158,13 @@ class _LoginPageState extends State<LoginPage> {
                   title: Text('Sign up as?'),
                   actions: <Widget>[
                     FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DriverSignUpPage()));
+                      },
                       child: Text('Driver'),
                     ),
                     FlatButton(
@@ -192,9 +199,6 @@ class _LoginPageState extends State<LoginPage> {
                   .display2
                   .copyWith(color: Colors.white)),
         ),
-        SizedBox(
-          height: 50.0,
-        )
       ],
     );
   }
@@ -207,11 +211,12 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(
-              horizontal: 12.5 * SizeConfig.widthMultiplier,
-              vertical: 9.94 * SizeConfig.heightMultiplier),
+          margin: EdgeInsets.only(
+            left: 12.5 * SizeConfig.widthMultiplier,
+            right: 12.5 * SizeConfig.widthMultiplier,
+            top: 6.84 * SizeConfig.heightMultiplier,
+          ),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                 child: Image(

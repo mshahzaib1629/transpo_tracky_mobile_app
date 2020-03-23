@@ -1,26 +1,27 @@
 import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import './person.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 
-class Passenger {
-  int id;
-  String registrationId;
-  String firstName;
-  String lastName;
-  String password;
-  Gender gender;
-  String contact;
+class Passenger extends Person {
   String email;
   Session session;
 
   Passenger({
     int id,
-    String registrationId,
+    String registrationID,
     String firstName,
     String lastName,
     String password,
     Gender gender,
     String contact,
-    String email,
-    Session session,
-  });
+    this.email,
+    this.session,
+  }) : super(
+            id: id,
+            registrationID: registrationID,
+            firstName: firstName,
+            lastName: lastName,
+            password: password,
+            gender: gender,
+            contact: contact);
 }

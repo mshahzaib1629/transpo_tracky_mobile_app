@@ -1,42 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/providers/designation.dart';
+import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 
-class PassengerSignUpPage extends StatefulWidget {
-  PassengerSignUpPage({Key key}) : super(key: key);
+class DriverSignUpPage extends StatefulWidget {
+  DriverSignUpPage({Key key}) : super(key: key);
 
   @override
-  _PassengerSignUpPageState createState() => _PassengerSignUpPageState();
+  _DriverSignUpPageState createState() => _DriverSignUpPageState();
 }
 
-class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
+class _DriverSignUpPageState extends State<DriverSignUpPage> {
   int _pageCounter = 1;
-  final _passengerSignupKey = GlobalKey<FormState>();
+  final _driverSignupKey = GlobalKey<FormState>();
 
   final _registrationIdController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _contactController = TextEditingController();
-  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   final _lastNameFocusNode = FocusNode();
-  final _emailFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
-  var _passengerForm = Passenger(
-      registrationID: '',
-      firstName: '',
-      lastName: '',
-      gender: Gender.Male,
-      contact: '',
-      email: '',
-      password: '',
-      session: null);
+  final List<Designation> designations = [
+    Designation(id: 1, name: "Driver"),
+    Designation(id: 2, name: "Conductor"),
+  ];
+  var _driverForm = Driver(
+    registrationID: '',
+    designation: null,
+    firstName: '',
+    lastName: '',
+    gender: null,
+    contact: '',
+    password: '',
+  );
 
 // common configurations through out the pages:
   double _topPadding = 3.75 * SizeConfig.heightMultiplier;
@@ -44,9 +47,9 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
   double _titleSize = 4.5 * SizeConfig.textMultiplier;
 
   void _saveForm() {
-    final isValid = _passengerSignupKey.currentState.validate();
+    final isValid = _driverSignupKey.currentState.validate();
     if (isValid) {
-      _passengerSignupKey.currentState.save();
+      _driverSignupKey.currentState.save();
     }
   }
 
@@ -56,17 +59,15 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _contactController.dispose();
-    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _lastNameFocusNode.dispose();
-    _emailFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
     super.dispose();
   }
 
   void _submitForm() {
-    if (_passengerSignupKey.currentState.validate()) {
+    if (_driverSignupKey.currentState.validate()) {
       _saveForm();
       showDialog(
           context: context,
@@ -85,21 +86,19 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                   child: Text('OK'))
             ],
           ));
-      print(_passengerForm.registrationID +
+      print(_driverForm.registrationID +
           ' f-Name: ' +
-          _passengerForm.firstName +
+          _driverForm.firstName +
           ' l-Name: ' +
-          _passengerForm.lastName +
+          _driverForm.lastName +
           ' contact: ' +
-          _passengerForm.contact +
-          ' email: ' +
-          _passengerForm.email +
+          _driverForm.contact +
           ' gender: ' +
-          _passengerForm.gender.toString() +
+          _driverForm.gender.toString() +
           ' password: ' +
-          _passengerForm.password +
-          ' session: ' +
-          _passengerForm.session.name);
+          _driverForm.password +
+          ' designation: ' +
+          _driverForm.designation.name);
     }
   }
 
@@ -132,16 +131,63 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                     .copyWith(fontStyle: FontStyle.italic),
               ),
               Text(
-                '${currentSession.name} Registration',
+                'Transpo Tracky',
                 style: Theme.of(context).textTheme.title.copyWith(
                     fontSize: 4.5 * SizeConfig.textMultiplier,
-                    color: Colors.red),
+                    color: Theme.of(context).accentColor),
+              ),
+              Text(
+                'Registration',
+                style: Theme.of(context).textTheme.title.copyWith(
+                    fontSize: 4.5 * SizeConfig.textMultiplier,
+                    color: Theme.of(context).accentColor),
               ),
             ],
           ),
         ),
+        Center(
+          child: Container(
+            padding: EdgeInsets.symmetric(
+                horizontal: 3.56 * SizeConfig.widthMultiplier,
+                vertical: 0.93 * SizeConfig.heightMultiplier),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 0.3125 * SizeConfig.imageSizeMultiplier,
+                  color: Colors.black12),
+              borderRadius:
+                  BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
+            ),
+            width: 55.125 * SizeConfig.widthMultiplier,
+            child: DropdownButtonFormField<Designation>(
+              decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(0),
+                  border: InputBorder.none,
+                  errorMaxLines: 2),
+              hint: Text(
+                'I am...',
+                style:
+                    TextStyle(fontWeight: FontWeight.w400, color: Colors.black),
+              ),
+              value: _driverForm.designation,
+              items: designations
+                  .map<DropdownMenuItem<Designation>>((Designation value) {
+                return DropdownMenuItem<Designation>(
+                    value: value, child: Text(value.name));
+              }).toList(),
+              validator: (value) {
+                if (value == null) return 'Please specify designation';
+                return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  _driverForm.designation = value;
+                });
+              },
+            ),
+          ),
+        ),
         SizedBox(
-          height: 9.38 * SizeConfig.heightMultiplier,
+          height: 5.38 * SizeConfig.heightMultiplier,
         ),
         Text('To proceed, click Next!'),
       ],
@@ -179,7 +225,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               onFieldSubmitted: (value) {},
               onSaved: (value) {
                 setState(() {
-                  _passengerForm.registrationID = value;
+                  _driverForm.registrationID = value;
                 });
               },
               validator: (value) {
@@ -225,7 +271,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               },
               onSaved: (value) {
                 setState(() {
-                  _passengerForm.firstName = value;
+                  _driverForm.firstName = value;
                 });
               },
               validator: (value) {
@@ -254,14 +300,12 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               onFieldSubmitted: (value) {},
               onSaved: (value) {
                 setState(() {
-                  _passengerForm.lastName = value;
+                  _driverForm.lastName = value;
                 });
               },
             ),
           ),
-          SizedBox(
-            height: 1.8 * SizeConfig.heightMultiplier
-          ),
+          SizedBox(height: 1.8 * SizeConfig.heightMultiplier),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
@@ -272,7 +316,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                     border: InputBorder.none,
                     errorMaxLines: 2),
                 hint: Text('Gender'),
-                value: _passengerForm.gender,
+                value: _driverForm.gender,
                 items:
                     Gender.values.map<DropdownMenuItem<Gender>>((Gender value) {
                   return DropdownMenuItem<Gender>(
@@ -285,7 +329,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                 },
                 onChanged: (value) {
                   setState(() {
-                    _passengerForm.gender = value;
+                    _driverForm.gender = value;
                   });
                 },
               ),
@@ -297,7 +341,6 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
   }
 
   Widget _contactPage(BuildContext context) {
-    final _emailFocusNode = FocusNode();
     return SingleChildScrollView(
       child: Column(
         children: <Widget>[
@@ -326,10 +369,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                   hintText: '03XXXXXXXXX',
                   errorMaxLines: 2),
               keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
-              onFieldSubmitted: (value) {
-                FocusScope.of(context).requestFocus(_emailFocusNode);
-              },
+              textInputAction: TextInputAction.done,
               validator: (value) {
                 if (value.isEmpty)
                   return 'Please provide your contact number, we keep it confidential';
@@ -337,40 +377,13 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               },
               onSaved: (value) {
                 setState(() {
-                  _passengerForm.contact = value;
+                  _driverForm.contact = value;
                 });
               },
             ),
           ),
           SizedBox(
             height: 1.8 * SizeConfig.heightMultiplier,
-          ),
-          _inputContainer(
-            input: TextFormField(
-              controller: _emailController,
-              focusNode: _emailFocusNode,
-              cursorColor: Colors.black,
-              style: TextStyle(color: Colors.black),
-              decoration: InputDecoration(
-                contentPadding:
-                    EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
-                border: InputBorder.none,
-                labelText: 'Email Id',
-              ),
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (value) {},
-              validator: (value) {
-                if (value.isNotEmpty && !value.contains('@'))
-                  return 'Enter valid email id';
-                return null;
-              },
-              onSaved: (value) {
-                setState(() {
-                  _passengerForm.email = value;
-                });
-              },
-            ),
           ),
         ],
       ),
@@ -433,7 +446,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               onFieldSubmitted: (value) {},
               onSaved: (value) {
                 if (_passwordController.text == value) {
-                  _passengerForm.password = value;
+                  _driverForm.password = value;
                 }
               },
               validator: (value) {
@@ -507,19 +520,11 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
             if (_pageCounter < 5)
               FlatButton(
                   onPressed: () {
-                    if (_pageCounter == 1) {
-                      _passengerForm.session =
-                          Provider.of<SessionProvider>(context).currentSession;
+                    if (_driverSignupKey.currentState.validate()) {
+                      _saveForm();
                       setState(() {
                         _pageCounter++;
                       });
-                    } else {
-                      if (_passengerSignupKey.currentState.validate()) {
-                        _saveForm();
-                        setState(() {
-                          _pageCounter++;
-                        });
-                      }
                     }
                   },
                   child: Text(
@@ -558,7 +563,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
             vertical: 3.75 * SizeConfig.heightMultiplier,
             horizontal: 3.125 * SizeConfig.widthMultiplier),
         child: Form(
-          key: _passengerSignupKey,
+          key: _driverSignupKey,
           child: _buildPages(context),
         ),
       )),
