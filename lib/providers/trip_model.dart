@@ -3,7 +3,7 @@ import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 
 import 'driver_model.dart';
-import 'enums.dart';
+import '../helpers/enums.dart';
 import 'route_model.dart' as r;
 import 'bus_model.dart';
 

@@ -30,12 +30,18 @@ class BusProvider with ChangeNotifier {
       capacity: 65,
     ),
     Bus(
-      id: 1,
+      id: 3,
       plateNumber: 'LZF 8218',
       name: 'Hiace Coaster',
       capacity: 50,
     ),
   ];
+
+  Bus getBus(int id) {
+    return dummy_avalialbeBuses.firstWhere((bus) => bus.id == id, orElse: () {
+      return null;
+    });
+  }
 }
 
 // ----------- For Meter Readings -----------

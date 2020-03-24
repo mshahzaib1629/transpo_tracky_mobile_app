@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 import 'stop_model.dart';
@@ -98,5 +98,13 @@ class RouteProvider with ChangeNotifier {
           currentRoute.favoriteStop.id == trip.passengerStop.id) return true;
     }
     return false;
+  }
+
+  Route getRoute(int id) {
+    return dummy_routes.firstWhere((route) {
+      return route.id == id;
+    }, orElse: () {
+      return null;
+    });
   }
 }

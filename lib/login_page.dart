@@ -8,7 +8,7 @@ import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
 
-import 'providers/enums.dart';
+import './helpers/enums.dart';
 
 class LoginPage extends StatefulWidget {
   @override

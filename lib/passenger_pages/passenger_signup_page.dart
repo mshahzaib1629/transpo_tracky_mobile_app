@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';

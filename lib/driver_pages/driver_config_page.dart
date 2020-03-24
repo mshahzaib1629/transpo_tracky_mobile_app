@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -31,15 +31,6 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       mapTraceKey: null,
       mode: TripMode.PICK_UP,
       startTime: null);
-
-// this object is used to initialize the values from autoconfigs (which are created by the users)
-  var _autoConfig = TripConfig(
-    route: null,
-    currentDriver: null,
-    partnerDriver: null,
-    bus: null,
-    mode: null,
-  );
 
   final _driverConfigKey = GlobalKey<FormState>();
   final _driverFocusNode = FocusNode();
@@ -111,19 +102,58 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildAutoConfigCard(BuildContext context, TripConfig config) {
     return GestureDetector(
       onTap: () {
-        _autoConfig = config;
-        _tripConfig.route = _autoConfig.route;
-        _tripConfig.mode = _autoConfig.mode;
-        // setting bus & partner driver as null here bcz they will be automatically re-assigned on submitting the form
-        _tripConfig.bus = null;
-        _tripConfig.partnerDriver = null;
-        busPlateController.text = _autoConfig.bus.plateNumber;
-        if (_autoConfig.partnerDriver != null) {
-          _toggleTakingPartnerDriver(true);
-          partnerIdController.text = _autoConfig.partnerDriver.registrationID;
+        final route = Provider.of<RouteProvider>(context, listen: false)
+            .getRoute(config.route.id);
+        final bus = Provider.of<BusProvider>(context, listen: false)
+            .getBus(config.bus.id);
+        final partnerDriver = config.partnerDriver != null
+            ? Provider.of<DriverProvider>(context, listen: false)
+                .getDriver(config.partnerDriver.id)
+            : null;
+        if (route == null || bus == null) {
+          showConfigError(context, config: config, route: route, bus: bus);
         } else {
-          _toggleTakingPartnerDriver(false);
+          TripConfig _autoConfig = TripConfig(
+            route: route,
+            partnerDriver: partnerDriver,
+            bus: bus,
+            mode: config.mode,
+          );
+          _tripConfig.route = _autoConfig.route;
+          _tripConfig.mode = _autoConfig.mode;
+          _tripConfig.bus = _autoConfig.bus;
+
+          _tripConfig.partnerDriver = _autoConfig.partnerDriver;
+          busPlateController.text = _autoConfig.bus.plateNumber;
+          if (_autoConfig.partnerDriver != null) {
+            _toggleTakingPartnerDriver(true);
+            partnerIdController.text = _autoConfig.partnerDriver.registrationID;
+          } else {
+            _toggleTakingPartnerDriver(false);
+          }
         }
+      },
+      onLongPress: () {
+        showDialog(
+            context: context,
+            child: AlertDialog(
+              content: Text('Delete auto-fill \'${config.configName}\'?'),
+              actions: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Cancel')),
+                FlatButton(
+                  onPressed: () {
+                    Provider.of<TripConfigProvider>(context, listen: false)
+                        .deleteConfig(config.id);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Delete'),
+                ),
+              ],
+            ));
       },
       child: Container(
         width: 22.2 * SizeConfig.widthMultiplier,
@@ -148,45 +178,52 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _buildAutoConfigs(BuildContext context) {
-    return Consumer<TripConfigProvider>(
-      builder: (context, configConsumer, child) =>
-          configConsumer.savedTripConfigs.length != 0
-              ? Container(
-                  height: 14.78 * SizeConfig.heightMultiplier,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: 0.8 * SizeConfig.widthMultiplier,
-                          top: 1.25 * SizeConfig.heightMultiplier,
-                          bottom: 0.625 * SizeConfig.heightMultiplier,
+    return FutureBuilder(
+      // here currently we are passing dummy id of Current Logged IN Driver
+      // later, it should be passed of current logged in user
+      // =====================================================================
+      future: Provider.of<TripConfigProvider>(context, listen: false)
+          .fetchAndSetConfigs(currentDriverId: 1),
+      // =====================================================================
+     builder: (context, snapshot) => Consumer<TripConfigProvider>(
+        builder: (context, configConsumer, child) =>
+            configConsumer.savedTripConfigs.length != 0
+                ? Container(
+                    padding: EdgeInsets.symmetric(vertical: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: 0.8 * SizeConfig.widthMultiplier,
+                            bottom: 0.625 * SizeConfig.heightMultiplier,
+                          ),
+                          child: Text(
+                            'AUTO-FILLS',
+                            style: Theme.of(context).textTheme.display2,
+                          ),
                         ),
-                        child: Text(
-                          'AUTO-FILLS',
-                          style: Theme.of(context).textTheme.display2,
+                        SizedBox(
+                          height: 0.78 * SizeConfig.heightMultiplier,
                         ),
-                      ),
-                      SizedBox(
-                        height: 0.78 * SizeConfig.heightMultiplier,
-                      ),
-                      Container(
-                        height: 6.59 * SizeConfig.heightMultiplier,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: configConsumer.savedTripConfigs.length,
-                          itemBuilder: (context, index) {
-                            TripConfig config =
-                                configConsumer.savedTripConfigs[index];
-                            return _buildAutoConfigCard(context, config);
-                          },
+                        Container(
+                          height: 6.59 * SizeConfig.heightMultiplier,
+                          // padding: EdgeInsets.only(bottom: 5),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: configConsumer.savedTripConfigs.length,
+                            itemBuilder: (context, index) {
+                              TripConfig config =
+                                  configConsumer.savedTripConfigs[index];
+                              return _buildAutoConfigCard(context, config);
+                            },
+                          ),
                         ),
-                      ),
-                      Divider(),
-                    ],
-                  ),
-                )
-              : Container(),
+                      ],
+                    ),
+                  )
+                : Container(),
+      ),
     );
   }
 
@@ -194,29 +231,44 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     final routeProvider = Provider.of<RouteProvider>(context, listen: false);
     List<r.Route> availableRoutes = routeProvider.dummy_routes;
     return Container(
-        width: 180,
-        child: DropdownButtonFormField<r.Route>(
-            decoration: InputDecoration(
-              border: InputBorder.none,
-            ),
-            hint: Text('Select Route'),
-            value: _tripConfig.route,
-            items:
-                availableRoutes.map<DropdownMenuItem<r.Route>>((r.Route route) {
-              return DropdownMenuItem<r.Route>(
-                value: route,
-                child: Text(route.name),
-              );
-            }).toList(),
-            onChanged: (r.Route value) {
-              setState(() {
-                _tripConfig.route = value;
-              });
-              print(_tripConfig.route.name);
-            },
-            onSaved: (value) {
-              _tripConfig.route = value;
-            }));
+      padding: EdgeInsets.symmetric(
+        horizontal: 3.56 * SizeConfig.widthMultiplier,
+        // vertical: 0.93 * SizeConfig.heightMultiplier
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(
+            width: 0.3125 * SizeConfig.imageSizeMultiplier,
+            color: Colors.black12),
+        borderRadius:
+            BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
+      ),
+      width: 55.125 * SizeConfig.widthMultiplier,
+      child: DropdownButtonFormField<r.Route>(
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
+          border: InputBorder.none,
+        ),
+        hint: Text('Select Route'),
+        value: _tripConfig.route,
+        items: availableRoutes.map<DropdownMenuItem<r.Route>>((r.Route route) {
+          return DropdownMenuItem<r.Route>(
+            value: route,
+            child: Text(route.name),
+          );
+        }).toList(),
+        onChanged: (r.Route value) {
+          setState(() {
+            _tripConfig.route = value;
+          });
+          print(_tripConfig.route.name);
+        },
+        // onSaved: (r.Route value) {
+        //   setState(() {
+        //     _tripConfig.route = value;
+        //   });
+        // },
+      ),
+    );
   }
 
   Widget _toggleMode(BuildContext context) => Container(
@@ -468,12 +520,18 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
+          SizedBox(
+            height: 5,
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               _routeDropdownButton(context),
               _selectMode(context),
             ],
+          ),
+          SizedBox(
+            height: 10,
           ),
           _busDetail(context),
           _partnerDriverDetail(context)
@@ -658,6 +716,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 child: ListView(
                   children: <Widget>[
                     _buildAutoConfigs(context),
+                    Divider(),
                     _buildForm(context),
                     _buildBottomBar(context),
                   ],
@@ -669,4 +728,35 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       ),
     );
   }
+}
+
+void showConfigError(context, {TripConfig config, r.Route route, Bus bus}) {
+  String nullItem = '';
+  if (route == null)
+    nullItem = 'Route';
+  else if (bus == null) nullItem = 'Bus';
+  print('route not found');
+  showDialog(
+    context: context,
+    child: AlertDialog(
+      title: Text('Delete \'${config.configName}\'?'),
+      content: Text('Targeted ${nullItem} is no more in the system.'),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text('No Thanks'),
+        ),
+        FlatButton(
+          onPressed: () {
+            Provider.of<TripConfigProvider>(context, listen: false)
+                .deleteConfig(config.id);
+            Navigator.pop(context);
+          },
+          child: Text('Yes Sure'),
+        ),
+      ],
+    ),
+  );
 }

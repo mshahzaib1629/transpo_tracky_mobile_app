@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/route_detail_page.dart';
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import '../providers/route_model.dart' as r;
 

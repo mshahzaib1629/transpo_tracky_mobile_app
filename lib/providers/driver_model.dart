@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import './person.dart';
 
-import 'enums.dart';
+import '../helpers/enums.dart';
 
 class Driver extends Person {
   Designation designation;
@@ -51,11 +51,18 @@ class DriverProvider with ChangeNotifier {
       designation: Designation(id: 1, name: 'Driver'),
     ),
     Driver(
-      id: 1,
+      id: 3,
       registrationID: 'EMP-DR-3',
       firstName: 'Ejaz',
       lastName: 'Khan',
       designation: Designation(id: 1, name: 'Conductor'),
     ),
   ];
+
+  Driver getDriver(int id) {
+    return dummy_available_drivers.firstWhere((driver) => driver.id == id,
+        orElse: () {
+      return null;
+    });
+  }
 }

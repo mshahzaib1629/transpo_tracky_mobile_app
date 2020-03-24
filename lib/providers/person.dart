@@ -1,4 +1,4 @@
-import 'enums.dart';
+import '../helpers/enums.dart';
 
 class Person {
   int id;

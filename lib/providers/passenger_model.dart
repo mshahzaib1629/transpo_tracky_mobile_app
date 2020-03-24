@@ -1,4 +1,4 @@
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
+import '../helpers/enums.dart';
 import './person.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 

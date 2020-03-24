@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/app_drawer.dart';
-import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_tracking_page.dart';
-import 'package:transpo_tracky_mobile_app/providers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_home_page_top_bar.dart';
-
 import '../size_config.dart';
-import '../styling.dart';
 
 class PassengerHomePage extends StatefulWidget {
   @override
