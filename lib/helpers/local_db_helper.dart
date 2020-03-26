@@ -7,8 +7,10 @@ class LocalDatabase {
     final dbPath = await sql.getDatabasesPath();
     return sql.openDatabase(path.join(dbPath, 'localdata.db'),
         onCreate: (db, version) {
-      return db.execute(
+      db.execute(
           'CREATE TABLE auto_configs(id INTEGER PRIMARY KEY AUTOINCREMENT, configName TEXT, currentDriverId INT, routeId INT, busId INT, mode TEXT, partnerDriverId INT)');
+      db.execute(
+          'CREATE TABLE favorite_routes(id INTEGER PRIMARY KEY AUTOINCREMENT, passengerId INT, routeId INT, routeName TEXT, stopName TEXT, timeToReach TEXT, mode TEXT)');
     }, version: 1);
   }
 
@@ -21,13 +23,21 @@ class LocalDatabase {
     );
   }
 
-  static Future<List<Map<String, dynamic>>> getDriverConfigs (String table, int driverId) async {
+  static Future<List<Map<String, dynamic>>> getDriverConfigs(
+      int driverId) async {
     final db = await LocalDatabase.database();
-    return db.query(table, where: 'currentDriverId = ?', whereArgs: [ driverId ]);
+    return db.query('auto_configs',
+        where: 'currentDriverId = ?', whereArgs: [driverId]);
+  }
+
+  static Future<List<Map<String, dynamic>>> getFavoriteRoutes(
+      int passengerId) async {
+    final db = await LocalDatabase.database();
+    return db.query('favorite_routes', where: 'passengerId = ?', whereArgs: [passengerId]);
   }
 
   static Future<void> delete(String table, int id) async {
     final db = await LocalDatabase.database();
-    db.delete(table, where: 'id = ?', whereArgs: [ id ]);
+    db.delete(table, where: 'id = ?', whereArgs: [id]);
   }
 }

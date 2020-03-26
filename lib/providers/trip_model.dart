@@ -50,191 +50,7 @@ class TripProvider with ChangeNotifier {
     return _driverCreatedTrip;
   }
 
-  List<Trip> dummy_trips_suggested = [
-    Trip(
-      id: 1,
-      route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 45,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 2,
-      route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
-      mode: TripMode.PICK_UP,
-      bus: Bus(
-          id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 36,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 3,
-      route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 56,
-      shareLiveLocation: false,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 1,
-      route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 45,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 2,
-      route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
-      mode: TripMode.PICK_UP,
-      bus: Bus(
-          id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 36,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 3,
-      route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 56,
-      shareLiveLocation: false,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 1,
-      route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 45,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 2,
-      route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
-      mode: TripMode.PICK_UP,
-      bus: Bus(
-          id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 36,
-      shareLiveLocation: true,
-      mapTraceKey: 'ABC321e2',
-    ),
-    Trip(
-      id: 3,
-      route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-      mode: TripMode.PICK_UP,
-      bus: Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
-      drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
-      ],
-      passengersOnBoard: 56,
-      shareLiveLocation: false,
-      mapTraceKey: 'ABC321e2',
-    ),
-  ];
+  List<Trip> trips_suggested = [];
 
   List<Trip> dummy_trips_record = [
     Trip(
@@ -381,9 +197,8 @@ class TripProvider with ChangeNotifier {
   ];
 
 // for passenger
-  void setSelectedTrip({Trip selectedTrip, Stop selectedStop}) {
+  void setSelectedTrip({Trip selectedTrip}) {
     this._passengerSelectedTrip = selectedTrip;
-    _passengerSelectedTrip.passengerStop = selectedStop;
     notifyListeners();
   }
 
@@ -417,5 +232,254 @@ class TripProvider with ChangeNotifier {
     // add server notify logic here
     // ---------------------
     _driverCreatedTrip = null;
+  }
+
+  void fetchSuggestedTrips(double longitude, double latitude) {
+    // --------------------------------------------------------------------------------
+    // Modification required here, we should pass suggested trips based on user's shared
+    // location, currently passing a dummy list
+    // How should it work?
+    // We'll pass current location's cordinates to server, where we pass those cordinates
+    // along with the list of active trip's stops to the 3rd Party API (may be  elastic search),
+    // from where we get the list of nearby stops to the user's cordinates. We return the
+    // trips associated with those nearby stops to the mobile app.
+    // --------------------------------------------------------------------------------
+    trips_suggested = [
+      Trip(
+        id: 1,
+        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
+        mode: TripMode.PICK_UP,
+        bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 45,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+        passengerStop: dummy_stops_1[2],
+      ),
+      Trip(
+        id: 2,
+        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
+        mode: TripMode.PICK_UP,
+        bus: Bus(
+            id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 36,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+        passengerStop: dummy_stops_3[5],
+      ),
+      Trip(
+        id: 3,
+        route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
+        mode: TripMode.PICK_UP,
+        bus:
+            Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 56,
+        shareLiveLocation: false,
+        mapTraceKey: 'ABC321e2',
+        passengerStop: dummy_stops_2[4],
+      ),
+      Trip(
+        id: 4,
+        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
+        mode: TripMode.PICK_UP,
+        bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 45,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+        passengerStop: dummy_stops_1[6],
+      ),
+      Trip(
+        id: 5,
+        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
+        mode: TripMode.PICK_UP,
+        bus: Bus(
+            id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 36,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+        passengerStop: dummy_stops_3[0],
+      ),
+    ];
+  }
+
+  void fetchFavoriteSuggested(r.FavoriteRoute favorite) {
+    // How it will work?
+    // we get routeId, favorite stop's name & mode from the 
+    // favorite and pass it to the server, where we'll find for 
+    // the trip with same routeId, stop's name & mode from the current
+    // active trips. If some are found, we return a list of trips
+    // back to the mobile app.
+    List<Trip> dummy_trips_on_server = [
+      Trip(
+        id: 1,
+        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
+        mode: TripMode.PICK_UP,
+        bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 45,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+      ),
+      Trip(
+        id: 2,
+        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
+        mode: TripMode.PICK_UP,
+        bus: Bus(
+            id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 36,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+
+      ),
+      Trip(
+        id: 3,
+        route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
+        mode: TripMode.PICK_UP,
+        bus:
+            Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 56,
+        shareLiveLocation: false,
+        mapTraceKey: 'ABC321e2',
+      ),
+      Trip(
+        id: 4,
+        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
+        mode: TripMode.PICK_UP,
+        bus: Bus(id: 1, plateNumber: 'LOY 7714', name: 'Hondai Coaster', capacity: 65),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 45,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+
+      ),
+      Trip(
+        id: 5,
+        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
+        mode: TripMode.PICK_UP,
+        bus: Bus(
+            id: 1, plateNumber: 'LZF 8218', name: 'Coaseter VU', capacity: 40),
+        drivers: [
+          Driver(
+              registrationID: 'EMP-DR-107',
+              firstName: 'Mushtaq',
+              lastName: 'Sidique'),
+          Driver(
+            registrationID: 'EMP-CD-108',
+            firstName: 'Shakeel',
+            lastName: 'Ahmed',
+          )
+        ],
+        passengersOnBoard: 36,
+        shareLiveLocation: true,
+        mapTraceKey: 'ABC321e2',
+      ),
+    ];
+
+    trips_suggested = [];
+    dummy_trips_on_server.map((trip) {
+      if (trip.route.id == favorite.routeId) {
+        trip.passengerStop = trip.route.stopList
+            .firstWhere((stop) => stop.name == favorite.favoriteStop.name);
+        if (trip.passengerStop != null) {
+          trips_suggested.add(trip);
+        }
+      }
+    }).toList();
   }
 }

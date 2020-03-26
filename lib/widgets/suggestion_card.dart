@@ -8,17 +8,9 @@ import '../size_config.dart';
 
 class SuggestionCard extends StatefulWidget {
   final Trip prefTrip;
-  final Stop prefStop;
-  // time required by the bus to reach the stop. If driver hasn't shared live location yet, pass estimated time to reach that stop
-  final String approxTime;
-  // Walking distance time from passenger's current postion to the stop
-  final String walkingTime;
 
   SuggestionCard({
     @required this.prefTrip,
-    @required this.prefStop,
-    this.approxTime,
-    @required this.walkingTime,
   });
   @override
   State<StatefulWidget> createState() {
@@ -65,7 +57,7 @@ class _SuggestionCardState extends State<SuggestionCard> {
 
     return GestureDetector(
       onTap: () {
-        tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip, selectedStop: widget.prefStop);
+        tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip);
         Navigator.pop(context);
       },
       child: Container(
@@ -91,16 +83,15 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text(
-                      widget.approxTime != null
-                          ? widget.approxTime
-                          : widget.prefTrip.route.stopList
-                              .where((stop) => stop.id == widget.prefStop.id)
-                              .elementAt(0)
-                              .timeToReach,
+                      widget.prefTrip.passengerStop.estToReachBus != null
+                          ? widget.prefTrip.passengerStop.estToReachBus
+                          : widget.prefTrip.passengerStop.timeToReach,
                       style: Theme.of(context).textTheme.headline,
                     ),
                     Text(
-                      widget.approxTime != null ? '' : 'Est. Time',
+                      widget.prefTrip.passengerStop.estToReachBus != null
+                          ? ''
+                          : 'Est. Time',
                       style: Theme.of(context).textTheme.subtitle,
                     ),
                   ],
@@ -117,7 +108,7 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   Container(
                     width: 61.1 * SizeConfig.widthMultiplier,
                     child: Text(
-                      widget.prefStop.name,
+                      widget.prefTrip.passengerStop.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.display3,
@@ -142,25 +133,29 @@ class _SuggestionCardState extends State<SuggestionCard> {
       },
       child: Padding(
         padding: EdgeInsets.only(right: 3.05 * SizeConfig.widthMultiplier),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Icon(
-                  Icons.directions_walk,
-                  size: 5.56 * SizeConfig.imageSizeMultiplier,
-                ),
-                SizedBox(
-                  width: 1.67 * SizeConfig.widthMultiplier,
-                ),
-                Text('${widget.walkingTime} from your location'),
-              ],
-            ),
-            Icon(
-              _expanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-            ),
-          ],
+        child: Container(
+          color: Colors.transparent,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Icon(
+                    Icons.directions_walk,
+                    size: 5.56 * SizeConfig.imageSizeMultiplier,
+                  ),
+                  SizedBox(
+                    width: 1.67 * SizeConfig.widthMultiplier,
+                  ),
+                  Text(
+                      '${widget.prefTrip.passengerStop.estWalkTime} from your location'),
+                ],
+              ),
+              Icon(
+                _expanded ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+              ),
+            ],
+          ),
         ),
       ),
     );

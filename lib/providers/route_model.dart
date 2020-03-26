@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:transpo_tracky_mobile_app/helpers/local_db_helper.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
@@ -21,12 +22,14 @@ class Route {
 }
 
 class FavoriteRoute {
+  int id;
   int routeId;
   String routeName;
   Stop favoriteStop;
   TripMode mode;
 
   FavoriteRoute({
+    this.id,
     this.routeId,
     this.routeName,
     this.favoriteStop,
@@ -68,25 +71,47 @@ class RouteProvider with ChangeNotifier {
     ),
   ];
 
-  void addFavorite({Trip trip}) {
-    Stop favoriteStop = new Stop(
-      id: trip.passengerStop.id,
-      name: trip.passengerStop.name,
+  void addFavorite({Trip trip, int currentPassengerId}) {
+    
+
+    LocalDatabase.insert('favorite_routes', {
+      'passengerId': currentPassengerId,
+      'routeId': trip.route.id,
+      'routeName': trip.route.name,
+      'stopName': trip.passengerStop.name,
       // --------------------------------------------------------------------------------
       // Modification required here, set timeToReach of the stop as it is on PickUp Mode,
       // but on DropOff Mode, set time to reach that stop estimated by google maps api
-      timeToReach: trip.passengerStop.timeToReach,
+      'timeToReach': trip.passengerStop.timeToReach,
       // --------------------------------------------------------------------------------
-      latitude: trip.passengerStop.latitude,
-      longitude: trip.passengerStop.longitude,
-    );
+      'mode': trip.mode.toString(),
+    });
+    fetchAndSetFavorites(currentPassengerId: 1);
+    notifyListeners();
+  }
 
-    FavoriteRoute favoriteRoute = new FavoriteRoute(
-        routeId: trip.route.id,
-        routeName: trip.route.name,
-        mode: trip.mode,
-        favoriteStop: favoriteStop);
-    passengerFavoriteRoutes.add(favoriteRoute);
+  Future<void> fetchAndSetFavorites({int currentPassengerId}) async {
+    final dataList = await LocalDatabase.getFavoriteRoutes(currentPassengerId);
+    // print(dataList);
+    passengerFavoriteRoutes = dataList
+        .map((favorite) => FavoriteRoute(
+              id: favorite['id'],
+              routeId: favorite['routeId'],
+              routeName: favorite['routeName'],
+              favoriteStop: Stop(
+                name: favorite['stopName'],
+                timeToReach: favorite['timeToReach'],
+              ),
+              mode: favorite['mode'] == 'TripMode.PICK_UP'
+                  ? TripMode.PICK_UP
+                  : TripMode.DROP_OFF,
+            ))
+        .toList();
+    notifyListeners();
+  }
+
+  void deleteConfig(int id) {
+    LocalDatabase.delete('favorite_routes', id);
     notifyListeners();
   }
 

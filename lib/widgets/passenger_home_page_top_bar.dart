@@ -152,8 +152,8 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
 
   void showFavoriteOption(routeProvider, tripProvider) {
     if (_isInit) {
-      _showFavoriteOption =
-          !routeProvider.isFavoriteFound(trip: tripProvider.passengerSelectedTrip);
+      _showFavoriteOption = !routeProvider.isFavoriteFound(
+          trip: tripProvider.passengerSelectedTrip);
     }
     _isInit = false;
   }
@@ -187,7 +187,13 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
             FlatButton(
                 onPressed: () {
                   Provider.of<RouteProvider>(context, listen: false)
-                      .addFavorite(trip: tripConsumer.passengerSelectedTrip);
+                      // --------------------------------------------------------------------------------
+                      // Modification required here, pass the id of current logged in passenger, currently
+                      // passing '1' as the dummy id
+                      .addFavorite(
+                          trip: tripConsumer.passengerSelectedTrip,
+                          currentPassengerId: 1);
+                  // --------------------------------------------------------------------------------
                   setState(() {
                     _showFavoriteOption = false;
                   });
@@ -238,9 +244,10 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
               Column(
                 children: <Widget>[
                   Row(
-                    crossAxisAlignment: tripConsumer.passengerSelectedTrip == null
-                        ? CrossAxisAlignment.center
-                        : CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        tripConsumer.passengerSelectedTrip == null
+                            ? CrossAxisAlignment.center
+                            : CrossAxisAlignment.start,
                     children: <Widget>[
                       IconButton(
                         icon: Icon(Icons.menu),
@@ -260,13 +267,12 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                             },
                             child: tripConsumer.passengerSelectedTrip == null
                                 ? _topBarShrinked(context)
-                                : _topBarExpanded(
-                                    context, tripConsumer.passengerSelectedTrip)),
+                                : _topBarExpanded(context,
+                                    tripConsumer.passengerSelectedTrip)),
                       )
                     ],
                   ),
-                  if (_showFavoriteOption == true)
-                    _favoriteOptionBar(context),
+                  if (_showFavoriteOption == true) _favoriteOptionBar(context),
                 ],
               ),
             ],

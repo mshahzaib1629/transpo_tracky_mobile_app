@@ -115,10 +115,7 @@ class _PassengerTrackingPageDetailState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    // ----------------------------------------------------------------------------
-                    // Here goes the calculated time by the google to reach the bus on current stop
-                    '12 mins',
-                    // ----------------------------------------------------------------------------
+                    widget.trip.passengerStop.estToReachBus,
                     style: Theme.of(context)
                         .textTheme
                         .title
@@ -216,7 +213,6 @@ class _PassengerTrackingPageDetailState
 
   @override
   Widget build(BuildContext context) {
-    
     return AnimatedPositioned(
       duration: Duration(milliseconds: 250),
       top: _isExpanded

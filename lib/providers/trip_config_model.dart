@@ -40,7 +40,6 @@ class TripConfigProvider with ChangeNotifier {
   }
 
   void addTripConfig(TripConfig config) {
-    
     LocalDatabase.insert('auto_configs', {
       'configName': config.configName,
       'currentDriverId': config.currentDriver.id,
@@ -54,8 +53,7 @@ class TripConfigProvider with ChangeNotifier {
   }
 
   Future<void> fetchAndSetConfigs({int currentDriverId}) async {
-    final dataList = await LocalDatabase.getDriverConfigs('auto_configs', currentDriverId);
-    print(dataList);
+    final dataList = await LocalDatabase.getDriverConfigs(currentDriverId);
     _savedTripConfigs = dataList
         .map((config) => TripConfig(
             id: config['id'],

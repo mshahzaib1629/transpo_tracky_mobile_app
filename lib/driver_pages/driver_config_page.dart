@@ -178,52 +178,55 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _buildAutoConfigs(BuildContext context) {
+    final configProvider = Provider.of<TripConfigProvider>(context);
     return FutureBuilder(
       // here currently we are passing dummy id of Current Logged IN Driver
       // later, it should be passed of current logged in user
       // =====================================================================
-      future: Provider.of<TripConfigProvider>(context, listen: false)
-          .fetchAndSetConfigs(currentDriverId: 1),
+      future: configProvider.fetchAndSetConfigs(currentDriverId: 1),
       // =====================================================================
-     builder: (context, snapshot) => Consumer<TripConfigProvider>(
-        builder: (context, configConsumer, child) =>
-            configConsumer.savedTripConfigs.length != 0
-                ? Container(
-                    padding: EdgeInsets.symmetric(vertical: 5),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 0.8 * SizeConfig.widthMultiplier,
-                            bottom: 0.625 * SizeConfig.heightMultiplier,
+      builder: (context, snapshot) =>
+          configProvider.savedTripConfigs.length != 0
+              ? Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: 0.8 * SizeConfig.widthMultiplier,
+                              bottom: 0.625 * SizeConfig.heightMultiplier,
+                            ),
+                            child: Text(
+                              'AUTO-FILLS',
+                              style: Theme.of(context).textTheme.display2,
+                            ),
                           ),
-                          child: Text(
-                            'AUTO-FILLS',
-                            style: Theme.of(context).textTheme.display2,
+                          SizedBox(
+                            height: 0.78 * SizeConfig.heightMultiplier,
                           ),
-                        ),
-                        SizedBox(
-                          height: 0.78 * SizeConfig.heightMultiplier,
-                        ),
-                        Container(
-                          height: 6.59 * SizeConfig.heightMultiplier,
-                          // padding: EdgeInsets.only(bottom: 5),
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: configConsumer.savedTripConfigs.length,
-                            itemBuilder: (context, index) {
-                              TripConfig config =
-                                  configConsumer.savedTripConfigs[index];
-                              return _buildAutoConfigCard(context, config);
-                            },
+                          Container(
+                            height: 6.59 * SizeConfig.heightMultiplier,
+                            // padding: EdgeInsets.only(bottom: 5),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: configProvider.savedTripConfigs.length,
+                              itemBuilder: (context, index) {
+                                TripConfig config =
+                                    configProvider.savedTripConfigs[index];
+                                return _buildAutoConfigCard(context, config);
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  )
-                : Container(),
-      ),
+                    Divider(),
+                  ],
+                )
+              : Container(),
     );
   }
 
@@ -716,7 +719,6 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 child: ListView(
                   children: <Widget>[
                     _buildAutoConfigs(context),
-                    Divider(),
                     _buildForm(context),
                     _buildBottomBar(context),
                   ],

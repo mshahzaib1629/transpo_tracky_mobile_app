@@ -33,23 +33,60 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 border: InputBorder.none,
                 hintText: 'Enter Your Location',
               ),
-              onSubmitted: (vale) {},
+              onSubmitted: (value) {
+                // --------------------------------------------------------------------------------
+                // Modification required here, we should pass user's entered locations cordinates to
+                // this method, currently sending dummy values 12, 32
+                Provider.of<TripProvider>(context, listen: false)
+                    .fetchSuggestedTrips(12, 32);
+                // --------------------------------------------------------------------------------
+              },
             ),
           ),
           // For Fetching User's Location automatically
           IconButton(
             icon: Icon(Icons.location_on),
-            onPressed: () {},
+            onPressed: () {
+              // --------------------------------------------------------------------------------
+              // Modification required here, we should pass user's current locations cordinates to
+              // this method, currently sending dummy values 12, 32
+              Provider.of<TripProvider>(context, listen: false)
+                  .fetchSuggestedTrips(12, 32);
+              // --------------------------------------------------------------------------------
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFavoriteRouteCard(BuildContext context, FavoriteRoute route) {
+  Widget _buildFavoriteRouteCard(BuildContext context, FavoriteRoute favorite) {
     return GestureDetector(
       onTap: () {
-        print('hello');
+        Provider.of<TripProvider>(context, listen: false)
+            .fetchFavoriteSuggested(favorite);
+      },
+      onLongPress: () {
+        showDialog(
+            context: context,
+            child: AlertDialog(
+              content: Text('Delete \'${favorite.favoriteStop.name}\' card?'),
+              actions: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text('Cancel')),
+                FlatButton(
+                  onPressed: () {
+                    Provider.of<RouteProvider>(context, listen: false)
+                        .deleteConfig(favorite.id);
+                    Navigator.pop(context);
+                  },
+                  child: Text('Delete'),
+                ),
+              ],
+            ));
       },
       child: Container(
         // width: 140.0,
@@ -77,7 +114,7 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 Container(
                   width: 22.2 * SizeConfig.widthMultiplier,
                   child: Text(
-                    route.routeName,
+                    favorite.routeName,
                     style: Theme.of(context).textTheme.body2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -85,7 +122,7 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(route.favoriteStop.timeToReach),
+                    Text(favorite.favoriteStop.timeToReach),
                     Text(
                       'Est. Time',
                       style: Theme.of(context)
@@ -100,7 +137,7 @@ class PassengerRouteSelectionPage extends StatelessWidget {
             Container(
               width: 33.3 * SizeConfig.widthMultiplier,
               child: Text(
-                route.favoriteStop.name,
+                favorite.favoriteStop.name,
                 style: Theme.of(context)
                     .textTheme
                     .body1
@@ -115,6 +152,12 @@ class PassengerRouteSelectionPage extends StatelessWidget {
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
+    Provider.of<RouteProvider>(context)
+        // --------------------------------------------------------------------------------
+        // Modification required here, pass the id of current logged in passenger, currently
+        // passing '1' as the dummy id
+        .fetchAndSetFavorites(currentPassengerId: 1);
+    // --------------------------------------------------------------------------------
     return Consumer<RouteProvider>(
       builder: (context, routeConsumer, child) => Container(
         // height: 15.28 * SizeConfig.heightMultiplier,
@@ -128,7 +171,7 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     'Favorite Routes',
-                    style: Theme.of(context).textTheme.display3,
+                    style: Theme.of(context).textTheme.display2,
                   ),
                   SizedBox(
                     height: 0.78 * SizeConfig.heightMultiplier,
@@ -157,25 +200,21 @@ class PassengerRouteSelectionPage extends StatelessWidget {
   Widget _buildSuggestedRoutes(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context);
     return Expanded(
-      child: ListView.builder(
-        itemCount: tripProvider.dummy_trips_suggested.length,
-        itemBuilder: (context, index) {
-          Trip trip = tripProvider.dummy_trips_suggested[index];
-          // Add searching logics here
-          // Pass the nearest stop and times to reach them accordingly in future
-          return SuggestionCard(
-            prefTrip: trip,
-            prefStop: Stop(
-                id: trip.route.stopList[0].id,
-                name: trip.route.stopList[0].name,
-                latitude: trip.route.stopList[0].latitude,
-                longitude: trip.route.stopList[0].longitude,
-                timeToReach: trip.route.stopList[0].timeToReach),
-            approxTime: '12 mins',
-            walkingTime: '10 mins',
-          );
-        },
-      ),
+      child: tripProvider.trips_suggested.length != 0
+          ? ListView.builder(
+              itemCount: tripProvider.trips_suggested.length,
+              itemBuilder: (context, index) {
+                Trip trip = tripProvider.trips_suggested[index];
+                // Add searching logics here
+                // Pass the nearest stop and times to reach them accordingly in future
+                return SuggestionCard(
+                  prefTrip: trip,
+                );
+              },
+            )
+          : Center(
+              child: Text('No Routes to suggest!'),
+            ),
     );
   }
 
