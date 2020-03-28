@@ -4,7 +4,7 @@ import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverNavigationPageDetail extends StatefulWidget {
   
@@ -125,9 +125,9 @@ class _DriverNavigationPageDetailState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeReached),
+                      Text(currentStop.timeReached != null ? currentStop.timeReached : currentStop.timeToReach),
                       Text(
-                        'Reached',
+                        currentStop.timeReached != null ? 'Reached' : 'est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(
                             fontSize: 1.56 * SizeConfig.textMultiplier),
                       ),

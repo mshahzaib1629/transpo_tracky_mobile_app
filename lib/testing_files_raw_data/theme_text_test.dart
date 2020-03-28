@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:transpo_tracky_mobile_app/login_page.dart';
-import '../size_config.dart';
-import '../styling.dart';
+import '../common_pages/login_page.dart';
+
 
 class TestingThemeText extends StatelessWidget {
   const TestingThemeText({Key key}) : super(key: key);

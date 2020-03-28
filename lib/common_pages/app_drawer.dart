@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/last_trips_page.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/settings_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import './view_all_routes_page.dart';
-import 'package:transpo_tracky_mobile_app/login_page.dart';
+import './login_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key key}) : super(key: key);

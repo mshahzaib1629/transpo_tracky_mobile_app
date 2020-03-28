@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/widgets/driver_navigation_page_detail.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverNavigationPage extends StatefulWidget {
   @override

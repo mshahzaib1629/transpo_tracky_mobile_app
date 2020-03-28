@@ -4,7 +4,7 @@ import 'package:transpo_tracky_mobile_app/common_pages/app_drawer.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_tracking_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_home_page_top_bar.dart';
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class PassengerHomePage extends StatefulWidget {
   @override

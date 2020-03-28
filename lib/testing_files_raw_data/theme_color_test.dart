@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:transpo_tracky_mobile_app/login_page.dart';
+import '../common_pages/login_page.dart';
 
 class TestingThemeColor extends StatefulWidget {
   TestingThemeColor({Key key}) : super(key: key);

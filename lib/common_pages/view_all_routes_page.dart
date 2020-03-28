@@ -1,13 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/enums.dart';
+import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/route_info_card.dart';
 import './route_detail_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart' as r;
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import '../helpers/size_config.dart';
 
-class ViewAllRoutesPage extends StatelessWidget {
-  const ViewAllRoutesPage({Key key}) : super(key: key);
+class ViewAllRoutesPage extends StatefulWidget {
+  @override
+  _ViewAllRoutesPageState createState() => _ViewAllRoutesPageState();
+}
+
+class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
+  bool _isInit = true;
+  bool _isLoading = false;
+
+  List<r.Route> routes = [];
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+
+      routeProvider.fetchRoutes().catchError((error) {
+        setState(() {
+          routes = [];
+        });
+      }).then((_) {
+        setState(() {
+          routes = routeProvider.routes;
+          _isLoading = false;
+          _isInit = false;
+        });
+      });
+    }
+    super.didChangeDependencies();
+  }
 
   Widget circle(BuildContext context, {bool filled}) => Container(
         width: 4.0 * SizeConfig.widthMultiplier,
@@ -71,19 +107,71 @@ class ViewAllRoutesPage extends StatelessWidget {
           ),
           // For Fetching User's Location automatically
           PopupMenuButton(
-              itemBuilder: (context) => [
-                    PopupMenuItem(
-                      child: Text('All'),
-                    ),
-                    PopupMenuItem(
-                      child: Text('Morning'),
-                    ),
-                    PopupMenuItem(
-                      child: Text('Evening'),
-                    ),
-                  ]),
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: Text('All'),
+                value: RouteFilter.All,
+              ),
+              PopupMenuItem(
+                child: Text('Morning'),
+                value: RouteFilter.Morning,
+              ),
+              PopupMenuItem(
+                child: Text('Evening'),
+                value: RouteFilter.Evening,
+              ),
+            ],
+            onSelected: (value) {
+              setState(() {
+                routes = Provider.of<RouteProvider>(context, listen: false)
+                    .getFilteredRoutes(value);
+              });
+            },
+          ),
         ],
       ),
+    );
+  }
+
+  Future<void> _onRefresh() async {
+    final route = Provider.of<RouteProvider>(context, listen: false);
+    try {
+      await route.fetchRoutes();
+      setState(() {
+        routes = route.routes;
+      });
+    } catch (error) {
+      setState(() {
+        routes = [];
+      });
+    }
+  }
+
+  Widget _showErrorMessage() {
+    return ListView(
+      children: <Widget>[
+        SizedBox(
+          height: 28.3 * SizeConfig.heightMultiplier,
+        ),
+        Center(
+            child: Column(
+          children: <Widget>[
+            Text(
+              'No Routes Found!',
+              style: TextStyle(fontSize: 2.63 * SizeConfig.textMultiplier),
+            ),
+            SizedBox(
+              height: 0.94 * SizeConfig.heightMultiplier,
+            ),
+            Text(
+              'PULL DOWN TO REFRESH',
+              style: TextStyle(
+                  fontSize: 2.43 * SizeConfig.textMultiplier,
+                  color: Theme.of(context).accentColor),
+            ),
+          ],
+        )),
+      ],
     );
   }
 
@@ -101,24 +189,33 @@ class ViewAllRoutesPage extends StatelessWidget {
             _buildTopBar(context),
             SizedBox(height: 0.93 * SizeConfig.heightMultiplier),
             Expanded(
-              child: Consumer<r.RouteProvider>(
-                builder: (context, routeConsumer, child) => ListView.builder(
-                  itemCount: routeConsumer.dummy_routes.length,
-                  itemBuilder: (context, index) {
-                    r.Route route = routeConsumer.dummy_routes[index];
-                    return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RouteDetailPage(
-                                        route: route,
-                                      )));
-                        },
-                        child: RouteInfoCard(route: route));
-                  },
-                ),
-              ),
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : RefreshIndicator(
+                      key: _refreshIndicatorKey,
+                      onRefresh: _onRefresh,
+                      child: routes.length == 0
+                          ? _showErrorMessage()
+                          : ListView.builder(
+                              itemCount: routes.length,
+                              itemBuilder: (context, index) {
+                                r.Route route = routes[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RouteDetailPage(
+                                          route: route,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: RouteInfoCard(route: route),
+                                );
+                              },
+                            ),
+                    ),
             ),
           ],
         ),

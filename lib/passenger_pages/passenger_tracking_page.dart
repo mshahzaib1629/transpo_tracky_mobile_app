@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_tracking_page_detail.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class PassengerTrackingPage extends StatefulWidget {
 // this is the user's selected trip

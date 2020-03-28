@@ -5,9 +5,9 @@ import 'package:transpo_tracky_mobile_app/driver_pages/driver_config_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
-import 'package:transpo_tracky_mobile_app/styling.dart';
+import '../helpers/styling.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 import '../common_pages/app_drawer.dart';
 
 class DriverHomePage extends StatefulWidget {

@@ -6,7 +6,7 @@ import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/trip_record_card.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class LastTripsDetailPage extends StatelessWidget {
   // In this page, we check either driver is logged in to the app or passenger, bases on that we share the details accordingly

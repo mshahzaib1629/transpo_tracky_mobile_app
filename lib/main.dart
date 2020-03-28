@@ -1,20 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:transpo_tracky_mobile_app/common_pages/last_trips_page.dart';
-import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
-import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
-import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
-import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
 
-import './login_page.dart';
-import 'styling.dart';
-
+import './common_pages/login_page.dart';
+import 'helpers/size_config.dart'; 
+import 'helpers/styling.dart';
 void main(List<String> args) {
   // debugPaintSizeEnabled = true;
   runApp(MyApp());

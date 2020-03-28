@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-
-import '../size_config.dart';
 
 class PassengerHomePageTopBar extends StatefulWidget {
   @override
@@ -218,67 +217,67 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
     );
   }
 
+  Widget _buildTopBar(BuildContext context) {
+    return Consumer<TripProvider>(
+      builder: (context, tripConsumer, child) => Row(
+        crossAxisAlignment: tripConsumer.passengerSelectedTrip == null
+            ? CrossAxisAlignment.center
+            : CrossAxisAlignment.start,
+        children: <Widget>[
+          IconButton(
+            icon: Icon(Icons.menu),
+            color: Theme.of(context).iconTheme.color,
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+          Expanded(
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PassengerRouteSelectionPage()));
+                },
+                child: tripConsumer.passengerSelectedTrip == null
+                    ? _topBarShrinked(context)
+                    : _topBarExpanded(
+                        context, tripConsumer.passengerSelectedTrip)),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<TripProvider>(
-      builder: (context, tripConsumer, child) {
-        return Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
-                ),
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
-                ),
-              ]),
-          child: Column(
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+            ),
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+            ),
+          ]),
+      child: Column(
+        children: <Widget>[
+          Column(
             children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment:
-                        tripConsumer.passengerSelectedTrip == null
-                            ? CrossAxisAlignment.center
-                            : CrossAxisAlignment.start,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.menu),
-                        color: Theme.of(context).iconTheme.color,
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PassengerRouteSelectionPage()));
-                            },
-                            child: tripConsumer.passengerSelectedTrip == null
-                                ? _topBarShrinked(context)
-                                : _topBarExpanded(context,
-                                    tripConsumer.passengerSelectedTrip)),
-                      )
-                    ],
-                  ),
-                  if (_showFavoriteOption == true) _favoriteOptionBar(context),
-                ],
-              ),
+              _buildTopBar(context),
+              if (_showFavoriteOption == true) _favoriteOptionBar(context),
             ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:transpo_tracky_mobile_app/common_pages/route_detail_page.dart';
+import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import '../providers/route_model.dart' as r;
 
-import '../size_config.dart';
 
 class RouteInfoCard extends StatefulWidget {
   // In this card, we check either driver is logged in to the app or passenger, bases on that we share the details accordingly
@@ -51,11 +50,20 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
       );
 
   Widget verticalLLine(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 16.45 * SizeConfig.widthMultiplier),
         width: 0.56 * SizeConfig.widthMultiplier,
-        height: 1.87 * SizeConfig.heightMultiplier,
+        height: 2.27 * SizeConfig.heightMultiplier,
         color: Theme.of(context).accentColor,
       );
+
+  Widget _locationWidget(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        circle(context, filled: false),
+        verticalLLine(context),
+        circle(context, filled: true),
+      ],
+    );
+  }
 
   Widget bottomVerticalLLine(BuildContext context) => Container(
         width: 0.26 * SizeConfig.widthMultiplier,
@@ -86,45 +94,50 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
           SizedBox(height: 1.56 * SizeConfig.heightMultiplier),
           Row(
             children: <Widget>[
-              Container(
-                  padding:
-                      EdgeInsets.only(right: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(origin.timeToReach)),
-              circle(context, filled: false),
-              Container(
-                  padding:
-                      EdgeInsets.only(left: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(
-                    origin.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .body1
-                        .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
-                    overflow: TextOverflow.ellipsis,
-                  ))
+              Column(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(
+                          right: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(origin.timeToReach)),
+                  SizedBox(
+                    height: 1.97 * SizeConfig.heightMultiplier,
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(
+                          right: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(destination.timeToReach)),
+                ],
+              ),
+              _locationWidget(context),
+              Column(
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(
+                          left: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(
+                        origin.name,
+                        style: Theme.of(context).textTheme.body1.copyWith(
+                            fontSize: 2.4 * SizeConfig.textMultiplier),
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                  SizedBox(
+                    height: 1.87 * SizeConfig.heightMultiplier,
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(
+                          left: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(
+                        destination.name,
+                        style: Theme.of(context).textTheme.body1.copyWith(
+                            fontSize: 2.4 * SizeConfig.textMultiplier),
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                ],
+              ),
             ],
           ),
-          verticalLLine(context),
-          Row(
-            children: <Widget>[
-              Container(
-                  padding:
-                      EdgeInsets.only(right: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(destination.timeToReach)),
-              circle(context, filled: true),
-              Container(
-                  padding:
-                      EdgeInsets.only(left: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(
-                    destination.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .body1
-                        .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
-                    overflow: TextOverflow.ellipsis,
-                  ))
-            ],
-          ),
+          SizedBox(height: 1.56 * SizeConfig.heightMultiplier),
         ],
       ),
     );
@@ -132,7 +145,6 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
 
   Widget _buildBottomBody(BuildContext context) {
     return Container(
-        // height: 20.0,
         padding: EdgeInsets.symmetric(
           horizontal: 3.88 * SizeConfig.widthMultiplier,
         ),
@@ -189,22 +201,20 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
   Widget build(BuildContext context) {
     setPoints();
     return Container(
-        
-        margin: EdgeInsets.only(top: 1.28 * SizeConfig.heightMultiplier),
-
-        decoration: BoxDecoration(
-    color: Colors.white,
-    border: Border.all(color: Colors.black12),
-    borderRadius:
-        BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
-        ),
-        child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      _buildTopBody(context),
-      _buildBottomBody(context),
-    ],
-        ),
-      );
+      margin: EdgeInsets.only(top: 1.28 * SizeConfig.heightMultiplier),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black12),
+        borderRadius:
+            BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          _buildTopBody(context),
+          _buildBottomBody(context),
+        ],
+      ),
+    );
   }
 }

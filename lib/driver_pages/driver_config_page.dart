@@ -10,7 +10,7 @@ import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../providers/route_model.dart' as r;
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverConfigurationPage extends StatefulWidget {
   bool isExpanded;
@@ -21,6 +21,8 @@ class DriverConfigurationPage extends StatefulWidget {
 
 class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   bool takingParnterDriver = false;
+
+  List<r.Route> availableRoutes = [];
 
   var _tripConfig = TripConfig(
       route: null,
@@ -38,10 +40,43 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   final busPlateController = TextEditingController();
   final partnerIdController = TextEditingController();
 
+  bool _isInit = true;
+  bool _isLoading = false;
+  bool _errorEncountered = false;
+
   void initState() {
     super.initState();
-    _tripConfig.route =
-        Provider.of<RouteProvider>(context, listen: false).dummy_routes[0];
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<RouteProvider>(context, listen: false)
+          .fetchRoutes()
+          .then((_) {
+        setState(() {
+          availableRoutes =
+              Provider.of<RouteProvider>(context, listen: false).routes;
+        });
+
+        _tripConfig.route = availableRoutes[0];
+        setState(() {
+          _errorEncountered = false;
+          _isLoading = false;
+          _isInit = false;
+        });
+      }).catchError((error) {
+        setState(() {
+          _errorEncountered = true;
+          _isLoading = false;
+          _isInit = false;
+        });
+      });
+    }
+    super.didChangeDependencies();
   }
 
   void _saveForm() {
@@ -99,11 +134,18 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  r.Route getRoute(int id) {
+    return availableRoutes.firstWhere((route) {
+      return route.id == id;
+    }, orElse: () {
+      return null;
+    });
+  }
+
   Widget _buildAutoConfigCard(BuildContext context, TripConfig config) {
     return GestureDetector(
       onTap: () {
-        final route = Provider.of<RouteProvider>(context, listen: false)
-            .getRoute(config.route.id);
+        final route = getRoute(config.route.id);
         final bus = Provider.of<BusProvider>(context, listen: false)
             .getBus(config.bus.id);
         final partnerDriver = config.partnerDriver != null
@@ -231,8 +273,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _routeDropdownButton(BuildContext context) {
-    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    List<r.Route> availableRoutes = routeProvider.dummy_routes;
+    // final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    // List<r.Route> availableRoutes = routeProvider.routes;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 3.56 * SizeConfig.widthMultiplier,
@@ -256,7 +298,12 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         items: availableRoutes.map<DropdownMenuItem<r.Route>>((r.Route route) {
           return DropdownMenuItem<r.Route>(
             value: route,
-            child: Text(route.name),
+            child: Container(
+                width: 30.125 * SizeConfig.widthMultiplier,
+                child: Text(
+                  route.name,
+                  overflow: TextOverflow.ellipsis,
+                )),
           );
         }).toList(),
         onChanged: (r.Route value) {
@@ -677,6 +724,31 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  Widget _showErrorMessage(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Something went wrong!',
+            style: TextStyle(fontSize: 2.63 * SizeConfig.textMultiplier),
+          ),
+          FlatButton(
+              onPressed: () {
+                setState(() {
+                  _isInit = true;
+                });
+                didChangeDependencies();
+              },
+              child: Text(
+                'TRY AGAIN',
+                style: TextStyle(color: Theme.of(context).accentColor),
+              )),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
@@ -716,13 +788,17 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                   horizontal: 3.6 * SizeConfig.widthMultiplier),
               child: Container(
                 height: 75 * SizeConfig.heightMultiplier,
-                child: ListView(
-                  children: <Widget>[
-                    _buildAutoConfigs(context),
-                    _buildForm(context),
-                    _buildBottomBar(context),
-                  ],
-                ),
+                child: _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : (_errorEncountered
+                        ? _showErrorMessage(context)
+                        : ListView(
+                            children: <Widget>[
+                              _buildAutoConfigs(context),
+                              _buildForm(context),
+                              _buildBottomBar(context),
+                            ],
+                          )),
               ),
             )
           ],

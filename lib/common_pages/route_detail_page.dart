@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/widgets/route_info_card.dart';
 import '../providers/route_model.dart' as r;
 

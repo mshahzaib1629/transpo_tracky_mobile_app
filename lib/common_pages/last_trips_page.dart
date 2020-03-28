@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/last_trips_detail_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import '../helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/widgets/trip_record_card.dart';
 
 class LastTripsPage extends StatelessWidget {

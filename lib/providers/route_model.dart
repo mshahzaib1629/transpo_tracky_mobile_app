@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:transpo_tracky_mobile_app/helpers/local_db_helper.dart';
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
+import 'package:http/http.dart' as http;
 
 import 'stop_model.dart';
 
@@ -40,40 +44,75 @@ class FavoriteRoute {
 class RouteProvider with ChangeNotifier {
   List<FavoriteRoute> passengerFavoriteRoutes = [];
 
-  List<Route> dummy_routes = [
-    Route(
-      id: 1,
-      name: 'Route# 1',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_1,
-    ),
-    Route(
-      id: 2,
-      name: 'Route# 2',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_2,
-    ),
-    Route(
-      id: 3,
-      name: 'Route# 3',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_3,
-    ),
-    Route(
-      id: 4,
-      name: 'Route# 4',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_4,
-    ),
+  List<Route> routes = [
+    // Route(
+    //   id: 1,
+    //   name: 'Route# 1',
+    //   pickUpTime: '8:30 AM',
+    //   dropOffTime: '5:30 PM',
+    //   stopList: dummy_stops_1,
+    // ),
+    // Route(
+    //   id: 2,
+    //   name: 'Route# 2',
+    //   pickUpTime: '8:30 AM',
+    //   dropOffTime: '5:30 PM',
+    //   stopList: dummy_stops_2,
+    // ),
+    // Route(
+    //   id: 3,
+    //   name: 'Route# 3',
+    //   pickUpTime: '8:30 AM',
+    //   dropOffTime: '5:30 PM',
+    //   stopList: dummy_stops_3,
+    // ),
+    // Route(
+    //   id: 4,
+    //   name: 'Route# 4',
+    //   pickUpTime: '8:30 AM',
+    //   dropOffTime: '5:30 PM',
+    //   stopList: dummy_stops_4,
+    // ),
   ];
 
-  void addFavorite({Trip trip, int currentPassengerId}) {
-    
+  Future<void> fetchRoutes() async {
+    try {
+      List<Route> fetchedRoutes = [];
+      final response = await http
+          .get('$connectionString/routes/live-routes')
+          .timeout(requestTimeout);
+      print(json.decode(response.body)['message']);
+      final fetchedData = json.decode(response.body)['data'] as List;
 
+      fetchedData.forEach((data) {
+        var route = Route(
+          id: data['id'],
+          name: data['name'],
+          pickUpTime: data['pickUpTime'],
+          dropOffTime: data['dropOffTime'],
+          stopList: [],
+        );
+
+        data['stopList'].forEach((data2) {
+          var stop = Stop(
+            id: data2['id'],
+            name: data2['name'],
+            timeToReach: data2['timeToReach'],
+            longitude: data2['longitude'],
+            latitude: data2['latitude'],
+          );
+          route.stopList.add(stop);
+        });
+        if (route.stopList.length != 0) fetchedRoutes.add(route);
+      });
+      routes = fetchedRoutes;
+      notifyListeners();
+    } catch (error) {
+      throw (error);
+    }
+  }
+
+  void addFavorite({Trip trip, int currentPassengerId}) {
     LocalDatabase.insert('favorite_routes', {
       'passengerId': currentPassengerId,
       'routeId': trip.route.id,
@@ -125,11 +164,19 @@ class RouteProvider with ChangeNotifier {
     return false;
   }
 
-  Route getRoute(int id) {
-    return dummy_routes.firstWhere((route) {
-      return route.id == id;
-    }, orElse: () {
-      return null;
-    });
+  List<Route> getFilteredRoutes(RouteFilter filter) {
+    List<Route> filteredRoutes = [];
+    if (filter == RouteFilter.All) {
+      filteredRoutes = routes;
+    } else if (filter == RouteFilter.Morning) {
+      filteredRoutes = routes
+          .where((route) => route.pickUpTime == '08:30:00.000000')
+          .toList();
+    } else if (filter == RouteFilter.Evening) {
+      filteredRoutes = routes
+          .where((route) => route.pickUpTime == '11:30:00.000000')
+          .toList();
+    }
+    return filteredRoutes;
   }
 }

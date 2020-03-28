@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import '../helpers/size_config.dart';
 
 class PassengerSignUpPage extends StatefulWidget {
   PassengerSignUpPage({Key key}) : super(key: key);

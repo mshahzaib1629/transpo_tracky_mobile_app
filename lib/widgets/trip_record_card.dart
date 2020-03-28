@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-import '../size_config.dart';
 
 class TripRecordCard extends StatefulWidget {
 

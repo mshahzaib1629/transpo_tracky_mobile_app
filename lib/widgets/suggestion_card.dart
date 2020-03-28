@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../helpers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class SuggestionCard extends StatefulWidget {
   final Trip prefTrip;

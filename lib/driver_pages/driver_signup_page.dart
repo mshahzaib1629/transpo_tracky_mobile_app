@@ -4,7 +4,7 @@ import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverSignUpPage extends StatefulWidget {
   DriverSignUpPage({Key key}) : super(key: key);
@@ -220,7 +220,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                       EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
                   border: InputBorder.none,
                   labelText: 'Registration ID *',
-                  hintText: 'FA00-AAA-000'),
+                  hintText: 'EMP-AAA-000'),
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (value) {},
               onSaved: (value) {
