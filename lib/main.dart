@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:transpo_tracky_mobile_app/driver_pages/route_detail_page.dart';
-import 'package:transpo_tracky_mobile_app/driver_pages/view_all_routes_page.dart';
+import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/common_pages/last_trips_page.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
-import 'package:transpo_tracky_mobile_app/testing.dart';
 
 import './login_page.dart';
 import 'styling.dart';
@@ -23,21 +30,32 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    
     SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-      ]);
+      DeviceOrientation.portraitUp,
+    ]);
 
     return LayoutBuilder(
-      builder: (context, constraints) => OrientationBuilder(
-        builder: (context, orientation) { 
-          SizeConfig().init(constraints, orientation);
-          return MaterialApp(
-          home: Testing(),
-          theme: AppTheme.lightTheme,
+      builder: (context, constraints) =>
+          OrientationBuilder(builder: (context, orientation) {
+        SizeConfig().init(constraints, orientation);
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(
+              value: TripProvider(),
+            ),
+            ChangeNotifierProvider.value(
+              value: RouteProvider(),
+            ),
+            ChangeNotifierProvider.value(
+              value: SessionProvider(),
+            ),
+          ],
+          child: MaterialApp(
+            home: LoginPage(),
+            theme: AppTheme.lightTheme,
+          ),
         );
-        }
-      ),
+      }),
     );
   }
 }

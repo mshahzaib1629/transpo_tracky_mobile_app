@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
-import 'package:transpo_tracky_mobile_app/passenger_pages.dart/passenger_home_page.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/size_config.dart';
 import 'package:transpo_tracky_mobile_app/styling.dart';
+
+import './helpers/enums.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -65,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
     return GestureDetector(
       onTap: () {
         if (_loginMode == LoginMode.Driver) {
-          Navigator.pushReplacement(context,
+          Navigator.push(context,
               MaterialPageRoute(builder: (context) => DriverHomePage()));
         } else {
           Navigator.push(context,
@@ -76,27 +82,26 @@ class _LoginPageState extends State<LoginPage> {
         height: 45,
         width: double.infinity,
         decoration: BoxDecoration(
-            color: AppTheme.buttonColorDefalut,
+            color: Color(0xFFF0F55F),
             borderRadius:
                 BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0.0 * SizeConfig.heightMultiplier,
-                      0.23 * SizeConfig.heightMultiplier),
-                  blurRadius: 1.02 * SizeConfig.heightMultiplier,
-                  spreadRadius: 0.2 * SizeConfig.heightMultiplier),
+                color: Colors.black12,
+                offset: Offset(0.0, 0.5),
+                blurRadius: 15,
+              ),
               BoxShadow(
-                  color: Colors.black26,
-                  offset: Offset(0.28 * SizeConfig.heightMultiplier,
-                      0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 0.98 * SizeConfig.heightMultiplier,
-                  spreadRadius: 0.2 * SizeConfig.heightMultiplier),
+                color: Colors.black12,
+                offset: Offset(0.0, -0.5),
+                blurRadius: 15,
+              ),
             ]),
         child: Center(
             child: Text(
           'LOGIN',
-          style: Theme.of(context).textTheme.button,
+          style:
+              Theme.of(context).textTheme.button.copyWith(color: Colors.black),
         )),
       ),
     );
@@ -118,7 +123,10 @@ class _LoginPageState extends State<LoginPage> {
                   _loginMode == LoginMode.Passenger
                       ? "Login as Driver?"
                       : "Login as Passenger?",
-                  style: Theme.of(context).textTheme.display2,
+                  style: Theme.of(context)
+                      .textTheme
+                      .display2
+                      .copyWith(color: Colors.white),
                 ),
                 onPressed: () => _toggleLoginMode(),
                 padding: EdgeInsets.symmetric(
@@ -128,14 +136,69 @@ class _LoginPageState extends State<LoginPage> {
             FittedBox(
               child: FlatButton(
                 child: Text("Forgot Password?",
-                    style: Theme.of(context).textTheme.display2),
+                    style: Theme.of(context)
+                        .textTheme
+                        .display2
+                        .copyWith(color: Colors.white)),
                 onPressed: () {},
                 padding:
                     EdgeInsets.only(left: 0.78 * SizeConfig.heightMultiplier),
               ),
             ),
           ],
-        )
+        ),
+        FlatButton(
+          padding: EdgeInsets.only(bottom: 20, top: 10),
+          onPressed: () {
+            final _sessionProvider =
+                Provider.of<SessionProvider>(context, listen: false);
+            showDialog(
+                context: context,
+                child: AlertDialog(
+                  title: Text('Sign up as?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DriverSignUpPage()));
+                      },
+                      child: Text('Driver'),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _sessionProvider.currentSession != null
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PassengerSignUpPage()))
+                            : showDialog(
+                                context: context,
+                                child: AlertDialog(
+                                  content: Text('No Active Session found.'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('OK'),
+                                    )
+                                  ],
+                                ));
+                      },
+                      child: Text('Passenger'),
+                    )
+                  ],
+                ));
+          },
+          child: Text('SIGN UP',
+              style: Theme.of(context)
+                  .textTheme
+                  .display2
+                  .copyWith(color: Colors.white)),
+        ),
       ],
     );
   }
@@ -148,11 +211,12 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.symmetric(
-              horizontal: 12.5 * SizeConfig.widthMultiplier,
-              vertical: 9.94 * SizeConfig.heightMultiplier),
+          margin: EdgeInsets.only(
+            left: 12.5 * SizeConfig.widthMultiplier,
+            right: 12.5 * SizeConfig.widthMultiplier,
+            top: 6.84 * SizeConfig.heightMultiplier,
+          ),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                 child: Image(
@@ -178,5 +242,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-
-enum LoginMode { Passenger, Driver }
