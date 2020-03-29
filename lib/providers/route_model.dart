@@ -76,8 +76,8 @@ class RouteProvider with ChangeNotifier {
   ];
 
   Future<void> fetchRoutes() async {
+    List<Route> fetchedRoutes = [];
     try {
-      List<Route> fetchedRoutes = [];
       final response = await http
           .get('$connectionString/routes/live-routes')
           .timeout(requestTimeout);

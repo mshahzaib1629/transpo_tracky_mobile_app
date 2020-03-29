@@ -51,7 +51,7 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
 
   Widget verticalLLine(BuildContext context) => Container(
         width: 0.56 * SizeConfig.widthMultiplier,
-        height: 2.27 * SizeConfig.heightMultiplier,
+        height: 2.47 * SizeConfig.heightMultiplier,
         color: Theme.of(context).accentColor,
       );
 
@@ -95,6 +95,7 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
           Row(
             children: <Widget>[
               Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Container(
                       padding: EdgeInsets.only(
@@ -111,6 +112,7 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
               ),
               _locationWidget(context),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
                       padding: EdgeInsets.only(

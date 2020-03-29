@@ -151,16 +151,17 @@ class PassengerRouteSelectionPage extends StatelessWidget {
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
-    Provider.of<RouteProvider>(context)
-        // --------------------------------------------------------------------------------
-        // Modification required here, pass the id of current logged in passenger, currently
-        // passing '1' as the dummy id
-        .fetchAndSetFavorites(currentPassengerId: 1);
-    // --------------------------------------------------------------------------------
-    return Consumer<RouteProvider>(
-      builder: (context, routeConsumer, child) => Container(
+    final routeProvider = Provider.of<RouteProvider>(context);
+
+    return FutureBuilder(
+      // --------------------------------------------------------------------------------
+      // Modification required here, pass the id of current logged in passenger, currently
+      // passing '1' as the dummy id
+      future: routeProvider.fetchAndSetFavorites(currentPassengerId: 1),
+      // --------------------------------------------------------------------------------
+      builder: (context, snapshot) => Container(
         // height: 15.28 * SizeConfig.heightMultiplier,
-        child: routeConsumer.passengerFavoriteRoutes.length == 0
+        child: routeProvider.passengerFavoriteRoutes.length == 0
             ? SizedBox(
                 height: 0.0,
                 width: 0.0,
@@ -179,10 +180,10 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                     height: 8.59 * SizeConfig.heightMultiplier,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: routeConsumer.passengerFavoriteRoutes.length,
+                      itemCount: routeProvider.passengerFavoriteRoutes.length,
                       itemBuilder: (context, index) {
                         FavoriteRoute route =
-                            routeConsumer.passengerFavoriteRoutes[index];
+                            routeProvider.passengerFavoriteRoutes[index];
                         return _buildFavoriteRouteCard(context, route);
                       },
                     ),
@@ -212,7 +213,12 @@ class PassengerRouteSelectionPage extends StatelessWidget {
               },
             )
           : Center(
-              child: Text('No Routes to suggest!'),
+              child: Text(
+                'No Routes to suggest!',
+                style: TextStyle(
+                  fontSize: 2.63 * SizeConfig.textMultiplier,
+                ),
+              ),
             ),
     );
   }

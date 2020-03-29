@@ -75,6 +75,15 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           _isInit = false;
         });
       });
+      Provider.of<BusProvider>(context, listen: false)
+          .fetchBuses()
+          .catchError((error) {
+        setState(() {
+          _errorEncountered = true;
+          _isLoading = false;
+          _isInit = false;
+        });
+      });
     }
     super.didChangeDependencies();
   }
@@ -104,6 +113,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       onTap: () {
         setState(() {
           widget.isExpanded = !widget.isExpanded;
+          if (widget.isExpanded) _isInit = true;
         });
       },
       child: Container(
@@ -152,7 +162,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             ? Provider.of<DriverProvider>(context, listen: false)
                 .getDriver(config.partnerDriver.id)
             : null;
-        if (route == null || bus == null) {
+        if (route == null) {
           showConfigError(context, config: config, route: route, bus: bus);
         } else {
           TripConfig _autoConfig = TripConfig(
@@ -166,7 +176,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           _tripConfig.bus = _autoConfig.bus;
 
           _tripConfig.partnerDriver = _autoConfig.partnerDriver;
-          busPlateController.text = _autoConfig.bus.plateNumber;
+          if (_autoConfig.bus != null)
+            busPlateController.text = _autoConfig.bus.plateNumber;
+          else
+            busPlateController.text = '';
           if (_autoConfig.partnerDriver != null) {
             _toggleTakingPartnerDriver(true);
             partnerIdController.text = _autoConfig.partnerDriver.registrationID;
@@ -232,7 +245,9 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               ? Column(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 0.94 * SizeConfig.heightMultiplier,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
@@ -338,8 +353,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         ),
       ),
       child: Container(
-        width: 10.0,
-        height: 10.0,
+        width: 3.125 * SizeConfig.widthMultiplier,
+        height: 1.9 * SizeConfig.heightMultiplier,
         decoration: BoxDecoration(
             shape: BoxShape.circle, color: Theme.of(context).accentColor),
       ));
@@ -389,7 +404,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               ],
             ),
             SizedBox(
-              width: 10.0,
+              width: 3.125 * SizeConfig.widthMultiplier,
             ),
             _toggleMode(context),
           ],
@@ -418,14 +433,21 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
-          height: 10.0,
+          height: 1.9 * SizeConfig.heightMultiplier,
         ),
         if (takingParnterDriver == true)
           Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 1.0, color: Colors.black12),
-                borderRadius: BorderRadius.circular(8.0)),
-            padding: EdgeInsets.all(5),
+              border: Border.all(
+                  width: 0.31 * SizeConfig.widthMultiplier,
+                  color: Colors.black12),
+              borderRadius:
+                  BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 1.56 * SizeConfig.widthMultiplier,
+              vertical: 0.94 * SizeConfig.heightMultiplier,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -503,10 +525,15 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
 
     return Container(
       // width: 120,
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.symmetric(
+        horizontal: 1.56 * SizeConfig.widthMultiplier,
+        vertical: 0.94 * SizeConfig.heightMultiplier,
+      ),
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.black12),
-        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+            width: 0.31 * SizeConfig.widthMultiplier, color: Colors.black12),
+        borderRadius:
+            BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -527,7 +554,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onFieldSubmitted: (value) {
               setState(() {
                 _tripConfig.bus =
-                    busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
+                    busProvider.avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 }, orElse: () {
                   return null;
@@ -538,7 +565,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onSaved: (value) {
               setState(() {
                 _tripConfig.bus =
-                    busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
+                    busProvider.avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 }, orElse: () {
                   return null;
@@ -571,7 +598,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            height: 5,
+            height: 0.94 * SizeConfig.heightMultiplier,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -581,7 +608,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 1.9 * SizeConfig.heightMultiplier,
           ),
           _busDetail(context),
           _partnerDriverDetail(context)
@@ -755,8 +782,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       duration: Duration(milliseconds: 250),
       top: widget.isExpanded
           ? 3.125 * SizeConfig.heightMultiplier
-          : 77.8 * SizeConfig.heightMultiplier,
-      // top: 20.0,
+          : 75.5 * SizeConfig.heightMultiplier,
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height -

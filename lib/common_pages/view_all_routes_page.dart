@@ -161,7 +161,7 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
               style: TextStyle(fontSize: 2.63 * SizeConfig.textMultiplier),
             ),
             SizedBox(
-              height: 0.94 * SizeConfig.heightMultiplier,
+              height: 1.54 * SizeConfig.heightMultiplier,
             ),
             Text(
               'PULL DOWN TO REFRESH',

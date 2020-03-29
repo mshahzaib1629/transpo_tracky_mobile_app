@@ -4,9 +4,7 @@ import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-
 class TripRecordCard extends StatefulWidget {
-
   // In this card, we check either driver is logged in to the app or passenger, bases on that we share the details accordingly
   LoginMode loginMode = LoginMode.Driver;
   final Trip trip;
@@ -40,12 +38,12 @@ class _TripRecordCardState extends State<TripRecordCard> {
           origin = widget.trip.route.stopList[0];
           destination = widget.trip.passengerStop;
         });
-    }
-    else
-    setState(() {
-      origin = widget.trip.route.stopList[0];
-      destination = widget.trip.route.stopList[widget.trip.route.stopList.length - 1];
-    });
+    } else
+      setState(() {
+        origin = widget.trip.route.stopList[0];
+        destination =
+            widget.trip.route.stopList[widget.trip.route.stopList.length - 1];
+      });
   }
 
   Widget circle(BuildContext context, {bool filled}) => Container(
@@ -73,11 +71,21 @@ class _TripRecordCardState extends State<TripRecordCard> {
       );
 
   Widget verticalLLine(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 16.45 * SizeConfig.widthMultiplier),
+        // margin: EdgeInsets.only(left: 16.45 * SizeConfig.widthMultiplier),
         width: 0.56 * SizeConfig.widthMultiplier,
-        height: 1.87 * SizeConfig.heightMultiplier,
+        height: 2.47 * SizeConfig.heightMultiplier,
         color: Theme.of(context).accentColor,
       );
+
+  Widget _locationWidget(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        circle(context, filled: false),
+        verticalLLine(context),
+        circle(context, filled: true),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,47 +121,55 @@ class _TripRecordCardState extends State<TripRecordCard> {
           SizedBox(height: 1.56 * SizeConfig.heightMultiplier),
           Row(
             children: <Widget>[
-              Container(
-                  padding:
-                      EdgeInsets.only(right: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(origin.timeReached)),
-              circle(context,
-                  filled: widget.trip.mode == TripMode.PICK_UP ? false : true),
-              Container(
-                  padding:
-                      EdgeInsets.only(left: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(
-                    origin.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .body1
-                        .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
-                    overflow: TextOverflow.ellipsis,
-                  ))
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(
+                          right: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(origin.timeToReach)),
+                  SizedBox(
+                    height: 1.97 * SizeConfig.heightMultiplier,
+                  ),
+                  Container(
+                      padding: EdgeInsets.only(
+                          right: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(destination.timeToReach)),
+                ],
+              ),
+              _locationWidget(context),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.only(
+                          left: 2.2 * SizeConfig.widthMultiplier),
+                      child: Text(
+                        origin.name,
+                        style: Theme.of(context).textTheme.body1.copyWith(
+                            fontSize: 2.4 * SizeConfig.textMultiplier),
+                        overflow: TextOverflow.ellipsis,
+                      )),
+                  SizedBox(
+                    height: 1.87 * SizeConfig.heightMultiplier,
+                  ),
+                  Container(
+                    padding:
+                        EdgeInsets.only(left: 2.2 * SizeConfig.widthMultiplier),
+                    child: Text(
+                      destination.name,
+                      style: Theme.of(context)
+                          .textTheme
+                          .body1
+                          .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-          verticalLLine(context),
-          Row(
-            children: <Widget>[
-              Container(
-                  padding:
-                      EdgeInsets.only(right: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(destination.timeReached)),
-              circle(context,
-                  filled: widget.trip.mode == TripMode.PICK_UP ? true : false),
-              Container(
-                  padding:
-                      EdgeInsets.only(left: 2.2 * SizeConfig.widthMultiplier),
-                  child: Text(
-                    destination.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .body1
-                        .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
-                    overflow: TextOverflow.ellipsis,
-                  ))
-            ],
-          ),
+          SizedBox(height: 1.56 * SizeConfig.heightMultiplier),
         ],
       ),
     );
