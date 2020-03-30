@@ -113,7 +113,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       onTap: () {
         setState(() {
           widget.isExpanded = !widget.isExpanded;
-          if (widget.isExpanded) _isInit = true;
+          if (widget.isExpanded) {
+            _isInit = true;
+            didChangeDependencies();
+          }
         });
       },
       child: Container(
@@ -163,7 +166,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                 .getDriver(config.partnerDriver.id)
             : null;
         if (route == null) {
-          showConfigError(context, config: config, route: route, bus: bus);
+          showConfigError(context, config: config, route: route);
         } else {
           TripConfig _autoConfig = TripConfig(
             route: route,
@@ -233,58 +236,62 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _buildAutoConfigs(BuildContext context) {
-    final configProvider = Provider.of<TripConfigProvider>(context);
     return FutureBuilder(
-      // here currently we are passing dummy id of Current Logged IN Driver
-      // later, it should be passed of current logged in user
-      // =====================================================================
-      future: configProvider.fetchAndSetConfigs(currentDriverId: 1),
-      // =====================================================================
-      builder: (context, snapshot) =>
-          configProvider.savedTripConfigs.length != 0
-              ? Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        vertical: 0.94 * SizeConfig.heightMultiplier,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        // here currently we are passing dummy id of Current Logged IN Driver
+        // later, it should be passed of current logged in user
+        // =====================================================================
+        future: Provider.of<TripConfigProvider>(context, listen: false)
+            .fetchAndSetConfigs(currentDriverId: 1),
+        // =====================================================================
+        builder: (context, snapshot) => Consumer<TripConfigProvider>(
+              builder: (context, configConsumer, child) {
+                return configConsumer.savedTripConfigs.length != 0
+                    ? Column(
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(
-                              left: 0.8 * SizeConfig.widthMultiplier,
-                              bottom: 0.625 * SizeConfig.heightMultiplier,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 0.94 * SizeConfig.heightMultiplier,
                             ),
-                            child: Text(
-                              'AUTO-FILLS',
-                              style: Theme.of(context).textTheme.display2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 0.8 * SizeConfig.widthMultiplier,
+                                    bottom: 0.625 * SizeConfig.heightMultiplier,
+                                  ),
+                                  child: Text(
+                                    'AUTO-FILLS',
+                                    style: Theme.of(context).textTheme.display2,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 0.78 * SizeConfig.heightMultiplier,
+                                ),
+                                Container(
+                                  height: 6.59 * SizeConfig.heightMultiplier,
+                                  // padding: EdgeInsets.only(bottom: 5),
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount:
+                                        configConsumer.savedTripConfigs.length,
+                                    itemBuilder: (context, index) {
+                                      TripConfig config = configConsumer
+                                          .savedTripConfigs[index];
+                                      return _buildAutoConfigCard(
+                                          context, config);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            height: 0.78 * SizeConfig.heightMultiplier,
-                          ),
-                          Container(
-                            height: 6.59 * SizeConfig.heightMultiplier,
-                            // padding: EdgeInsets.only(bottom: 5),
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: configProvider.savedTripConfigs.length,
-                              itemBuilder: (context, index) {
-                                TripConfig config =
-                                    configProvider.savedTripConfigs[index];
-                                return _buildAutoConfigCard(context, config);
-                              },
-                            ),
-                          ),
+                          Divider(),
                         ],
-                      ),
-                    ),
-                    Divider(),
-                  ],
-                )
-              : Container(),
-    );
+                      )
+                    : Container();
+              },
+            ));
   }
 
   Widget _routeDropdownButton(BuildContext context) {
@@ -834,17 +841,13 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 }
 
-void showConfigError(context, {TripConfig config, r.Route route, Bus bus}) {
-  String nullItem = '';
-  if (route == null)
-    nullItem = 'Route';
-  else if (bus == null) nullItem = 'Bus';
+void showConfigError(context, {TripConfig config, r.Route route}) {
   print('route not found');
   showDialog(
     context: context,
     child: AlertDialog(
       title: Text('Delete \'${config.configName}\'?'),
-      content: Text('Targeted ${nullItem} is no more in the system.'),
+      content: Text('Targeted Route is no more in the system.'),
       actions: <Widget>[
         FlatButton(
           onPressed: () {
