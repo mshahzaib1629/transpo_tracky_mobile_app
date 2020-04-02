@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -125,7 +126,7 @@ class _DriverNavigationPageDetailState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeReached != null ? currentStop.timeReached : currentStop.timeToReach),
+                      Text(currentStop.timeReached != null ? currentStop.timeReached : DateFormat.jm().format(currentStop.timeToReach)),
                       Text(
                         currentStop.timeReached != null ? 'Reached' : 'est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(
@@ -235,7 +236,7 @@ class _DriverNavigationPageDetailState
                   Text(
                     // --------------------------------------------------------
                     // here should come the next stop's estimated time to reach
-                    currentTrip.route.stopList[0].timeToReach,
+                    DateFormat.jm().format(currentTrip.route.stopList[0].timeToReach),
                     // --------------------------------------------------------
                     style: Theme.of(context).textTheme.title,
                   ),

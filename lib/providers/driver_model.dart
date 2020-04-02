@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import './person.dart';
 

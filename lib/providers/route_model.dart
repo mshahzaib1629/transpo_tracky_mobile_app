@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/helpers/local_db_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import '../helpers/enums.dart';
@@ -12,8 +13,8 @@ import 'stop_model.dart';
 class Route {
   int id;
   String name;
-  String pickUpTime;
-  String dropOffTime;
+  DateTime pickUpTime;
+  DateTime dropOffTime;
   List<Stop> stopList;
 
   Route({
@@ -88,8 +89,8 @@ class RouteProvider with ChangeNotifier {
         var route = Route(
           id: data['id'],
           name: data['name'],
-          pickUpTime: data['pickUpTime'],
-          dropOffTime: data['dropOffTime'],
+          pickUpTime: DateFormat('Hms', 'en_US').parse(data['pickUpTime']),
+          dropOffTime: DateFormat('Hms', 'en_US').parse(data['dropOffTime']),
           stopList: [],
         );
 
@@ -97,7 +98,7 @@ class RouteProvider with ChangeNotifier {
           var stop = Stop(
             id: data2['id'],
             name: data2['name'],
-            timeToReach: data2['timeToReach'],
+            timeToReach: DateFormat('Hms', 'en_US').parse(data2['timeToReach']),
             longitude: data2['longitude'],
             latitude: data2['latitude'],
           );
@@ -121,7 +122,7 @@ class RouteProvider with ChangeNotifier {
       // --------------------------------------------------------------------------------
       // Modification required here, set timeToReach of the stop as it is on PickUp Mode,
       // but on DropOff Mode, set time to reach that stop estimated by google maps api
-      'timeToReach': trip.passengerStop.timeToReach,
+      'timeToReach': trip.passengerStop.timeToReach.toIso8601String(),
       // --------------------------------------------------------------------------------
       'mode': trip.mode.toString(),
     });
@@ -139,7 +140,7 @@ class RouteProvider with ChangeNotifier {
               routeName: favorite['routeName'],
               favoriteStop: Stop(
                 name: favorite['stopName'],
-                timeToReach: favorite['timeToReach'],
+                timeToReach: DateTime.parse(favorite['timeToReach']),
               ),
               mode: favorite['mode'] == 'TripMode.PICK_UP'
                   ? TripMode.PICK_UP
@@ -151,6 +152,7 @@ class RouteProvider with ChangeNotifier {
 
   void deleteConfig(int id) {
     LocalDatabase.delete('favorite_routes', id);
+    passengerFavoriteRoutes.removeWhere((favorite) => favorite.id == id);
     notifyListeners();
   }
 

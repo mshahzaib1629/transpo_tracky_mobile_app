@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_config_page.dart';
+import 'package:transpo_tracky_mobile_app/google_maps/driver_hp_map.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
-import '../helpers/styling.dart';
 
 import '../helpers/size_config.dart';
 import '../common_pages/app_drawer.dart';
@@ -20,28 +19,11 @@ class DriverHomePage extends StatefulWidget {
 class _DriverHomePageState extends State<DriverHomePage> {
   bool _expandConfig = false;
 
-  Widget _buildMap(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Text('Google Map goes here'),
-      ),
-    );
-  }
-
-  Widget _horizontalLLine(BuildContext context) => Container(
-        margin:
-            EdgeInsets.symmetric(vertical: 2.82 * SizeConfig.widthMultiplier),
-        width: 16.87 * SizeConfig.widthMultiplier,
-        height: 0.56 * SizeConfig.heightMultiplier,
-        color: Theme.of(context).accentColor,
-      );
-
   void _onClickLocationButton(BuildContext context) {
     // After getting current location of driver
-    setState(() {
-      _expandConfig = true;
-    });
+    // setState(() {
+    //   _expandConfig = true;
+    // });
   }
 
   Widget _buildCurrentLocationButton(BuildContext context) {
@@ -89,7 +71,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
         body: SafeArea(
           child: Stack(
             children: <Widget>[
-              _buildMap(context),
+              DriverHomePageMap(),
               _buildCurrentLocationButton(context),
               DriverConfigurationPage(
                 isExpanded: _expandConfig,

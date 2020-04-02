@@ -14,7 +14,6 @@ class PassengerHomePageTopBar extends StatefulWidget {
 }
 
 class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
-  bool _isInit = true;
   bool _showFavoriteOption = false;
 
   Widget _topBarShrinked(BuildContext context) {
@@ -69,8 +68,8 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   }
 
   Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {
-    final routeProvider = Provider.of<RouteProvider>(context);
-    final tripProvider = Provider.of<TripProvider>(context);
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
 
     showFavoriteOption(routeProvider, tripProvider);
     return Padding(
@@ -150,11 +149,11 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   }
 
   void showFavoriteOption(routeProvider, tripProvider) {
-    if (_isInit) {
+    if (_showFavoriteOption == false) {
       _showFavoriteOption = !routeProvider.isFavoriteFound(
           trip: tripProvider.passengerSelectedTrip);
     }
-    _isInit = false;
+    // _isInit = false;
   }
 
   Widget _favoriteOptionBar(BuildContext context) {

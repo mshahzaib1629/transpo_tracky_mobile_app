@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import '../helpers/size_config.dart';
 
 class DriverSignUpPage extends StatefulWidget {
@@ -103,8 +101,6 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
   }
 
   Widget _welcomePage(BuildContext context) {
-    Session currentSession =
-        Provider.of<SessionProvider>(context, listen: false).currentSession;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,

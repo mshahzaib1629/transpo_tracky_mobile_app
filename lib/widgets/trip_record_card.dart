@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -127,14 +128,14 @@ class _TripRecordCardState extends State<TripRecordCard> {
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(origin.timeToReach)),
+                      child: Text(DateFormat.jm().format(origin.timeToReach))),
                   SizedBox(
                     height: 1.97 * SizeConfig.heightMultiplier,
                   ),
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(destination.timeToReach)),
+                      child: Text(DateFormat.jm().format(destination.timeToReach))),
                 ],
               ),
               _locationWidget(context),

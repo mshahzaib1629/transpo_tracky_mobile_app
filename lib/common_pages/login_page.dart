@@ -146,59 +146,62 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ],
         ),
-        FlatButton(
-          padding: EdgeInsets.only(bottom: 20, top: 10),
-          onPressed: () {
-            final _sessionProvider =
-                Provider.of<SessionProvider>(context, listen: false);
-            showDialog(
-                context: context,
-                child: AlertDialog(
-                  title: Text('Sign up as?'),
-                  actions: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.push(
+      ],
+    );
+  }
+
+  Widget _buildSignUpButton() {
+    return FlatButton(
+      // padding: EdgeInsets.only(bottom: 20, top: 10),
+      onPressed: () {
+        final _sessionProvider =
+            Provider.of<SessionProvider>(context, listen: false);
+        showDialog(
+            context: context,
+            child: AlertDialog(
+              title: Text('Sign up as?'),
+              actions: <Widget>[
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DriverSignUpPage()));
+                  },
+                  child: Text('Driver'),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _sessionProvider.currentSession != null
+                        ? Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => DriverSignUpPage()));
-                      },
-                      child: Text('Driver'),
-                    ),
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        _sessionProvider.currentSession != null
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        PassengerSignUpPage()))
-                            : showDialog(
-                                context: context,
-                                child: AlertDialog(
-                                  content: Text('No Active Session found.'),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: Text('OK'),
-                                    )
-                                  ],
-                                ));
-                      },
-                      child: Text('Passenger'),
-                    )
-                  ],
-                ));
-          },
-          child: Text('SIGN UP',
-              style: Theme.of(context)
-                  .textTheme
-                  .display2
-                  .copyWith(color: Colors.white)),
-        ),
-      ],
+                                builder: (context) => PassengerSignUpPage()))
+                        : showDialog(
+                            context: context,
+                            child: AlertDialog(
+                              content: Text('No Active Session found.'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text('OK'),
+                                )
+                              ],
+                            ),
+                          );
+                  },
+                  child: Text('Passenger'),
+                )
+              ],
+            ));
+      },
+      child: Text('SIGN UP',
+          style: Theme.of(context)
+              .textTheme
+              .display2
+              .copyWith(color: Colors.white)),
     );
   }
 
@@ -213,9 +216,10 @@ class _LoginPageState extends State<LoginPage> {
           margin: EdgeInsets.only(
             left: 12.5 * SizeConfig.widthMultiplier,
             right: 12.5 * SizeConfig.widthMultiplier,
-            top: 6.84 * SizeConfig.heightMultiplier,
+            top: 11.84 * SizeConfig.heightMultiplier,
           ),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
               Container(
                 child: Image(
@@ -234,6 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 3.9 * SizeConfig.heightMultiplier,
               ),
               _buildButtons(),
+              _buildSignUpButton(),
             ],
           ),
         ),

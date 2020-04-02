@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart' as r;
-import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import '../helpers/local_db_helper.dart';
 import 'bus_model.dart';
 import '../helpers/enums.dart';

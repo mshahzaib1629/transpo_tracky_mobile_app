@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:transpo_tracky_mobile_app/google_maps/driver_navigation_map.dart';
 import 'package:transpo_tracky_mobile_app/widgets/driver_navigation_page_detail.dart';
 
 import '../helpers/size_config.dart';
@@ -9,15 +11,7 @@ class DriverNavigationPage extends StatefulWidget {
 }
 
 class _DriverNavigationPageState extends State<DriverNavigationPage> {
-  Widget _buildMap(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Text('Google Map goes here'),
-      ),
-    );
-  }
-
+  
   Widget _buildLocationButton(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(right: 1.94 * SizeConfig.widthMultiplier),
@@ -102,7 +96,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
         body: SafeArea(
           child: Stack(
             children: <Widget>[
-              _buildMap(context),
+              DriverNavigationMap(),
               _buildFloatingButtons(context),
               DriverNavigationPageDetail()
             ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -121,7 +122,8 @@ class PassengerRouteSelectionPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(favorite.favoriteStop.timeToReach),
+                    Text(DateFormat.jm()
+                        .format(favorite.favoriteStop.timeToReach)),
                     Text(
                       'Est. Time',
                       style: Theme.of(context)
@@ -151,48 +153,49 @@ class PassengerRouteSelectionPage extends StatelessWidget {
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
-    final routeProvider = Provider.of<RouteProvider>(context);
-
     return FutureBuilder(
       // --------------------------------------------------------------------------------
       // Modification required here, pass the id of current logged in passenger, currently
       // passing '1' as the dummy id
-      future: routeProvider.fetchAndSetFavorites(currentPassengerId: 1),
+      future: Provider.of<RouteProvider>(context, listen: false)
+          .fetchAndSetFavorites(currentPassengerId: 1),
       // --------------------------------------------------------------------------------
-      builder: (context, snapshot) => Container(
-        // height: 15.28 * SizeConfig.heightMultiplier,
-        child: routeProvider.passengerFavoriteRoutes.length == 0
-            ? SizedBox(
-                height: 0.0,
-                width: 0.0,
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Favorite Routes',
-                    style: Theme.of(context).textTheme.display2,
-                  ),
-                  SizedBox(
-                    height: 0.78 * SizeConfig.heightMultiplier,
-                  ),
-                  Container(
-                    height: 8.59 * SizeConfig.heightMultiplier,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: routeProvider.passengerFavoriteRoutes.length,
-                      itemBuilder: (context, index) {
-                        FavoriteRoute route =
-                            routeProvider.passengerFavoriteRoutes[index];
-                        return _buildFavoriteRouteCard(context, route);
-                      },
+      builder: (context, snapshot) => Consumer<RouteProvider>(
+        builder: (context, routeConsumer, child) => Container(
+          // height: 15.28 * SizeConfig.heightMultiplier,
+          child: routeConsumer.passengerFavoriteRoutes.length == 0
+              ? SizedBox(
+                  height: 0.0,
+                  width: 0.0,
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Favorite Routes',
+                      style: Theme.of(context).textTheme.display2,
                     ),
-                  ),
-                  SizedBox(
-                    height: 1.56 * SizeConfig.heightMultiplier,
-                  ),
-                ],
-              ),
+                    SizedBox(
+                      height: 0.78 * SizeConfig.heightMultiplier,
+                    ),
+                    Container(
+                      height: 8.59 * SizeConfig.heightMultiplier,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: routeConsumer.passengerFavoriteRoutes.length,
+                        itemBuilder: (context, index) {
+                          FavoriteRoute route =
+                              routeConsumer.passengerFavoriteRoutes[index];
+                          return _buildFavoriteRouteCard(context, route);
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 1.56 * SizeConfig.heightMultiplier,
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }

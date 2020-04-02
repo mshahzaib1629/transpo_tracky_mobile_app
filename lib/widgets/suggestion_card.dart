@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -53,7 +54,6 @@ class _SuggestionCardState extends State<SuggestionCard> {
 
   Widget _buildHead(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context, listen: false);
-
     return GestureDetector(
       onTap: () {
         tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip);
@@ -83,8 +83,8 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   children: <Widget>[
                     Text(
                       widget.prefTrip.passengerStop.estToReachBus != null
-                          ? widget.prefTrip.passengerStop.estToReachBus
-                          : widget.prefTrip.passengerStop.timeToReach,
+                          ? DateFormat.jm().format(widget.prefTrip.passengerStop.estToReachBus)
+                          : DateFormat.jm().format(widget.prefTrip.passengerStop.timeToReach),
                       style: Theme.of(context).textTheme.headline,
                     ),
                     Text(

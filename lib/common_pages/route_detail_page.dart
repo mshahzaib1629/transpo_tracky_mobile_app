@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/widgets/route_info_card.dart';
@@ -41,7 +42,7 @@ class _RouteDetailPageState extends State<RouteDetailPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeToReach),
+                      Text(DateFormat.jm().format(currentStop.timeToReach)),
                       Text(
                         'Est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(

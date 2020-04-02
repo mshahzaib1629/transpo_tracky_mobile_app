@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:transpo_tracky_mobile_app/google_maps/passenger_tracking_map.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_tracking_page_detail.dart';
 
@@ -14,15 +16,7 @@ class PassengerTrackingPage extends StatefulWidget {
 }
 
 class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
-  Widget _buildMap(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Text('Google Map goes here'),
-      ),
-    );
-  }
-
+  
   Widget _buildLocationButton(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(right: 1.94 * SizeConfig.widthMultiplier),
@@ -106,7 +100,7 @@ class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
       body: SafeArea(
         child: Stack(
           children: <Widget>[
-            _buildMap(context),
+            PassengerTrackingMap(),
             _buildFloatingButtons(context),
             PassengerTrackingPageDetail(trip: widget.trip),
           ],

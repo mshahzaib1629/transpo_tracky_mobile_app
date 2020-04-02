@@ -789,7 +789,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       duration: Duration(milliseconds: 250),
       top: widget.isExpanded
           ? 3.125 * SizeConfig.heightMultiplier
-          : 75.5 * SizeConfig.heightMultiplier,
+          : 78.5 * SizeConfig.heightMultiplier,
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height -

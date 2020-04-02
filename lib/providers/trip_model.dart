@@ -235,6 +235,7 @@ class TripProvider with ChangeNotifier {
   }
 
   void fetchSuggestedTrips(double longitude, double latitude) {
+
     // --------------------------------------------------------------------------------
     // Modification required here, we should pass suggested trips based on user's shared
     // location, currently passing a dummy list
@@ -354,6 +355,7 @@ class TripProvider with ChangeNotifier {
         passengerStop: dummy_stops_3[0],
       ),
     ];
+    notifyListeners();
   }
 
   void fetchFavoriteSuggested(r.FavoriteRoute favorite) {
@@ -481,5 +483,6 @@ class TripProvider with ChangeNotifier {
         }
       }
     }).toList();
+    notifyListeners();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/app_drawer.dart';
+import 'package:transpo_tracky_mobile_app/google_maps/passenger_hp_map.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_tracking_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_home_page_top_bar.dart';
@@ -12,18 +13,6 @@ class PassengerHomePage extends StatefulWidget {
 }
 
 class _PassengerHomePageState extends State<PassengerHomePage> {
-  
-  Widget _buildMap(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Center(
-        child: Text('Google Map goes here'),
-      ),
-    );
-  }
-
-  
-  
   Widget _buildCurrentLocationButton(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(bottom: 3.9 * SizeConfig.heightMultiplier),
@@ -101,7 +90,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
       body: SafeArea(
           child: Stack(
         children: <Widget>[
-          _buildMap(context),
+          PassengerHomePageMap(),
           Padding(
             padding: EdgeInsets.symmetric(
               horizontal: 4.5 * SizeConfig.widthMultiplier,

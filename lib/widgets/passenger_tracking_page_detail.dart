@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -114,7 +114,7 @@ class _PassengerTrackingPageDetailState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    widget.trip.passengerStop.estToReachBus,
+                    DateFormat.jm().format(widget.trip.passengerStop.estToReachBus),
                     style: Theme.of(context)
                         .textTheme
                         .title
@@ -127,7 +127,7 @@ class _PassengerTrackingPageDetailState
           ),
           // ---------------------------------------------------------------------------
           // Here goes the estimated time defined by the institute to reach current stop
-          Text('Estimated Time: ' + widget.trip.passengerStop.timeToReach),
+          Text('Estimated Time: ' + DateFormat.jm().format(widget.trip.passengerStop.timeToReach)),
           // ---------------------------------------------------------------------------
         ],
       ),

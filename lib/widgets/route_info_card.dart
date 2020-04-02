@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -100,14 +101,14 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(origin.timeToReach)),
+                      child: Text(DateFormat.jm().format(origin.timeToReach))),
                   SizedBox(
                     height: 1.97 * SizeConfig.heightMultiplier,
                   ),
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(destination.timeToReach)),
+                      child: Text(DateFormat.jm().format(destination.timeToReach))),
                 ],
               ),
               _locationWidget(context),
@@ -168,7 +169,7 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
                 children: <Widget>[
                   Text('PICK-UP',
                       style: TextStyle(fontSize: 9, color: Colors.white)),
-                  Text(widget.route.pickUpTime,
+                  Text(DateFormat.jm().format(widget.route.pickUpTime),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,
@@ -186,7 +187,7 @@ class _RouteInfoCardState extends State<RouteInfoCard> {
                 children: <Widget>[
                   Text('DROP-OFF',
                       style: TextStyle(fontSize: 9, color: Colors.white)),
-                  Text(widget.route.dropOffTime,
+                  Text(DateFormat.jm().format(widget.route.dropOffTime),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.white,
