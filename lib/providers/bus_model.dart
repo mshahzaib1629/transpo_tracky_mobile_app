@@ -32,8 +32,6 @@ class BusProvider with ChangeNotifier {
     try {
       final response =
           await http.get('$connectionString/buses/available-buses').timeout(requestTimeout);
-      print(json.decode(response.body)['message']);
-      print(json.decode(response.body)['data']);
       final fetchedData = json.decode(response.body)['data'] as List;
       fetchedData.forEach((data) {
         var bus = Bus(

@@ -11,7 +11,6 @@ class DriverNavigationPage extends StatefulWidget {
 }
 
 class _DriverNavigationPageState extends State<DriverNavigationPage> {
-  
   Widget _buildLocationButton(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(right: 1.94 * SizeConfig.widthMultiplier),
@@ -41,7 +40,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 4.44 * SizeConfig.widthMultiplier,
-            vertical: 2.5 * SizeConfig.heightMultiplier,
+            vertical: 2.44 * SizeConfig.heightMultiplier,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -51,7 +50,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.arrow_back),
+                    icon: Icon(Icons.arrow_back, size: 8.26 * SizeConfig.imageSizeMultiplier),
                     onPressed: () {
                       showDialog(
                           context: context,
@@ -76,7 +75,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.chat),
+                    icon: Icon(Icons.chat, size: 8.26 * SizeConfig.imageSizeMultiplier),
                     onPressed: () {},
                   )
                 ],

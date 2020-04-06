@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_config_page.dart';
 import 'package:transpo_tracky_mobile_app/google_maps/driver_hp_map.dart';
@@ -19,11 +20,18 @@ class DriverHomePage extends StatefulWidget {
 class _DriverHomePageState extends State<DriverHomePage> {
   bool _expandConfig = false;
 
-  void _onClickLocationButton(BuildContext context) {
-    // After getting current location of driver
-    // setState(() {
-    //   _expandConfig = true;
-    // });
+  void _onClickLocationButton() async {
+    try {
+      LocationData userLocation = await Location().getLocation();
+      print(
+          'latitude: ${userLocation.latitude} \nlongitude: ${userLocation.longitude}');
+      // After getting current location of driver
+      // setState(() {
+      //   _expandConfig = true;
+      // });
+    } catch (error) {
+      return;
+    }
   }
 
   Widget _buildCurrentLocationButton(BuildContext context) {
@@ -35,7 +43,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
         width: 12.5 * SizeConfig.widthMultiplier,
         child: FloatingActionButton(
           onPressed: () {
-            _onClickLocationButton(context);
+            _onClickLocationButton();
           },
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           child: Icon(

@@ -34,7 +34,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       mode: TripMode.PICK_UP,
       startTime: null);
 
-  final _driverConfigKey = GlobalKey<FormState>();
+  final _driverConfigFormKey = GlobalKey<FormState>();
   final _driverFocusNode = FocusNode();
 
   final busPlateController = TextEditingController();
@@ -89,7 +89,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   void _saveForm() {
-    _driverConfigKey.currentState.save();
+    _driverConfigFormKey.currentState.save();
     // -----------------------------------------
     // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
     _tripConfig.currentDriver = Driver(
@@ -600,7 +600,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildForm(BuildContext context) {
     return Form(
       autovalidate: true,
-      key: _driverConfigKey,
+      key: _driverConfigFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -792,8 +792,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           : 78.5 * SizeConfig.heightMultiplier,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height -
-            (14.06 * SizeConfig.heightMultiplier),
+        // height: MediaQuery.of(context).size.height -
+        //     (14.06 * SizeConfig.heightMultiplier),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -813,7 +813,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
           ),
         ),
-        child: ListView(
+        child: Column(
           children: <Widget>[
             _buildTopBar(context),
             Padding(
@@ -825,10 +825,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                     ? Center(child: CircularProgressIndicator())
                     : (_errorEncountered
                         ? _showErrorMessage(context)
-                        : ListView(
+                        : Column(
                             children: <Widget>[
                               _buildAutoConfigs(context),
-                              _buildForm(context),
+                              Expanded(child: _buildForm(context)),
                               _buildBottomBar(context),
                             ],
                           )),

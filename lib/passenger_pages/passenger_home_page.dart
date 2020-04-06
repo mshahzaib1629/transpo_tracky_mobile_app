@@ -13,23 +13,6 @@ class PassengerHomePage extends StatefulWidget {
 }
 
 class _PassengerHomePageState extends State<PassengerHomePage> {
-  Widget _buildCurrentLocationButton(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 3.9 * SizeConfig.heightMultiplier),
-      height: 7.03 * SizeConfig.heightMultiplier,
-      width: 12.5 * SizeConfig.widthMultiplier,
-      child: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        child: Icon(
-          Icons.location_searching,
-          color: Colors.black54,
-          size: 7.78 * SizeConfig.imageSizeMultiplier,
-        ),
-      ),
-    );
-  }
-
   Widget _buildGoButton(BuildContext context) {
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) => GestureDetector(
@@ -100,13 +83,7 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 PassengerHomePageTopBar(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    _buildCurrentLocationButton(context),
-                    _buildGoButton(context),
-                  ],
-                ),
+                _buildGoButton(context),
               ],
             ),
           )

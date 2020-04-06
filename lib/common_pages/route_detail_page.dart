@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/widgets/route_info_card.dart';
+import 'package:transpo_tracky_mobile_app/widgets/stop_card.dart';
 import '../providers/route_model.dart' as r;
 
 class RouteDetailPage extends StatefulWidget {
@@ -15,9 +17,23 @@ class RouteDetailPage extends StatefulWidget {
 
 class _RouteDetailPageState extends State<RouteDetailPage> {
   Widget _buildMap(BuildContext context) {
+    final staticMapImageUrl =
+        MapHelper.generateMapPreviewImage(stopList: widget.route.stopList);
     return Container(
       color: Colors.black12,
+      alignment: Alignment.center,
       height: 32.8125 * SizeConfig.heightMultiplier,
+      child: staticMapImageUrl == null
+          ? Text(
+              'Something went wrong!',
+              textAlign: TextAlign.center,
+            )
+          : Image.network(
+              staticMapImageUrl,
+              fit: BoxFit.fill,
+              width: double.infinity,
+              height: double.infinity,
+            ),
     );
   }
 
@@ -25,43 +41,18 @@ class _RouteDetailPageState extends State<RouteDetailPage> {
     List<Widget> childs = [];
     for (var i = 0; i < stops.length; i++) {
       Stop currentStop = stops[i];
-      childs.add(Container(
-          margin: EdgeInsets.only(bottom: 1.28 * SizeConfig.heightMultiplier),
-          padding: EdgeInsets.symmetric(
-            vertical: 0.56 * SizeConfig.heightMultiplier,
-          ),
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    currentStop.name,
-                    style: Theme.of(context).textTheme.subhead,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(DateFormat.jm().format(currentStop.timeToReach)),
-                      Text(
-                        'Est. Time',
-                        style: Theme.of(context).textTheme.subtitle.copyWith(
-                            fontSize: 1.56 * SizeConfig.textMultiplier),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              Divider(),
-            ],
-          )));
+      childs.add(StopCard(
+        index: i,
+        currentStop: currentStop,
+      ));
     }
     return childs;
   }
 
   Widget _buildRouteDetail(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 2.5 * SizeConfig.widthMultiplier),
+      padding:
+          EdgeInsets.symmetric(horizontal: 2.5 * SizeConfig.widthMultiplier),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,

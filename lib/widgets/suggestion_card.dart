@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
@@ -21,6 +22,7 @@ class SuggestionCard extends StatefulWidget {
 
 class _SuggestionCardState extends State<SuggestionCard> {
   bool _expanded = false;
+  bool _isLoading = false;
 
   int _passengerStrength() {
     int difference =
@@ -83,8 +85,10 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   children: <Widget>[
                     Text(
                       widget.prefTrip.passengerStop.estToReachBus != null
-                          ? DateFormat.jm().format(widget.prefTrip.passengerStop.estToReachBus)
-                          : DateFormat.jm().format(widget.prefTrip.passengerStop.timeToReach),
+                          ? DateFormat.jm().format(
+                              widget.prefTrip.passengerStop.estToReachBus)
+                          : DateFormat.jm().format(
+                              widget.prefTrip.passengerStop.timeToReach),
                       style: Theme.of(context).textTheme.headline,
                     ),
                     Text(
@@ -123,12 +127,35 @@ class _SuggestionCardState extends State<SuggestionCard> {
     );
   }
 
+  void _fetchLocationAddress() async {
+    if (widget.prefTrip.passengerStop.stopAddress == null) {
+      try {
+        widget.prefTrip.passengerStop.stopAddress =
+            await MapHelper.getPlaceAddress(
+          widget.prefTrip.passengerStop.latitude,
+          widget.prefTrip.passengerStop.longitude,
+        );
+      } catch (error) {
+        widget.prefTrip.passengerStop.stopAddress = null;
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Widget _buildFooter(BuildContext context) {
     return GestureDetector(
       onTap: () {
         setState(() {
           _expanded = !_expanded;
         });
+        if (_expanded) {
+          setState(() {
+            _isLoading = true;
+          });
+          _fetchLocationAddress();
+        }
       },
       child: Padding(
         padding: EdgeInsets.only(right: 3.05 * SizeConfig.widthMultiplier),
@@ -227,17 +254,32 @@ class _SuggestionCardState extends State<SuggestionCard> {
               SizedBox(
                 width: 5.56 * SizeConfig.widthMultiplier,
               ),
-              Text(
-                widget.prefTrip.mode == TripMode.PICK_UP
-                    ? 'Pick Up Mode'
-                    : 'Drop Off Mode',
-                style: Theme.of(context)
-                    .textTheme
-                    .body2
-                    .copyWith(color: Theme.of(context).accentColor),
-              ),
+              Container(
+                width: 72.9 * SizeConfig.widthMultiplier,
+                child: _isLoading
+                    ? Text('Loading...')
+                    : Text(
+                        widget.prefTrip.passengerStop.stopAddress != null
+                            ? widget.prefTrip.passengerStop.stopAddress
+                            : 'No address available',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+              )
             ],
-          )
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              widget.prefTrip.mode == TripMode.PICK_UP
+                  ? 'Pick Up Mode'
+                  : 'Drop Off Mode',
+              style: Theme.of(context)
+                  .textTheme
+                  .body2
+                  .copyWith(color: Theme.of(context).accentColor),
+            ),
+          ),
         ],
       ),
     );
