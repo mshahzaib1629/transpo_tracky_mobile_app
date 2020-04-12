@@ -16,6 +16,7 @@ class Route {
   DateTime pickUpTime;
   DateTime dropOffTime;
   List<Stop> stopList;
+  Image staticMapImage;
 
   Route({
     this.id,
@@ -23,6 +24,7 @@ class Route {
     this.pickUpTime,
     this.dropOffTime,
     this.stopList,
+    this.staticMapImage,
   });
 }
 

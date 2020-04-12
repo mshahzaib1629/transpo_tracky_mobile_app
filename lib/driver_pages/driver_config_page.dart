@@ -295,12 +295,9 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _routeDropdownButton(BuildContext context) {
-    // final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    // List<r.Route> availableRoutes = routeProvider.routes;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 3.56 * SizeConfig.widthMultiplier,
-        // vertical: 0.93 * SizeConfig.heightMultiplier
       ),
       decoration: BoxDecoration(
         border: Border.all(
@@ -313,7 +310,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       child: DropdownButtonFormField<r.Route>(
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(0),
-          border: InputBorder.none,
+          border: InputBorder.none, 
         ),
         hint: Text('Select Route'),
         value: _tripConfig.route,

@@ -22,6 +22,9 @@ class _StopCardState extends State<StopCard> {
   bool _isLoading = false;
 
   void _fetchLocationAddress() async {
+    setState(() {
+      _isLoading = true;
+    });
     if (widget.currentStop.stopAddress == null) {
       try {
         widget.currentStop.stopAddress = await MapHelper.getPlaceAddress(
@@ -45,9 +48,6 @@ class _StopCardState extends State<StopCard> {
           _isExpanded = !_isExpanded;
         });
         if (_isExpanded) {
-          setState(() {
-            _isLoading = true;
-          });
           _fetchLocationAddress();
         }
       },

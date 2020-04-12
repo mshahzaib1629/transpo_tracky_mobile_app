@@ -19,22 +19,26 @@ class _RouteDetailPageState extends State<RouteDetailPage> {
   Widget _buildMap(BuildContext context) {
     final staticMapImageUrl =
         MapHelper.generateMapPreviewImage(stopList: widget.route.stopList);
+
+    if (widget.route.staticMapImage == null) {
+      widget.route.staticMapImage = Image.network(
+        staticMapImageUrl,
+        fit: BoxFit.fill,
+        width: double.infinity,
+        height: double.infinity,
+      );
+      print('api called');
+    }
     return Container(
-      color: Colors.black12,
-      alignment: Alignment.center,
-      height: 32.8125 * SizeConfig.heightMultiplier,
-      child: staticMapImageUrl == null
-          ? Text(
-              'Something went wrong!',
-              textAlign: TextAlign.center,
-            )
-          : Image.network(
-              staticMapImageUrl,
-              fit: BoxFit.fill,
-              width: double.infinity,
-              height: double.infinity,
-            ),
-    );
+        color: Colors.black12,
+        alignment: Alignment.center,
+        height: 32.8125 * SizeConfig.heightMultiplier,
+        child: widget.route.staticMapImage == null
+            ? Text(
+                'Something went wrong!',
+                textAlign: TextAlign.center,
+              )
+            : widget.route.staticMapImage);
   }
 
   List<Widget> getStopList(context, List stops) {

@@ -6,11 +6,6 @@ import 'package:http/http.dart' as http;
 const GOOGLE_API_KEY = 'AIzaSyBFbTO9skrhisSOPt5AoV5TJU4LpqlFbW0';
 
 class MapHelper {
-  static String generateMapPreviewImage({List<Stop> stopList}) {
-    String stopListGenerated = _generateStopListString(stopList);
-    return 'https://maps.googleapis.com/maps/api/staticmap?&size=600x300&maptype=roadmap&$stopListGenerated&key=$GOOGLE_API_KEY';
-  }
-
   static Future<String> getPlaceAddress(double lat, double lng) async {
     try {
       final url =
@@ -20,6 +15,11 @@ class MapHelper {
     } catch (error) {
       throw error;
     }
+  }
+
+  static String generateMapPreviewImage({List<Stop> stopList}) {
+    String stopListGenerated = _generateStopListString(stopList);
+    return 'https://maps.googleapis.com/maps/api/staticmap?&size=600x300&maptype=roadmap&$stopListGenerated&key=$GOOGLE_API_KEY';
   }
 }
 

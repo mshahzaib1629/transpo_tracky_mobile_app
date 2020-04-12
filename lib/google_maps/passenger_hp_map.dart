@@ -17,7 +17,7 @@ class PassengerHomePageMap extends StatefulWidget {
 class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
-  Marker marker;
+  Marker _userLocation;
   Circle circle;
   GoogleMapController _controller;
 
@@ -43,7 +43,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
     this.setState(() {
-      marker = Marker(
+      _userLocation = Marker(
           markerId: MarkerId("user"),
           position: latlng,
           rotation: newLocalData.heading,
@@ -124,7 +124,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
-      markers: Set.of((marker != null) ? [marker] : []),
+      markers: Set.of((_userLocation != null) ? [_userLocation] : []),
       circles: Set.of((circle != null) ? [circle] : []),
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;

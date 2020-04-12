@@ -234,7 +234,7 @@ class TripProvider with ChangeNotifier {
     _driverCreatedTrip = null;
   }
 
-  void fetchSuggestedTrips(double longitude, double latitude) {
+  void fetchSuggestedTrips(double latitude, double longitude) {
 
     // --------------------------------------------------------------------------------
     // Modification required here, we should pass suggested trips based on user's shared

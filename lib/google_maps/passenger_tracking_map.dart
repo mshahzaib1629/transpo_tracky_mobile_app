@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
+import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class PassengerTrackingMap extends StatefulWidget {
   PassengerTrackingMap({Key key}) : super(key: key);
@@ -17,7 +19,8 @@ class PassengerTrackingMap extends StatefulWidget {
 class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
-  Marker marker;
+  Marker _userLocation;
+  Marker _stopLocation;
   Circle circle;
   GoogleMapController _controller;
 
@@ -29,21 +32,38 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   );
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     getCurrentLocation();
+    getStopLocation();
+  }
+
+  void getStopLocation() async {
+    final selectedStop = Provider.of<TripProvider>(context, listen: false)
+        .passengerSelectedTrip
+        .passengerStop;
+    _stopLocation = Marker(
+      markerId: MarkerId(selectedStop.id.toString()),
+      position: LatLng(
+        selectedStop.latitude,
+        selectedStop.longitude,
+      ),
+      draggable: false,
+      infoWindow: InfoWindow(title: 'Stop Name', snippet: selectedStop.name),
+      icon: BitmapDescriptor.defaultMarker,
+    );
   }
 
   Future<Uint8List> getMarker() async {
-    ByteData byteData =
-        await DefaultAssetBundle.of(context).load("assets/location_icons/user_location.png");
+    ByteData byteData = await DefaultAssetBundle.of(context)
+        .load("assets/location_icons/user_location.png");
     return byteData.buffer.asUint8List();
   }
 
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
     this.setState(() {
-      marker = Marker(
+      _userLocation = Marker(
           markerId: MarkerId("user"),
           position: latlng,
           rotation: newLocalData.heading,
@@ -52,15 +72,16 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
           flat: true,
           anchor: Offset(0.5, 0.5),
           icon: BitmapDescriptor.fromBytes(imageData));
+      
       circle = Circle(
-          circleId: CircleId("user"),
-          radius: newLocalData.accuracy,
-          zIndex: 1,
-          strokeColor: Colors.blue,
-          center: latlng,
-          fillColor: Colors.blue.withAlpha(40),
-          strokeWidth: 0,
-          );
+        circleId: CircleId("user"),
+        radius: newLocalData.accuracy,
+        zIndex: 1,
+        strokeColor: Colors.blue,
+        center: latlng,
+        fillColor: Colors.blue.withAlpha(40),
+        strokeWidth: 0,
+      );
     });
   }
 
@@ -83,7 +104,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 18.00)));
+                  zoom: 10.00)));
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });
@@ -120,11 +141,18 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
     );
   }
 
+  Set<Marker> _getMarkersSet(){
+    Set<Marker> setOfMarkers = {};
+    if (_userLocation != null) setOfMarkers.add(_userLocation);
+    if (_stopLocation != null) setOfMarkers.add(_stopLocation);
+    return setOfMarkers;
+  }
+
   Widget _buildMap(BuildContext context) {
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
-      markers: Set.of((marker != null) ? [marker] : []),
+      markers: _getMarkersSet(),
       circles: Set.of((circle != null) ? [circle] : []),
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
