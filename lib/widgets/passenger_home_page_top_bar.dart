@@ -15,6 +15,7 @@ class PassengerHomePageTopBar extends StatefulWidget {
 
 class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   bool _showFavoriteOption = false;
+  bool _isInit = true;
 
   Widget _topBarShrinked(BuildContext context) {
     return Text(
@@ -65,6 +66,18 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
         circle(context, filled: true)
       ],
     );
+  }
+
+  void showFavoriteOption(routeProvider, tripProvider) {
+    if (tripProvider.passengerSelectedTrip != null) {
+      Future.delayed(Duration(milliseconds: 500), () {
+       if (_isInit == true) setState(() {
+          _showFavoriteOption = !routeProvider.isFavoriteFound(
+              trip: tripProvider.passengerSelectedTrip);
+          _isInit = false;
+        });
+      });
+    }
   }
 
   Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {
@@ -146,14 +159,6 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
         ],
       ),
     );
-  }
-
-  void showFavoriteOption(routeProvider, tripProvider) {
-    if (_showFavoriteOption == false) {
-      _showFavoriteOption = !routeProvider.isFavoriteFound(
-          trip: tripProvider.passengerSelectedTrip);
-    }
-    // _isInit = false;
   }
 
   Widget _favoriteOptionBar(BuildContext context) {

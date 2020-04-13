@@ -121,6 +121,9 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   }
 
   Widget _buildMap(BuildContext context) {
+    print('---------------------------------');
+    print('tracking page map build');
+    print('---------------------------------');
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,

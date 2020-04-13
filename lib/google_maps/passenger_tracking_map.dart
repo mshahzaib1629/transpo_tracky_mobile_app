@@ -72,7 +72,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
           flat: true,
           anchor: Offset(0.5, 0.5),
           icon: BitmapDescriptor.fromBytes(imageData));
-      
+
       circle = Circle(
         circleId: CircleId("user"),
         radius: newLocalData.accuracy,
@@ -141,7 +141,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
     );
   }
 
-  Set<Marker> _getMarkersSet(){
+  Set<Marker> _getMarkersSet() {
     Set<Marker> setOfMarkers = {};
     if (_userLocation != null) setOfMarkers.add(_userLocation);
     if (_stopLocation != null) setOfMarkers.add(_stopLocation);
@@ -149,6 +149,9 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   }
 
   Widget _buildMap(BuildContext context) {
+    print('---------------------------------');
+    print('tracking page map build');
+    print('---------------------------------');
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
