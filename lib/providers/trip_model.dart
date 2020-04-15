@@ -235,7 +235,6 @@ class TripProvider with ChangeNotifier {
   }
 
   void fetchSuggestedTrips(double latitude, double longitude) {
-
     // --------------------------------------------------------------------------------
     // Modification required here, we should pass suggested trips based on user's shared
     // location, currently passing a dummy list
@@ -360,8 +359,8 @@ class TripProvider with ChangeNotifier {
 
   void fetchFavoriteSuggested(r.FavoriteRoute favorite) {
     // How it will work?
-    // we get routeId, favorite stop's name & mode from the 
-    // favorite and pass it to the server, where we'll find for 
+    // we get routeId, favorite stop's name & mode from the
+    // favorite and pass it to the server, where we'll find for
     // the trip with same routeId, stop's name & mode from the current
     // active trips. If some are found, we return a list of trips
     // back to the mobile app.
@@ -406,7 +405,6 @@ class TripProvider with ChangeNotifier {
         passengersOnBoard: 36,
         shareLiveLocation: true,
         mapTraceKey: 'ABC321e2',
-
       ),
       Trip(
         id: 3,
@@ -433,7 +431,11 @@ class TripProvider with ChangeNotifier {
         id: 4,
         route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
         mode: TripMode.PICK_UP,
-        bus: Bus(id: 1, plateNumber: 'LOY 7714', name: 'Hondai Coaster', capacity: 65),
+        bus: Bus(
+            id: 1,
+            plateNumber: 'LOY 7714',
+            name: 'Hondai Coaster',
+            capacity: 65),
         drivers: [
           Driver(
               registrationID: 'EMP-DR-107',
@@ -448,7 +450,6 @@ class TripProvider with ChangeNotifier {
         passengersOnBoard: 45,
         shareLiveLocation: true,
         mapTraceKey: 'ABC321e2',
-
       ),
       Trip(
         id: 5,

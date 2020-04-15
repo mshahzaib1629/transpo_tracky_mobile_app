@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:http/http.dart' as http;
@@ -12,6 +13,39 @@ class MapHelper {
           'https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$GOOGLE_API_KEY';
       final response = await http.get(url).timeout(requestTimeout);
       return json.decode(response.body)['results'][0]['formatted_address'];
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static Future<LatLng> getPlaceLatLng(String placeId) async {
+    try{
+      LatLng placeLatLng;
+      final url = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$GOOGLE_API_KEY';
+      final http.Response response = await http.get(url).timeout(requestTimeout);
+      final dataFetched = json.decode(response.body)['result'];
+      placeLatLng = LatLng(dataFetched['geometry']['location']['lat'], dataFetched['geometry']['location']['lng']);
+      return placeLatLng;
+    }catch(error) {
+      throw error;
+    }
+  }
+
+  static Future<List> getLocationAutoFills(String input) async {
+    if (input.isEmpty) {
+      return [];
+    }
+    try {
+      final baseURL =
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      final components = 'country:pk';
+      // TODO Add session token
+      print('location auto-fill api called');
+      final request =
+          '$baseURL?input=$input&key=$GOOGLE_API_KEY&components=$components';
+      final response = await http.get(request).timeout(requestTimeout);
+      final predictions = json.decode(response.body)['predictions'];
+      return predictions;
     } catch (error) {
       throw error;
     }

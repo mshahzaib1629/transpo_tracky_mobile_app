@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/user_location.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_favorite_route_card.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_route_selection_page_top_bar.dart';
+import 'package:transpo_tracky_mobile_app/widgets/suggested_location_card.dart';
 import 'package:transpo_tracky_mobile_app/widgets/suggestion_card.dart';
 import '../helpers/size_config.dart';
 
@@ -18,6 +21,15 @@ class PassengerRouteSelectionPage extends StatefulWidget {
 class _PassengerRouteSelectionPageState
     extends State<PassengerRouteSelectionPage> {
   bool _isLoading = false;
+  List<Map<String, dynamic>> _locationPredictions = [];
+
+  void setLocationPredictions(List<Map<String, dynamic>> predictions) {
+    setState(() {
+      _isLoading = true;
+      this._locationPredictions = predictions;
+      _isLoading = false;
+    });
+  }
 
   Future<void> fetchTrips(UserLocation userLocation) async {
     setState(() {
@@ -30,6 +42,25 @@ class _PassengerRouteSelectionPageState
       _isLoading = false;
     });
     print('trips fetched');
+  }
+
+  Future<void> fetchTripsByLocationId(String locationId) async {
+    setState(() {
+      _isLoading = true;
+      this._locationPredictions = [];
+    });
+    try {
+      LatLng selectedLocation = await MapHelper.getPlaceLatLng(locationId);
+      if (selectedLocation != null)
+        Provider.of<TripProvider>(context, listen: false).fetchSuggestedTrips(
+            selectedLocation.latitude, selectedLocation.longitude);
+      print('trips fetched');
+    } catch (error) {
+      print(error);
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
@@ -79,6 +110,35 @@ class _PassengerRouteSelectionPageState
     );
   }
 
+  Widget _buildSuggestedLocations(BuildContext context) {
+    return Expanded(
+      child: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : (_locationPredictions.length != 0)
+              ? ListView.builder(
+                  itemCount: _locationPredictions.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> prediction =
+                        _locationPredictions[index];
+                    return SuggestedLocationCard(
+                      prediction: prediction,
+                      fetchTripsByLocationId: fetchTripsByLocationId,
+                    );
+                  },
+                )
+              : Center(
+                  child: Text(
+                    'No Locations to suggest!',
+                    style: TextStyle(
+                      fontSize: 2.63 * SizeConfig.textMultiplier,
+                    ),
+                  ),
+                ),
+    );
+  }
+
   Widget _buildSuggestedRoutes(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context);
     return Expanded(
@@ -121,12 +181,15 @@ class _PassengerRouteSelectionPageState
           children: <Widget>[
             RouteSelectionTopBar(
               fetchTrips: fetchTrips,
+              setLocationPredictions: setLocationPredictions,
             ),
             SizedBox(
               height: 1.56 * SizeConfig.heightMultiplier,
             ),
             _buildFavoriteRoutes(context),
-            _buildSuggestedRoutes(context),
+            _locationPredictions.length != 0
+                ? _buildSuggestedLocations(context)
+                : _buildSuggestedRoutes(context),
           ],
         ),
       )),

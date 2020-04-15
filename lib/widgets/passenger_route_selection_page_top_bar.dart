@@ -1,64 +1,63 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/user_location.dart';
 import 'package:location/location.dart' as locationPkg;
+import '../helpers/google_map_helper.dart';
 
 class RouteSelectionTopBar extends StatefulWidget {
   final Function fetchTrips;
+  final Function setLocationPredictions;
 
-  RouteSelectionTopBar({this.fetchTrips});
+  RouteSelectionTopBar({
+    this.fetchTrips,
+    this.setLocationPredictions,
+  });
 
   @override
   _RouteSelectionTopBarState createState() => _RouteSelectionTopBarState();
 }
 
 class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
-  GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: GOOGLE_API_KEY);
   final _locationTextController = TextEditingController();
+  Timer _throttle;
 
   UserLocation _userLocation;
 
-  void onError(PlacesAutocompleteResponse response) {
-    print(response.errorMessage);
-    // homeScaffoldKey.currentState.showSnackBar(
-    //   SnackBar(content: Text(response.errorMessage)),
-    // );
+  @override
+  void initState() {
+    super.initState();
+    _locationTextController.addListener(_onSearchChanged);
   }
 
-  Future<void> _searchLocation() async {
-    // show input autocomplete with selected mode
-    // then get the Prediction selected
-    Prediction p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: GOOGLE_API_KEY,
-      onError: onError,
-      mode: Mode.overlay,
-      language: "en",
-      components: [Component(Component.country, "pk")],
-    );
-
-    if (p != null) {
-      PlacesDetailsResponse detail =
-          await _places.getDetailsByPlaceId(p.placeId);
-      final lat = detail.result.geometry.location.lat;
-      final lng = detail.result.geometry.location.lng;
-
-      setState(
-        () {
-          _userLocation = UserLocation(
-              id: p.placeId,
-              address: p.description,
-              latitude: lat,
-              longitude: lng);
-          if (_userLocation != null)
-            _locationTextController.text = _userLocation.address;
-        },
-      );
-    }
+  @override
+  void dispose() {
+    _locationTextController.removeListener(_onSearchChanged);
+    _locationTextController.dispose();
+    super.dispose();
   }
+
+// _lastValue is added to avoid calling api on closing the keyboard
+  String _lastValue;
+  _onSearchChanged() {
+    if (_lastValue != _locationTextController.text){
+    List<Map<String, dynamic>> predictions = [];
+    if (_throttle?.isActive ?? false) _throttle.cancel();
+    _throttle = Timer(const Duration(milliseconds: 500), () async {
+      List predictionsFetched =
+          await MapHelper.getLocationAutoFills(_locationTextController.text);
+      for (int i = 0; i < predictionsFetched.length; i++) {
+        predictions.add({
+          'id': predictionsFetched[i]['place_id'],
+          'name': predictionsFetched[i]['description'],
+        });
+      }
+      widget.setLocationPredictions(predictions);
+      _lastValue = _locationTextController.text;
+    });}
+  }
+
 
   Future<void> _getCurrentLocation() async {
     var location = await locationPkg.Location().getLocation();
@@ -105,8 +104,6 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
                 border: InputBorder.none,
                 hintText: 'Enter Your Location',
               ),
-              onTap: _searchLocation,
-              onSubmitted: (value) => widget.fetchTrips(_userLocation),
             ),
           ),
           // For Fetching User's Location automatically
