@@ -19,12 +19,10 @@ class PassengerTrackingMap extends StatefulWidget {
 class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
-  Marker _userLocation;
-  Marker _stopLocation;
-  Circle circle;
+  Set<Marker> _setOfMarkers = {};
+  Set<Circle> _setOfCircles = {};
   GoogleMapController _controller;
 
-  bool _isInit = true;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -42,16 +40,18 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
     final selectedStop = Provider.of<TripProvider>(context, listen: false)
         .passengerSelectedTrip
         .passengerStop;
-    _stopLocation = Marker(
-      markerId: MarkerId(selectedStop.id.toString()),
-      position: LatLng(
-        selectedStop.latitude,
-        selectedStop.longitude,
-      ),
-      draggable: false,
-      infoWindow: InfoWindow(title: 'Stop Name', snippet: selectedStop.name),
-      icon: BitmapDescriptor.defaultMarker,
-    );
+    setState(() {
+      _setOfMarkers.add(Marker(
+        markerId: MarkerId(selectedStop.id.toString()),
+        position: LatLng(
+          selectedStop.latitude,
+          selectedStop.longitude,
+        ),
+        draggable: false,
+        infoWindow: InfoWindow(title: 'Stop Name', snippet: selectedStop.name),
+        icon: BitmapDescriptor.defaultMarker,
+      ));
+    });
   }
 
   Future<Uint8List> getMarker() async {
@@ -63,7 +63,8 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
     this.setState(() {
-      _userLocation = Marker(
+      _setOfMarkers.removeWhere((m) => m.markerId.value == "user");
+      _setOfMarkers.add(Marker(
           markerId: MarkerId("user"),
           position: latlng,
           rotation: newLocalData.heading,
@@ -71,9 +72,10 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
           zIndex: 2,
           flat: true,
           anchor: Offset(0.5, 0.5),
-          icon: BitmapDescriptor.fromBytes(imageData));
+          icon: BitmapDescriptor.fromBytes(imageData)));
 
-      circle = Circle(
+      _setOfCircles.removeWhere((c) => c.circleId.value == "user");
+      _setOfCircles.add(Circle(
         circleId: CircleId("user"),
         radius: newLocalData.accuracy,
         zIndex: 1,
@@ -81,7 +83,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
         center: latlng,
         fillColor: Colors.blue.withAlpha(40),
         strokeWidth: 0,
-      );
+      ));
     });
   }
 
@@ -104,7 +106,8 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 10.00)));
+                  zoom: 16.00
+                  )));
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });
@@ -141,24 +144,22 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
     );
   }
 
-  Set<Marker> _getMarkersSet() {
-    Set<Marker> setOfMarkers = {};
-    if (_userLocation != null) setOfMarkers.add(_userLocation);
-    if (_stopLocation != null) setOfMarkers.add(_stopLocation);
-    return setOfMarkers;
-  }
 
   Widget _buildMap(BuildContext context) {
-    print('---------------------------------');
-    print('tracking page map build');
-    print('---------------------------------');
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
-      markers: _getMarkersSet(),
-      circles: Set.of((circle != null) ? [circle] : []),
+      markers: _setOfMarkers,
+      circles: _setOfCircles,
+      compassEnabled: false,
+      mapToolbarEnabled: false,
+      myLocationEnabled: false,
+      myLocationButtonEnabled: false,
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
+        print('---------------------------------');
+        print('tracking page map created');
+        print('---------------------------------');
       },
     );
   }

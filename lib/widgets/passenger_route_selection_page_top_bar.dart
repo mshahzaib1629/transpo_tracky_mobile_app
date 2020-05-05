@@ -41,23 +41,28 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
 // _lastValue is added to avoid calling api on closing the keyboard
   String _lastValue;
   _onSearchChanged() {
-    if (_lastValue != _locationTextController.text){
-    List<Map<String, dynamic>> predictions = [];
-    if (_throttle?.isActive ?? false) _throttle.cancel();
-    _throttle = Timer(const Duration(milliseconds: 500), () async {
-      List predictionsFetched =
-          await MapHelper.getLocationAutoFills(_locationTextController.text);
-      for (int i = 0; i < predictionsFetched.length; i++) {
-        predictions.add({
-          'id': predictionsFetched[i]['place_id'],
-          'name': predictionsFetched[i]['description'],
-        });
-      }
-      widget.setLocationPredictions(predictions);
-      _lastValue = _locationTextController.text;
-    });}
+    if (_lastValue != _locationTextController.text) {
+      List<Map<String, dynamic>> predictions = [];
+      List predictionsFetched = [];
+      if (_throttle?.isActive ?? false) _throttle.cancel();
+      _throttle = Timer(const Duration(milliseconds: 500), () async {
+        try {
+          predictionsFetched = await MapHelper.getLocationAutoFills(
+              _locationTextController.text);
+        } catch (error) {
+          print(error);
+        }
+        for (int i = 0; i < predictionsFetched.length; i++) {
+          predictions.add({
+            'id': predictionsFetched[i]['place_id'],
+            'name': predictionsFetched[i]['description'],
+          });
+        }
+        widget.setLocationPredictions(predictions);
+        _lastValue = _locationTextController.text;
+      });
+    }
   }
-
 
   Future<void> _getCurrentLocation() async {
     var location = await locationPkg.Location().getLocation();

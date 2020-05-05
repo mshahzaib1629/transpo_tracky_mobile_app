@@ -29,14 +29,14 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   );
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
     getCurrentLocation();
   }
 
   Future<Uint8List> getMarker() async {
-    ByteData byteData =
-        await DefaultAssetBundle.of(context).load("assets/location_icons/user_location.png");
+    ByteData byteData = await DefaultAssetBundle.of(context)
+        .load("assets/location_icons/user_location.png");
     return byteData.buffer.asUint8List();
   }
 
@@ -53,14 +53,14 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
           anchor: Offset(0.5, 0.5),
           icon: BitmapDescriptor.fromBytes(imageData));
       circle = Circle(
-          circleId: CircleId("user"),
-          radius: newLocalData.accuracy,
-          zIndex: 1,
-          strokeColor: Colors.blue,
-          center: latlng,
-          fillColor: Colors.blue.withAlpha(40),
-          strokeWidth: 0,
-          );
+        circleId: CircleId("user"),
+        radius: newLocalData.accuracy,
+        zIndex: 1,
+        strokeColor: Colors.blue,
+        center: latlng,
+        fillColor: Colors.blue.withAlpha(40),
+        strokeWidth: 0,
+      );
     });
   }
 
@@ -121,9 +121,6 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   }
 
   Widget _buildMap(BuildContext context) {
-    print('---------------------------------');
-    print('home page map build');
-    print('---------------------------------');
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
@@ -131,6 +128,9 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
       circles: Set.of((circle != null) ? [circle] : []),
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
+        print('---------------------------------');
+        print('home page map created');
+        print('---------------------------------');
       },
     );
   }

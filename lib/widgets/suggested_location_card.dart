@@ -33,7 +33,7 @@ class SuggestedLocationCard extends StatelessWidget {
                 .textTheme
                 .body1
                 .copyWith(fontSize: 2.4 * SizeConfig.textMultiplier),
-            maxLines: 2,
+            maxLines: 3,
             overflow: TextOverflow.ellipsis,
           ),
         ),
