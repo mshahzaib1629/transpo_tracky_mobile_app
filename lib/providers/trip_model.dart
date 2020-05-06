@@ -41,6 +41,22 @@ class Trip {
 class TripProvider with ChangeNotifier {
   Trip _passengerSelectedTrip;
   Trip _driverCreatedTrip;
+  
+  // assigning dummy trip data for testing purpose only
+  // Trip _driverCreatedTrip = Trip(
+  //       route: r.Route(id: 1, name: 'Route Test', stopList: dummy_stops_1),
+  //       bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'New Bus'),
+  //       meter: BusMeterReading(initialReading: 1542),
+  //       mode: TripMode.PICK_UP,
+  //       drivers: [Driver(
+  //           registrationID: 'EMP-DR-107',
+  //           firstName: 'Mushtaq',
+  //           lastName: 'Sidique'),
+  //       Driver(
+  //         registrationID: 'EMP-CD-108',
+  //         firstName: 'Shakeel',
+  //         lastName: 'Ahmed',
+  //       )]);
 
   Trip get passengerSelectedTrip {
     return _passengerSelectedTrip;

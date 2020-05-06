@@ -106,7 +106,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 16.00
+                  zoom: 18.00
                   )));
           updateMarkerAndCircle(newLocalData, imageData);
         }
@@ -155,6 +155,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
       mapToolbarEnabled: false,
       myLocationEnabled: false,
       myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
         print('---------------------------------');

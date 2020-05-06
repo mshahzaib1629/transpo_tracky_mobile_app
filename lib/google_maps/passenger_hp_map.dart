@@ -17,11 +17,9 @@ class PassengerHomePageMap extends StatefulWidget {
 class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
-  Marker _userLocation;
-  Circle circle;
+  Set<Marker> _setOfMarkers = {};
+  Set<Circle> _setOfCircles = {};
   GoogleMapController _controller;
-
-  bool _isInit = true;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -43,7 +41,8 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
     this.setState(() {
-      _userLocation = Marker(
+      _setOfMarkers.removeWhere((m) => m.markerId.value == "user");
+      _setOfMarkers.add(Marker(
           markerId: MarkerId("user"),
           position: latlng,
           rotation: newLocalData.heading,
@@ -51,8 +50,10 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
           zIndex: 2,
           flat: true,
           anchor: Offset(0.5, 0.5),
-          icon: BitmapDescriptor.fromBytes(imageData));
-      circle = Circle(
+          icon: BitmapDescriptor.fromBytes(imageData)));
+
+      _setOfCircles.removeWhere((c) => c.circleId.value == "user");
+      _setOfCircles.add(Circle(
         circleId: CircleId("user"),
         radius: newLocalData.accuracy,
         zIndex: 1,
@@ -60,7 +61,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
         center: latlng,
         fillColor: Colors.blue.withAlpha(40),
         strokeWidth: 0,
-      );
+      ));
     });
   }
 
@@ -121,11 +122,17 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   }
 
   Widget _buildMap(BuildContext context) {
+    print("no. of markers: ${_setOfMarkers.length}");
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,
-      markers: Set.of((_userLocation != null) ? [_userLocation] : []),
-      circles: Set.of((circle != null) ? [circle] : []),
+      markers: _setOfMarkers,
+      circles: _setOfCircles,
+      zoomControlsEnabled: false,
+      compassEnabled: false,
+      mapToolbarEnabled: false,
+      myLocationEnabled: false,
+      myLocationButtonEnabled: false,
       onMapCreated: (GoogleMapController controller) {
         _controller = controller;
         print('---------------------------------');

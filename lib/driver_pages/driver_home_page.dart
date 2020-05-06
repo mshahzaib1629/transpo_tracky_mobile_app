@@ -34,28 +34,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
     }
   }
 
-  Widget _buildCurrentLocationButton(BuildContext context) {
-    return Positioned(
-      bottom: 13.76 * SizeConfig.heightMultiplier,
-      right: 6.72 * SizeConfig.widthMultiplier,
-      child: Container(
-        height: 7 * SizeConfig.heightMultiplier,
-        width: 12.5 * SizeConfig.widthMultiplier,
-        child: FloatingActionButton(
-          onPressed: () {
-            _onClickLocationButton();
-          },
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-          child: Icon(
-            Icons.location_searching,
-            color: Colors.black54,
-            size: 7.78 * SizeConfig.imageSizeMultiplier,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -80,7 +58,6 @@ class _DriverHomePageState extends State<DriverHomePage> {
           child: Stack(
             children: <Widget>[
               DriverHomePageMap(),
-              _buildCurrentLocationButton(context),
               DriverConfigurationPage(
                 isExpanded: _expandConfig,
               )
