@@ -54,7 +54,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           TextFormField(
             cursorColor: Colors.black,
-            style: TextStyle(color: Colors.black),
+            obscureText: true,
+            style: TextStyle(color: Colors.black,),
             decoration: InputDecoration(
               labelText: 'Enter Password',
               filled: true,
@@ -159,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
         showDialog(
             context: context,
             child: AlertDialog(
-              title: Text('Sign up as?'),
+              content: Text('Sign up as?'),
               actions: <Widget>[
                 FlatButton(
                   onPressed: () {

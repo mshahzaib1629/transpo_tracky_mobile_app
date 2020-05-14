@@ -405,6 +405,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               controller: _passwordController,
               cursorColor: Colors.black,
+              obscureText: true,
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 contentPadding:
@@ -432,6 +433,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
               focusNode: _confirmPasswordFocusNode,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
+              obscureText: true,
               decoration: InputDecoration(
                 contentPadding:
                     EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),

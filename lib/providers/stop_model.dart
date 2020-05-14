@@ -67,9 +67,9 @@ List<Stop> dummy_stops_1 = [
       estWalkTime: '8 mins'),
   Stop(
       id: 1,
-      name: 'Sanda',
-      longitude: 74.2475891,
-      latitude: 31.6240714,
+      name: 'Sagian Bypass',
+      longitude: 74.282999,
+      latitude: 31.569135,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       timeReached: '7:30 AM',
       estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
@@ -170,8 +170,8 @@ List<Stop> dummy_stops_2 = [
   Stop(
       id: 1,
       name: 'Chuburji',
-      longitude: 74.2475891,
-      latitude: 31.6240714,
+      longitude: 74.288804,
+      latitude: 31.5516476,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       timeReached: '7:30 AM',
       estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),

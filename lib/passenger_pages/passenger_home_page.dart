@@ -66,29 +66,55 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
     );
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Sure to Leave?'),
+        content: Text('You are going to exit the app!'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: AppDrawer(),
-      body: SafeArea(
-          child: Stack(
-        children: <Widget>[
-          PassengerHomePageMap(),
-          Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 4.5 * SizeConfig.widthMultiplier,
-              vertical: 3.45 * SizeConfig.heightMultiplier,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                PassengerHomePageTopBar(),
-                _buildGoButton(context),
-              ],
-            ),
-          )
-        ],
-      )),
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+              child: SafeArea(
+            child: Stack(
+          children: <Widget>[
+            PassengerHomePageMap(),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 4.5 * SizeConfig.widthMultiplier,
+                vertical: 3.45 * SizeConfig.heightMultiplier,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  PassengerHomePageTopBar(),
+                  _buildGoButton(context),
+                ],
+              ),
+            )
+          ],
+        )),
+      ),
     );
   }
 }

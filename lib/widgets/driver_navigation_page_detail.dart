@@ -190,7 +190,7 @@ class _DriverNavigationPageDetailState
               child: Text(
                 // -------------------------------------
                 // here should come the next stop's name
-                currentTrip.route.stopList[0].name,
+                currentTrip.driverNextStop.name,
                 // --------------------------------------
                 style: TextStyle(
                     color: Colors.white,

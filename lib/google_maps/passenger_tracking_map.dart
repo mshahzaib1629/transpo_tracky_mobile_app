@@ -106,7 +106,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 18.00
+                  zoom: 16.00
                   )));
           updateMarkerAndCircle(newLocalData, imageData);
         }

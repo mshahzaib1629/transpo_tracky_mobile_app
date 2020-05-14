@@ -34,6 +34,29 @@ class _DriverHomePageState extends State<DriverHomePage> {
     }
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Sure to Leave?'),
+        content: Text('You are going to exit the app!'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -54,14 +77,17 @@ class _DriverHomePageState extends State<DriverHomePage> {
         ),
         drawer: AppDrawer(),
         backgroundColor: Theme.of(context).primaryColor,
-        body: SafeArea(
-          child: Stack(
-            children: <Widget>[
-              DriverHomePageMap(),
-              DriverConfigurationPage(
-                isExpanded: _expandConfig,
-              )
-            ],
+        body: WillPopScope(
+          onWillPop: _onBackPressed,
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                DriverHomePageMap(),
+                DriverConfigurationPage(
+                  isExpanded: _expandConfig,
+                )
+              ],
+            ),
           ),
         ),
       ),

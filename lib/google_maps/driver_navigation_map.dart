@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
@@ -17,11 +19,14 @@ class DriverNavigationMap extends StatefulWidget {
 }
 
 class _DriverNavigationMapState extends State<DriverNavigationMap> {
+  TripProvider tripProvider;
+  Trip trip;
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   Set<Marker> _setOfMarkers = {};
   Set<Circle> _setOfCircles = {};
   GoogleMapController _controller;
+  Timer _throttle;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -31,15 +36,14 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
   @override
   void initState() {
     super.initState();
+    tripProvider = Provider.of<TripProvider>(context, listen: false);
+    trip = tripProvider.driverCreatedTrip;
     getCurrentLocation();
     getStopLocation();
   }
 
   void getStopLocation() async {
-    final routeStops = Provider.of<TripProvider>(context, listen: false)
-        .driverCreatedTrip
-        .route
-        .stopList;
+    final routeStops = trip.route.stopList;
     setState(() {
       routeStops.forEach((stop) {
         _setOfMarkers.add(Marker(
@@ -102,6 +106,25 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
 
       _locationSubscription =
           _locationTracker.onLocationChanged.listen((newLocalData) {
+        tripProvider.checkDistanceToNextStop(newLocalData);
+        if (_throttle?.isActive ?? false) _throttle.cancel();
+        _throttle = Timer(locationUpdatePeriod, () async {
+          try {
+            await MapHelper.updateDriverLocation(
+                trip.mapTraceKey, newLocalData);
+          } catch (error) {
+            showDialog(
+                context: context,
+                child: AlertDialog(
+                  content: Text('Internet Connection Failed!'),
+                  actions: [
+                    FlatButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('Try Again'))
+                  ],
+                ));
+          }
+        });
         if (_controller != null) {
           _controller.animateCamera(CameraUpdate.newCameraPosition(
               new CameraPosition(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:http/http.dart' as http;
@@ -51,6 +52,20 @@ class MapHelper {
     }
   }
 
+  static Future<void> updateDriverLocation(String trackingKey, LocationData location) async {
+    try {
+      var url =
+          "https://transpo-tracky.firebaseio.com/trackings/$trackingKey.json";
+      await http.post(url,
+          body: json.encode({
+            'lat': location.latitude,
+            'lng': location.longitude
+          })).timeout(requestTimeout);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static String generateMapPreviewImage({List<Stop> stopList}) {
     String stopListGenerated = _generateStopListString(stopList);
     return 'https://maps.googleapis.com/maps/api/staticmap?&size=600x300&maptype=roadmap&$stopListGenerated&key=$GOOGLE_API_KEY';
@@ -66,3 +81,5 @@ String _generateStopListString(List<Stop> stopList) {
   }
   return generatedString;
 }
+
+

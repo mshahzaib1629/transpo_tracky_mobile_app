@@ -114,7 +114,8 @@ class _PassengerTrackingPageDetailState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    DateFormat.jm().format(widget.trip.passengerStop.estToReachBus),
+                    // DateFormat.jm().format(widget.trip.passengerStop.estToReachBus),
+                    '07 mins',
                     style: Theme.of(context)
                         .textTheme
                         .title

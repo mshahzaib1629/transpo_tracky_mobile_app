@@ -310,7 +310,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       child: DropdownButtonFormField<r.Route>(
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(0),
-          border: InputBorder.none, 
+          border: InputBorder.none,
         ),
         hint: Text('Select Route'),
         value: _tripConfig.route,
@@ -650,16 +650,33 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             FlatButton(
                 onPressed: () {
                   _saveForm();
-                  print(meterReadingController.text);
                   _tripConfig.meter = BusMeterReading(
                       initialReading:
                           double.parse(meterReadingController.text));
                   Provider.of<TripProvider>(context, listen: false)
-                      .startTrip(config: _tripConfig);
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DriverNavigationPage()));
+                      .startTrip(config: _tripConfig)
+                      .then((_) {
+                        setState(() {
+                          widget.isExpanded = false;
+                        });
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DriverNavigationPage()));
+                  }).catchError((error) {
+                    Navigator.pop(context);
+                    showDialog(
+                        context: context,
+                        child: AlertDialog(
+                          title: Text('Oh no!'),
+                          content: Text('Something went wrong.'),
+                          actions: [
+                            FlatButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Okay'))
+                          ],
+                        ));
+                  });
                 },
                 child: Text('Lets Go'))
           ],

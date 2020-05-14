@@ -1,6 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:location/location.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
+import 'dart:math';
+import 'package:vector_math/vector_math.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
+import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
 
 import 'driver_model.dart';
 import '../helpers/enums.dart';
@@ -12,6 +21,7 @@ class Trip {
   // pass trip's stops from DB to the route's stopList here
   r.Route route;
   Stop passengerStop;
+  Stop driverNextStop;
   List<Driver> drivers;
   Bus bus;
   BusMeterReading meter;
@@ -27,6 +37,7 @@ class Trip {
     this.route,
     this.drivers,
     this.passengerStop,
+    this.driverNextStop,
     this.bus,
     this.meter,
     this.passengersOnBoard,
@@ -41,7 +52,8 @@ class Trip {
 class TripProvider with ChangeNotifier {
   Trip _passengerSelectedTrip;
   Trip _driverCreatedTrip;
-  
+  int _driverNextStopIndex = 0;
+
   // assigning dummy trip data for testing purpose only
   // Trip _driverCreatedTrip = Trip(
   //       route: r.Route(id: 1, name: 'Route Test', stopList: dummy_stops_1),
@@ -219,7 +231,14 @@ class TripProvider with ChangeNotifier {
   }
 
 // for driver
-  void startTrip({TripConfig config}) {
+  Future<void> startTrip({TripConfig config}) async {
+    final trackingKey = Uuid().v1();
+    var currentLocation = await Location().getLocation();
+    try {
+      await MapHelper.updateDriverLocation(trackingKey, currentLocation);
+    } catch (error) {
+      throw error;
+    }
     List<Driver> driversList = [];
     driversList.add(config.currentDriver);
     if (config.partnerDriver != null) driversList.add(config.partnerDriver);
@@ -228,26 +247,32 @@ class TripProvider with ChangeNotifier {
         bus: config.bus,
         meter: config.meter,
         mode: config.mode,
-        drivers: driversList);
+        drivers: driversList,
+        mapTraceKey: trackingKey);
+    _driverCreatedTrip.driverNextStop = _driverCreatedTrip.route.stopList[0];
+
+    notifyListeners();
     // ---------------------
     // add server notify logic here
     // ---------------------
   }
 
   // for passenger
-  void passengerEndTrip() {
+  Future<void> passengerEndTrip() async {
+    print('passenger trip ended');
     // ---------------------
     // add server notify / review logic here
     // ---------------------
     _passengerSelectedTrip = null;
   }
 
-  void driverEndTrip(BusMeterReading reading) {
+  Future<void> driverEndTrip(BusMeterReading reading) async {
     _driverCreatedTrip.meter.finalReading = reading.finalReading;
     // ---------------------
     // add server notify logic here
     // ---------------------
     _driverCreatedTrip = null;
+    _driverNextStopIndex = 0;
   }
 
   void fetchSuggestedTrips(double latitude, double longitude) {
@@ -302,7 +327,7 @@ class TripProvider with ChangeNotifier {
         passengersOnBoard: 36,
         shareLiveLocation: true,
         mapTraceKey: 'ABC321e2',
-        passengerStop: dummy_stops_3[5],
+        passengerStop: dummy_stops_1[4],
       ),
       Trip(
         id: 3,
@@ -501,5 +526,41 @@ class TripProvider with ChangeNotifier {
       }
     }).toList();
     notifyListeners();
+  }
+
+  void checkDistanceToNextStop(LocationData driverLocation) {
+    double distance = calculateDistance(
+        driverLocation.latitude,
+        driverLocation.longitude,
+        driverCreatedTrip.driverNextStop.latitude,
+        driverCreatedTrip.driverNextStop.longitude);
+    print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
+    if (distance < 0.5 && _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length-1)) {
+      _driverNextStopIndex++;
+      driverCreatedTrip.driverNextStop =
+          _driverCreatedTrip.route.stopList[_driverNextStopIndex];
+      notifyListeners();
+    }
+  }
+
+  // calculates the distance between two locations in KM
+  double calculateDistance(double lat1, double lng1, double lat2, double lng2) {
+    double earthRadius =
+        6371; // in kilometer, change to 3958.75 for miles output
+
+    double dLat = radians(lat2 - lat1);
+    double dLng = radians(lng2 - lng1);
+
+    double sindLat = sin(dLat / 2);
+    double sindLng = sin(dLng / 2);
+
+    double a = pow(sindLat, 2) +
+        pow(sindLng, 2) * cos(radians(lat1)) * cos(radians(lat2));
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    double dist = earthRadius * c;
+
+    return dist; // output distance, in MILES
   }
 }
