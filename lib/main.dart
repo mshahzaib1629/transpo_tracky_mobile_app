@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_broadcast_screen.dart';
+import 'package:transpo_tracky_mobile_app/providers/broadcast_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 import './common_pages/login_page.dart';
-import 'helpers/size_config.dart'; 
+import 'helpers/size_config.dart';
 import 'helpers/styling.dart';
+
 void main(List<String> args) {
   // debugPaintSizeEnabled = true;
   runApp(MyApp());
@@ -42,6 +45,9 @@ class _MyAppState extends State<MyApp> {
             ChangeNotifierProvider.value(
               value: SessionProvider(),
             ),
+            ChangeNotifierProvider.value(
+              value: BroadCastProvider(),
+            )
           ],
           child: MaterialApp(
             home: LoginPage(),

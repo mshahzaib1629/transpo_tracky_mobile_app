@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
@@ -51,24 +52,35 @@ class Trip {
 
 class TripProvider with ChangeNotifier {
   Trip _passengerSelectedTrip;
-  Trip _driverCreatedTrip;
+  // Trip _driverCreatedTrip;
   int _driverNextStopIndex = 0;
 
   // assigning dummy trip data for testing purpose only
-  // Trip _driverCreatedTrip = Trip(
-  //       route: r.Route(id: 1, name: 'Route Test', stopList: dummy_stops_1),
-  //       bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'New Bus'),
-  //       meter: BusMeterReading(initialReading: 1542),
-  //       mode: TripMode.PICK_UP,
-  //       drivers: [Driver(
-  //           registrationID: 'EMP-DR-107',
-  //           firstName: 'Mushtaq',
-  //           lastName: 'Sidique'),
-  //       Driver(
-  //         registrationID: 'EMP-CD-108',
-  //         firstName: 'Shakeel',
-  //         lastName: 'Ahmed',
-  //       )]);
+  Trip _driverCreatedTrip = Trip(
+      route: r.Route(id: 1, name: 'Route Test', stopList: dummy_stops_1),
+      bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'New Bus'),
+      meter: BusMeterReading(initialReading: 1542),
+      driverNextStop: Stop(
+          id: 1,
+          name: 'Dummy',
+          longitude: 74.2475891,
+          latitude: 31.6240714,
+          timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
+          timeReached: '6:50 AM',
+          estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+          estWalkTime: '8 mins'),
+      mode: TripMode.PICK_UP,
+      drivers: [
+        Driver(
+            registrationID: 'EMP-DR-107',
+            firstName: 'Mushtaq',
+            lastName: 'Sidique'),
+        Driver(
+          registrationID: 'EMP-CD-108',
+          firstName: 'Shakeel',
+          lastName: 'Ahmed',
+        )
+      ]);
 
   Trip get passengerSelectedTrip {
     return _passengerSelectedTrip;
@@ -264,6 +276,7 @@ class TripProvider with ChangeNotifier {
     // add server notify / review logic here
     // ---------------------
     _passengerSelectedTrip = null;
+    notifyListeners();
   }
 
   Future<void> driverEndTrip(BusMeterReading reading) async {
@@ -273,6 +286,7 @@ class TripProvider with ChangeNotifier {
     // ---------------------
     _driverCreatedTrip = null;
     _driverNextStopIndex = 0;
+    notifyListeners();
   }
 
   void fetchSuggestedTrips(double latitude, double longitude) {
@@ -535,7 +549,8 @@ class TripProvider with ChangeNotifier {
         driverCreatedTrip.driverNextStop.latitude,
         driverCreatedTrip.driverNextStop.longitude);
     print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
-    if (distance < 0.5 && _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length-1)) {
+    if (distance < 0.5 &&
+        _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length - 1)) {
       _driverNextStopIndex++;
       driverCreatedTrip.driverNextStop =
           _driverCreatedTrip.route.stopList[_driverNextStopIndex];

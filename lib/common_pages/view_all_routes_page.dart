@@ -104,7 +104,6 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
               onSubmitted: (vale) {},
             ),
           ),
-          // For Fetching User's Location automatically
           PopupMenuButton(
             itemBuilder: (context) => [
               PopupMenuItem(

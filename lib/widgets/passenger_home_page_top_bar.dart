@@ -18,6 +18,11 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   bool _isInit = true;
 
   Widget _topBarShrinked(BuildContext context) {
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        _showFavoriteOption = false;
+      });
+    });
     return Text(
       'Select Your Route',
       style: Theme.of(context)
@@ -71,13 +76,17 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   void showFavoriteOption(routeProvider, tripProvider) {
     if (tripProvider.passengerSelectedTrip != null) {
       Future.delayed(Duration(milliseconds: 500), () {
-       if (_isInit == true) setState(() {
-          _showFavoriteOption = !routeProvider.isFavoriteFound(
-              trip: tripProvider.passengerSelectedTrip);
-          _isInit = false;
-        });
+        if (_isInit == true)
+          setState(() {
+            _showFavoriteOption = !routeProvider.isFavoriteFound(
+                trip: tripProvider.passengerSelectedTrip);
+            _isInit = false;
+          });
       });
-    }
+    } else
+      setState(() {
+        _showFavoriteOption = false;
+      });
   }
 
   Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {

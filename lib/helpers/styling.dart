@@ -4,7 +4,8 @@ import './size_config.dart';
 class AppTheme {
   AppTheme();
   static const Color primaryColor = Color(0xFF344a32);
-  static const Color appBackgroundColor = Color(0xFFf2f2f2);
+  // static const Color appBackgroundColor = Color(0xFFf2f2f2);
+  static const Color appBackgroundColor = Colors.white;
   // static const Color indicatorColor = Color(0xFFD8ECF1);
   static const Color unSelectedBackgroundColor = Color(0xFFE7EBEE);
   static const Color subTitleTextColor = Color(0xFF9F988F);

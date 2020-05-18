@@ -122,7 +122,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   }
 
   Widget _buildMap(BuildContext context) {
-    print("no. of markers: ${_setOfMarkers.length}");
+    print("no. of markers in homepage: ${_setOfMarkers.length}");
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,

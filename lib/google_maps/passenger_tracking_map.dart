@@ -146,6 +146,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
 
 
   Widget _buildMap(BuildContext context) {
+    print('no. of markers in tracking page: ${_setOfMarkers.length}');
     return GoogleMap(
       mapType: MapType.normal,
       initialCameraPosition: initialLocation,

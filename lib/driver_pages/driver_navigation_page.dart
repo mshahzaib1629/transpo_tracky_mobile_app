@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_broadcast_screen.dart';
 import 'package:transpo_tracky_mobile_app/google_maps/driver_navigation_map.dart';
+import 'package:transpo_tracky_mobile_app/providers/broadcast_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/driver_navigation_page_detail.dart';
@@ -32,7 +34,13 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
           ),
           IconButton(
             icon: Icon(Icons.chat, size: 8.26 * SizeConfig.imageSizeMultiplier),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DriverBroadCastScreen(),
+                  ));
+            },
           )
         ],
       ),
@@ -100,18 +108,16 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        body: WillPopScope(
-          onWillPop: _onBackPressed,
-          child: SafeArea(
-            child: Stack(
-              children: <Widget>[
-                DriverNavigationMap(),
-                _buildFloatingButtons(context),
-                DriverNavigationPageDetail()
-              ],
-            ),
+    return Scaffold(
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+        child: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              DriverNavigationMap(),
+              DriverNavigationPageDetail(),
+              _buildFloatingButtons(context),
+            ],
           ),
         ),
       ),

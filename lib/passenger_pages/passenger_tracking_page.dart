@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/google_maps/passenger_tracking_map.dart';
+import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_broadcast_screen.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/passenger_tracking_page_detail.dart';
 
@@ -38,7 +39,13 @@ class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
               Icons.chat,
               size: 8.26 * SizeConfig.imageSizeMultiplier,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PassengerBroadCastScreen(),
+                  ));
+            },
           )
         ],
       ),
