@@ -18,11 +18,14 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
   final _registrationIdController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _cnicController = TextEditingController();
+  final _addressController = TextEditingController();
   final _contactController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   final _lastNameFocusNode = FocusNode();
+  final _cnicFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
   final List<Designation> designations = [
@@ -34,6 +37,8 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     designation: null,
     firstName: '',
     lastName: '',
+    cnic: '',
+    address: '',
     gender: null,
     contact: '',
     password: '',
@@ -56,6 +61,8 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     _registrationIdController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _cnicController.dispose();
+    _addressController.dispose();
     _contactController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -89,6 +96,10 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
           _driverForm.firstName +
           ' l-Name: ' +
           _driverForm.lastName +
+          ' cnic: ' +
+          _driverForm.cnic +
+          ' address: ' +
+          _driverForm.address +
           ' contact: ' +
           _driverForm.contact +
           ' gender: ' +
@@ -253,6 +264,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _firstNameController,
+              textCapitalization: TextCapitalization.words,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -283,6 +295,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _lastNameController,
+              textCapitalization: TextCapitalization.words,
               focusNode: _lastNameFocusNode,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
@@ -292,12 +305,44 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                 border: InputBorder.none,
                 labelText: 'Last Name',
               ),
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (value) {},
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (value) {
+                FocusScope.of(context).requestFocus(_cnicFocusNode);
+              },
               onSaved: (value) {
                 setState(() {
                   _driverForm.lastName = value;
                 });
+              },
+            ),
+          ),
+          SizedBox(
+            height: 1.8 * SizeConfig.heightMultiplier,
+          ),
+          _inputContainer(
+            input: TextFormField(
+              autofocus: false,
+              controller: _cnicController,
+              keyboardType: TextInputType.numberWithOptions(signed: true),
+              focusNode: _cnicFocusNode,
+              cursorColor: Colors.black,
+              style: TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
+                  border: InputBorder.none,
+                  labelText: 'CNIC# *',
+                  hintText: 'XXXXX-XXXXXXX-X'),
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (value) {},
+              onSaved: (value) {
+                setState(() {
+                  _driverForm.cnic = value;
+                });
+              },
+              validator: (value) {
+                if (value.isEmpty) return 'Please enter your cnic';
+                return null;
               },
             ),
           ),
@@ -380,6 +425,55 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
           ),
           SizedBox(
             height: 1.8 * SizeConfig.heightMultiplier,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _addressPage(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            height: _topPadding,
+          ),
+          Text('Where do you live?',
+              style: Theme.of(context)
+                  .textTheme
+                  .title
+                  .copyWith(fontSize: _titleSize)),
+          SizedBox(
+            height: _paddingAfterTitle,
+          ),
+          _inputContainer(
+            input: TextFormField(
+              autofocus: false,
+              controller: _addressController,
+              textCapitalization: TextCapitalization.sentences,
+              minLines: 2,
+              maxLines: 4,
+              cursorColor: Colors.black,
+              style: TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
+                  border: InputBorder.none,
+                  labelText: 'Address *',
+                  errorMaxLines: 2),
+              textInputAction: TextInputAction.done,
+              validator: (value) {
+                if (value.isEmpty)
+                  return 'Please provide your address, we keep it confidential';
+                return null;
+              },
+              onSaved: (value) {
+                setState(() {
+                  _driverForm.address = value;
+                });
+              },
+            ),
           ),
         ],
       ),
@@ -483,9 +577,11 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
         return _namePage(context);
         break;
       case 4:
+        return _addressPage(context);
+      case 5:
         return _contactPage(context);
         break;
-      case 5:
+      case 6:
         return _passwordPage(context);
         break;
     }
@@ -515,7 +611,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                         fontSize: 3.37 * SizeConfig.textMultiplier,
                         fontWeight: FontWeight.w400),
                   )),
-            if (_pageCounter < 5)
+            if (_pageCounter < 6)
               FlatButton(
                   onPressed: () {
                     if (_driverSignupKey.currentState.validate()) {
@@ -551,20 +647,45 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     );
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('Exit signup form?'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-          child: Container(
-        padding: EdgeInsets.symmetric(
-            vertical: 3.75 * SizeConfig.heightMultiplier,
-            horizontal: 3.125 * SizeConfig.widthMultiplier),
-        child: Form(
-          key: _driverSignupKey,
-          child: _buildPages(context),
-        ),
-      )),
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+              child: SafeArea(
+            child: Container(
+          padding: EdgeInsets.symmetric(
+              vertical: 3.75 * SizeConfig.heightMultiplier,
+              horizontal: 3.125 * SizeConfig.widthMultiplier),
+          child: Form(
+            key: _driverSignupKey,
+            child: _buildPages(context),
+          ),
+        )),
+      ),
       bottomNavigationBar: _buildBottomBar(context),
     );
   }

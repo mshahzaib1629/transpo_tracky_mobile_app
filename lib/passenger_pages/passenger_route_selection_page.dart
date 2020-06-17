@@ -36,8 +36,22 @@ class _PassengerRouteSelectionPageState
       _isLoading = true;
     });
     if (userLocation != null)
-      Provider.of<TripProvider>(context, listen: false)
-          .fetchSuggestedTrips(userLocation.latitude, userLocation.longitude);
+      try {
+        await Provider.of<TripProvider>(context, listen: false)
+            .fetchSuggestedTrips(userLocation.latitude, userLocation.longitude);
+      } catch (error) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oh no!'),
+            content: Text('Someting went wrong.'),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.pop(context), child: Text('Okay'))
+            ],
+          ),
+        );
+      }
     setState(() {
       _isLoading = false;
     });
@@ -146,23 +160,25 @@ class _PassengerRouteSelectionPageState
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : (tripProvider.trips_suggested.length != 0)
+          : (tripProvider.getSuggestedTrips.length != 0)
               ? ListView.builder(
-                  itemCount: tripProvider.trips_suggested.length,
+                  itemCount: tripProvider.getSuggestedTrips.length,
                   itemBuilder: (context, index) {
-                    Trip trip = tripProvider.trips_suggested[index];
+                    Trip trip = tripProvider.getSuggestedTrips[index];
                     return SuggestionCard(
                       prefTrip: trip,
                     );
                   },
                 )
               : Center(
-                  child: Text(
-                    'No Routes to suggest!',
-                    style: TextStyle(
-                      fontSize: 2.63 * SizeConfig.textMultiplier,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : Text(
+                          'No Routes to suggest!',
+                          style: TextStyle(
+                            fontSize: 2.63 * SizeConfig.textMultiplier,
+                          ),
+                        ),
                 ),
     );
   }

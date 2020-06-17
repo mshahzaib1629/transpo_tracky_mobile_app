@@ -20,14 +20,17 @@ class MapHelper {
   }
 
   static Future<LatLng> getPlaceLatLng(String placeId) async {
-    try{
+    try {
       LatLng placeLatLng;
-      final url = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$GOOGLE_API_KEY';
-      final http.Response response = await http.get(url).timeout(requestTimeout);
+      final url =
+          'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$GOOGLE_API_KEY';
+      final http.Response response =
+          await http.get(url).timeout(requestTimeout);
       final dataFetched = json.decode(response.body)['result'];
-      placeLatLng = LatLng(dataFetched['geometry']['location']['lat'], dataFetched['geometry']['location']['lng']);
+      placeLatLng = LatLng(dataFetched['geometry']['location']['lat'],
+          dataFetched['geometry']['location']['lng']);
       return placeLatLng;
-    }catch(error) {
+    } catch (error) {
       throw error;
     }
   }
@@ -52,17 +55,34 @@ class MapHelper {
     }
   }
 
-  static Future<void> updateDriverLocation(String trackingKey, LocationData location) async {
+  static Future<void> updateDriverLocation(
+      String trackingKey, LocationData location) async {
     try {
       var url =
           "https://transpo-tracky.firebaseio.com/trackings/$trackingKey.json";
-      await http.post(url,
-          body: json.encode({
-            'lat': location.latitude,
-            'lng': location.longitude
-          })).timeout(requestTimeout);
+      await http
+          .post(url,
+              body: json.encode(
+                  {'lat': location.latitude, 'lng': location.longitude}))
+          .timeout(requestTimeout);
     } catch (error) {
       throw error;
+    }
+  }
+
+  // under testing mode
+  static Future<void> getDirections(
+      LocationData currentPosition, Stop nextStop) async {
+    try {
+      final baseURL = 'https://maps.googleapis.com/maps/api/directions/json';
+      print('directions api called');
+      final request =
+          '$baseURL?origin=${currentPosition.latitude},${currentPosition.longitude}&destination=${nextStop.latitude},${nextStop.longitude}&key=$GOOGLE_API_KEY';
+      final response = await http.get(request).timeout(requestTimeout);
+      final pipeline = json.decode(response.body);
+      print(pipeline);
+    } catch (error) {
+      print(error);
     }
   }
 
@@ -81,5 +101,3 @@ String _generateStopListString(List<Stop> stopList) {
   }
   return generatedString;
 }
-
-

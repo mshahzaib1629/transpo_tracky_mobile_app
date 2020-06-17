@@ -115,8 +115,7 @@ class _TripRecordCardState extends State<TripRecordCard> {
                 widget.trip.route.name,
                 style: Theme.of(context).textTheme.body2,
               ),
-              // date should be fetched from trip's startTime
-              Text('17/02/2019'),
+              Text(DateFormat.yMMMMd().format(widget.trip.startTime)),
             ],
           ),
           SizedBox(height: 1.56 * SizeConfig.heightMultiplier),
@@ -128,14 +127,20 @@ class _TripRecordCardState extends State<TripRecordCard> {
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(DateFormat.jm().format(origin.timeToReach))),
+                      child: Text(DateFormat.jm().format(
+                          origin.timeReached != null
+                              ? origin.timeReached
+                              : origin.timeToReach))),
                   SizedBox(
                     height: 1.97 * SizeConfig.heightMultiplier,
                   ),
                   Container(
                       padding: EdgeInsets.only(
                           right: 2.2 * SizeConfig.widthMultiplier),
-                      child: Text(DateFormat.jm().format(destination.timeToReach))),
+                      child: Text(DateFormat.jm().format(
+                          destination.timeReached != null
+                              ? destination.timeReached
+                              : destination.timeToReach))),
                 ],
               ),
               _locationWidget(context),

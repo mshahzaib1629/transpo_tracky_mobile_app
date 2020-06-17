@@ -16,6 +16,7 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
   bool _isInit = true;
   bool _isLoading = false;
 
+  String _title = 'Morning Routes';
   List<r.Route> routes = [];
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -35,7 +36,7 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
         });
       }).then((_) {
         setState(() {
-          routes = routeProvider.routes;
+          routes = routeProvider.getFilteredRoutes(RouteFilter.Morning);
           _isLoading = false;
           _isInit = false;
         });
@@ -68,13 +69,6 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
             : Container(),
       );
 
-  Widget verticalLLine(BuildContext context) => Container(
-        margin: EdgeInsets.only(left: 1.72 * SizeConfig.widthMultiplier),
-        width: 0.56 * SizeConfig.widthMultiplier,
-        height: 1.87 * SizeConfig.heightMultiplier,
-        color: Theme.of(context).accentColor,
-      );
-
   Widget _buildTopBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -96,20 +90,20 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
           ),
           Expanded(
             // Let user enter location manually
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Search Here',
-              ),
-              onSubmitted: (vale) {},
+            child: Text(
+              _title,
+              style: Theme.of(context).textTheme.display3,
             ),
+            // TextField(
+            //   decoration: InputDecoration(
+            //     border: InputBorder.none,
+            //     hintText: 'Search Here',
+            //   ),
+            //   onSubmitted: (vale) {},
+            // ),
           ),
           PopupMenuButton(
             itemBuilder: (context) => [
-              PopupMenuItem(
-                child: Text('All'),
-                value: RouteFilter.All,
-              ),
               PopupMenuItem(
                 child: Text('Morning'),
                 value: RouteFilter.Morning,
@@ -118,11 +112,25 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
                 child: Text('Evening'),
                 value: RouteFilter.Evening,
               ),
+              PopupMenuItem(
+                child: Text('Faculty'),
+                value: RouteFilter.Faculty,
+              ),
+              PopupMenuItem(
+                child: Text('Hostel'),
+                value: RouteFilter.Hostel,
+              ),
             ],
             onSelected: (value) {
               setState(() {
                 routes = Provider.of<RouteProvider>(context, listen: false)
                     .getFilteredRoutes(value);
+                setState(() {
+                  if (value == RouteFilter.Morning) _title = 'Morning Routes';
+                  if (value == RouteFilter.Evening) _title = 'Evening Routes';
+                  if (value == RouteFilter.Faculty) _title = 'Faculty Routes';
+                  if (value == RouteFilter.Hostel) _title = 'Hostel Routes';
+                });
               });
             },
           ),
@@ -136,7 +144,8 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
     try {
       await route.fetchRoutes();
       setState(() {
-        routes = route.routes;
+        routes = route.getFilteredRoutes(RouteFilter.Morning);
+        _title = 'Morning Routes';
       });
     } catch (error) {
       setState(() {

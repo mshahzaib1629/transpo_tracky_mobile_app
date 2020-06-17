@@ -109,6 +109,8 @@ class RouteProvider with ChangeNotifier {
         if (route.stopList.length != 0) fetchedRoutes.add(route);
       });
       routes = fetchedRoutes;
+      routes
+          .sort((a, b) => a.name.compareTo(b.name));
       notifyListeners();
     } catch (error) {
       throw (error);
@@ -170,16 +172,20 @@ class RouteProvider with ChangeNotifier {
 
   List<Route> getFilteredRoutes(RouteFilter filter) {
     List<Route> filteredRoutes = [];
-    if (filter == RouteFilter.All) {
-      filteredRoutes = routes;
-    } else if (filter == RouteFilter.Morning) {
-      filteredRoutes = routes
-          .where((route) => route.pickUpTime == '08:30:00.000000')
-          .toList();
+    if (filter == RouteFilter.Morning) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('M')).toList();
     } else if (filter == RouteFilter.Evening) {
-      filteredRoutes = routes
-          .where((route) => route.pickUpTime == '11:30:00.000000')
-          .toList();
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('E')).toList();
+    }
+    else if (filter == RouteFilter.Faculty) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('F')).toList();
+    }
+    else if (filter == RouteFilter.Hostel) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('H')).toList();
     }
     return filteredRoutes;
   }

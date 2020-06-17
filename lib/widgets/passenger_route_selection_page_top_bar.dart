@@ -104,6 +104,7 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
           Expanded(
             // Let user enter location manually
             child: TextField(
+              textCapitalization: TextCapitalization.sentences,
               controller: _locationTextController,
               decoration: InputDecoration(
                 border: InputBorder.none,

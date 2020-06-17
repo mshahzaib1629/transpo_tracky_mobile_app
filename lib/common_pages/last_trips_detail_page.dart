@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -15,10 +17,28 @@ class LastTripsDetailPage extends StatelessWidget {
   LastTripsDetailPage({@required this.trip});
 
   Widget _buildMap(BuildContext context) {
+    final staticMapImageUrl =
+        MapHelper.generateMapPreviewImage(stopList: trip.route.stopList);
+
+    if (trip.route.staticMapImage == null) {
+      trip.route.staticMapImage = Image.network(
+        staticMapImageUrl,
+        fit: BoxFit.fill,
+        width: double.infinity,
+        height: double.infinity,
+      );
+      print('api called');
+    }
     return Container(
-      color: Colors.black12,
-      height: 32.8125 * SizeConfig.heightMultiplier,
-    );
+        color: Colors.black12,
+        alignment: Alignment.center,
+        height: 32.8125 * SizeConfig.heightMultiplier,
+        child: trip.route.staticMapImage == null
+            ? Text(
+                'Something went wrong!',
+                textAlign: TextAlign.center,
+              )
+            : trip.route.staticMapImage);
   }
 
   Widget horizontalLine(BuildContext context) => Container(
@@ -58,7 +78,7 @@ class LastTripsDetailPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
-                    Text(trip.startTime),
+                    Text(DateFormat.jm().format(trip.startTime)),
                     Text(trip.meter.initialReading.toStringAsFixed(1) + ' km'),
                   ],
                 ),
@@ -66,7 +86,7 @@ class LastTripsDetailPage extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(trip.endTime),
+                    Text(DateFormat.jm().format(trip.endTime)),
                     Text(trip.meter.finalReading.toStringAsFixed(1) + ' km'),
                   ],
                 ),
@@ -205,9 +225,14 @@ class LastTripsDetailPage extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeReached),
+                      Text(DateFormat.jm().format(
+                          currentStop.timeReached != null
+                              ? currentStop.timeReached
+                              : currentStop.timeToReach)),
                       Text(
-                        'Reached',
+                        currentStop.timeReached != null
+                            ? 'Reached'
+                            : 'Est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(
                             fontSize: 1.56 * SizeConfig.textMultiplier),
                       ),
@@ -300,11 +325,11 @@ class LastTripsDetailPage extends StatelessWidget {
               height: 0.78 * SizeConfig.heightMultiplier,
             ),
             _buildDriversDetail(context),
-            if (loginMode == LoginMode.Driver) Divider(),
+            Divider(),
             SizedBox(
               height: 0.78 * SizeConfig.heightMultiplier,
             ),
-            if (loginMode == LoginMode.Driver) _buildRouteDetail(context),
+            _buildRouteDetail(context),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[

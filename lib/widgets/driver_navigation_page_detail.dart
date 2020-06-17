@@ -236,7 +236,7 @@ class _DriverNavigationPageDetailState
                   Text(
                     // --------------------------------------------------------
                     // here should come the next stop's estimated time to reach
-                    DateFormat.jm().format(currentTrip.driverNextStop.timeToReach),
+                    DateFormat.jm().format(currentTrip.driverNextStop.timeToReach ?? '0'),
                     // --------------------------------------------------------
                     style: Theme.of(context).textTheme.title,
                   ),

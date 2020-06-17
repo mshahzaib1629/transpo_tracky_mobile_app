@@ -211,6 +211,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _firstNameController,
+              textCapitalization: TextCapitalization.words,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -241,6 +242,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _lastNameController,
+              textCapitalization: TextCapitalization.words,
               focusNode: _lastNameFocusNode,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
@@ -259,9 +261,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
               },
             ),
           ),
-          SizedBox(
-            height: 1.8 * SizeConfig.heightMultiplier
-          ),
+          SizedBox(height: 1.8 * SizeConfig.heightMultiplier),
           Align(
             alignment: Alignment.centerRight,
             child: Container(
@@ -550,20 +550,45 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
     );
   }
 
+Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('Exit registration form?'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-          child: Container(
-        padding: EdgeInsets.symmetric(
-            vertical: 3.75 * SizeConfig.heightMultiplier,
-            horizontal: 3.125 * SizeConfig.widthMultiplier),
-        child: Form(
-          key: _passengerSignupKey,
-          child: _buildPages(context),
-        ),
-      )),
+      body: WillPopScope(
+      onWillPop: _onBackPressed,
+              child: SafeArea(
+            child: Container(
+          padding: EdgeInsets.symmetric(
+              vertical: 3.75 * SizeConfig.heightMultiplier,
+              horizontal: 3.125 * SizeConfig.widthMultiplier),
+          child: Form(
+            key: _passengerSignupKey,
+            child: _buildPages(context),
+          ),
+        )),
+      ),
       bottomNavigationBar: _buildBottomBar(context),
     );
   }

@@ -93,10 +93,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     // -----------------------------------------
     // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
     _tripConfig.currentDriver = Driver(
-        id: 1,
-        registrationID: 'EMP-DR-1',
-        firstName: 'Mushtaq',
-        lastName: 'Ahmed');
+        id: 3,
+        registrationID: 'EMP-DR-3',
+        firstName: 'Ejaz',
+        lastName: 'Khan');
     // -----------------------------------------
   }
 
@@ -457,6 +457,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               children: <Widget>[
                 TextFormField(
                   controller: partnerIdController,
+                  textCapitalization: TextCapitalization.characters,
                   style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(0),
@@ -544,6 +545,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         children: <Widget>[
           TextFormField(
             controller: busPlateController,
+            textCapitalization: TextCapitalization.characters,
             cursorColor: Colors.black,
             style: TextStyle(color: Colors.black),
             decoration: InputDecoration(
@@ -649,22 +651,26 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           actions: <Widget>[
             FlatButton(
                 onPressed: () {
+                  Navigator.pop(context);
                   _saveForm();
+                  setState(() {
+                    _isLoading = true;
+                  });
                   _tripConfig.meter = BusMeterReading(
                       initialReading:
                           double.parse(meterReadingController.text));
                   Provider.of<TripProvider>(context, listen: false)
                       .startTrip(config: _tripConfig)
                       .then((_) {
-                        setState(() {
-                          widget.isExpanded = false;
-                        });
-                    Navigator.pushReplacement(
+                    setState(() {
+                      widget.isExpanded = false;
+                      _isLoading = false;
+                    });
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => DriverNavigationPage()));
                   }).catchError((error) {
-                    Navigator.pop(context);
                     showDialog(
                         context: context,
                         child: AlertDialog(
@@ -676,6 +682,9 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                                 child: Text('Okay'))
                           ],
                         ));
+                    setState(() {
+                      _isLoading = false;
+                    });
                   });
                 },
                 child: Text('Lets Go'))

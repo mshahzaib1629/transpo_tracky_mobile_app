@@ -145,6 +145,7 @@ class _SuggestionCardState extends State<SuggestionCard> {
   }
 
   Widget _buildFooter(BuildContext context) {
+    print('live status: ${widget.prefTrip.shareLiveLocation}');
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -174,7 +175,7 @@ class _SuggestionCardState extends State<SuggestionCard> {
                     width: 1.67 * SizeConfig.widthMultiplier,
                   ),
                   Text(
-                      '${widget.prefTrip.passengerStop.estWalkTime} from your location'),
+                      '${widget.prefTrip.passengerStop.distanceFromUser} km away'),
                 ],
               ),
               Icon(

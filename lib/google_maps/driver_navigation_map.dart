@@ -53,7 +53,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
             stop.longitude,
           ),
           draggable: false,
-          infoWindow: InfoWindow(title: 'Stop Name', snippet: stop.name),
+          infoWindow: InfoWindow(title: stop.name),
           icon: BitmapDescriptor.defaultMarker,
         ));
       });
@@ -110,6 +110,8 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
         if (_throttle?.isActive ?? false) _throttle.cancel();
         _throttle = Timer(locationUpdatePeriod, () async {
           try {
+            // await MapHelper.getDirections(
+            //     newLocalData, tripProvider.driverCreatedTrip.driverNextStop);
             await MapHelper.updateDriverLocation(
                 trip.mapTraceKey, newLocalData);
           } catch (error) {

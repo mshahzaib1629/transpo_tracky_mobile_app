@@ -6,7 +6,46 @@ import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/widgets/trip_record_card.dart';
 
-class LastTripsPage extends StatelessWidget {
+class LastTripsPage extends StatefulWidget {
+  @override
+  _LastTripsPageState createState() => _LastTripsPageState();
+}
+
+class _LastTripsPageState extends State<LastTripsPage> {
+  bool _isInit = true;
+  bool _isLoading = false;
+  String _title = 'Last 30 Trips';
+
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+      new GlobalKey<RefreshIndicatorState>();
+
+  List<Trip> trips = [];
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+
+      tripProvider.fetchTripsRecord().catchError((error) {
+        print(error);
+        setState(() {
+          trips = [];
+        });
+      }).then((_) {
+        setState(() {
+          trips = tripProvider.getTripsRecord;
+          _isLoading = false;
+          _isInit = false;
+          // print('trips I got: ');
+          // print(trips);
+        });
+      });
+    }
+    super.didChangeDependencies();
+  }
+
   Widget _buildTopBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
@@ -28,13 +67,17 @@ class LastTripsPage extends StatelessWidget {
           ),
           Expanded(
             // Let user enter location manually
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Search Here',
-              ),
-              onSubmitted: (vale) {},
+            child: Text(
+              _title,
+              style: Theme.of(context).textTheme.display3,
             ),
+            // TextField(
+            //   decoration: InputDecoration(
+            //     border: InputBorder.none,
+            //     hintText: 'Search Here',
+            //   ),
+            //   onSubmitted: (vale) {},
+            // ),
           ),
           // For Fetching User's Location automatically
           IconButton(
@@ -52,25 +95,73 @@ class LastTripsPage extends StatelessWidget {
     );
   }
 
+  Future<void> _onRefresh() async {
+    final tripProvider = Provider.of<TripProvider>(context, listen: false);
+    try {
+      await tripProvider.fetchTripsRecord();
+      setState(() {
+        trips = tripProvider.getTripsRecord;
+        _title = 'Last 30 Trips';
+      });
+    } catch (error) {
+      setState(() {
+        trips = [];
+      });
+    }
+  }
+
   Widget _buildTripsList(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context);
-    return Container(
-      child: Expanded(
-        child: ListView.builder(
-            itemCount: tripProvider.dummy_trips_record.length,
-            itemBuilder: (context, index) {
-              Trip trip = tripProvider.dummy_trips_record[index];
-              return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                LastTripsDetailPage(trip: trip)));
-                  },
-                  child: TripRecordCard(trip: trip));
-            }),
-      ),
+    return Expanded(
+      child: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              key: _refreshIndicatorKey,
+              onRefresh: _onRefresh,
+              child: trips.length == 0
+                  ? _showErrorMessage()
+                  : ListView.builder(
+                      itemCount: trips.length,
+                      itemBuilder: (context, index) {
+                        Trip trip = trips[index];
+                        return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          LastTripsDetailPage(trip: trip)));
+                            },
+                            child: TripRecordCard(trip: trip));
+                      }),
+            ),
+    );
+  }
+
+  Widget _showErrorMessage() {
+    return ListView(
+      children: <Widget>[
+        SizedBox(
+          height: 28.3 * SizeConfig.heightMultiplier,
+        ),
+        Center(
+            child: Column(
+          children: <Widget>[
+            Text(
+              'No Record Found!',
+              style: TextStyle(fontSize: 2.63 * SizeConfig.textMultiplier),
+            ),
+            SizedBox(
+              height: 1.54 * SizeConfig.heightMultiplier,
+            ),
+            Text(
+              'PULL DOWN TO REFRESH',
+              style: TextStyle(
+                  fontSize: 2.43 * SizeConfig.textMultiplier,
+                  color: Theme.of(context).accentColor),
+            ),
+          ],
+        )),
+      ],
     );
   }
 
