@@ -13,6 +13,11 @@ import 'package:transpo_tracky_mobile_app/widgets/suggestion_card.dart';
 import '../helpers/size_config.dart';
 
 class PassengerRouteSelectionPage extends StatefulWidget {
+
+  final Function setSelectedTrip;
+
+  PassengerRouteSelectionPage(this.setSelectedTrip);
+
   @override
   _PassengerRouteSelectionPageState createState() =>
       _PassengerRouteSelectionPageState();
@@ -29,6 +34,32 @@ class _PassengerRouteSelectionPageState
       this._locationPredictions = predictions;
       _isLoading = false;
     });
+  }
+
+  Future<void> fetchFavoriteTrips(favorite) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<TripProvider>(context, listen: false)
+          .fetchFavoriteSuggested(favorite);
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Oh no!'),
+          content: Text('Someting went wrong.'),
+          actions: [
+            FlatButton(
+                onPressed: () => Navigator.pop(context), child: Text('Okay'))
+          ],
+        ),
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    print('trips fetched');
   }
 
   Future<void> fetchTrips(UserLocation userLocation) async {
@@ -71,6 +102,17 @@ class _PassengerRouteSelectionPageState
       print('trips fetched');
     } catch (error) {
       print(error);
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oh no!'),
+            content: Text('Someting went wrong.'),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.pop(context), child: Text('Okay'))
+            ],
+          ),
+        );
     }
     setState(() {
       _isLoading = false;
@@ -110,7 +152,7 @@ class _PassengerRouteSelectionPageState
                         itemBuilder: (context, index) {
                           FavoriteRoute favoriteRoute =
                               routeConsumer.passengerFavoriteRoutes[index];
-                          return FavoriteRouteCard(favoriteRoute);
+                          return FavoriteRouteCard(favoriteRoute, fetchFavoriteTrips);
                         },
                       ),
                     ),
@@ -167,6 +209,7 @@ class _PassengerRouteSelectionPageState
                     Trip trip = tripProvider.getSuggestedTrips[index];
                     return SuggestionCard(
                       prefTrip: trip,
+                      setSelectedTrip: widget.setSelectedTrip
                     );
                   },
                 )

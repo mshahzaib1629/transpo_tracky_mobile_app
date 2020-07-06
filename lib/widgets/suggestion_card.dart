@@ -9,9 +9,11 @@ import '../helpers/size_config.dart';
 
 class SuggestionCard extends StatefulWidget {
   final Trip prefTrip;
+  final Function setSelectedTrip;
 
   SuggestionCard({
     @required this.prefTrip,
+    @required this.setSelectedTrip,
   });
   @override
   State<StatefulWidget> createState() {
@@ -55,10 +57,9 @@ class _SuggestionCardState extends State<SuggestionCard> {
       );
 
   Widget _buildHead(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context, listen: false);
     return GestureDetector(
       onTap: () {
-        tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip);
+        widget.setSelectedTrip(selectedTrip: widget.prefTrip);
         Navigator.pop(context);
       },
       child: Container(
@@ -85,8 +86,7 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   children: <Widget>[
                     Text(
                       widget.prefTrip.passengerStop.estToReachBus != null
-                          ? DateFormat.jm().format(
-                              widget.prefTrip.passengerStop.estToReachBus)
+                          ? widget.prefTrip.passengerStop.estToReachBus
                           : DateFormat.jm().format(
                               widget.prefTrip.passengerStop.timeToReach),
                       style: Theme.of(context).textTheme.headline,
@@ -145,7 +145,6 @@ class _SuggestionCardState extends State<SuggestionCard> {
   }
 
   Widget _buildFooter(BuildContext context) {
-    print('live status: ${widget.prefTrip.shareLiveLocation}');
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -174,8 +173,10 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   SizedBox(
                     width: 1.67 * SizeConfig.widthMultiplier,
                   ),
-                  Text(
-                      '${widget.prefTrip.passengerStop.distanceFromUser} km away'),
+                  widget.prefTrip.passengerStop.distanceFromUser != null
+                      ? Text(
+                          '${widget.prefTrip.passengerStop.distanceFromUser} km away')
+                      : Text('location access rejected!'),
                 ],
               ),
               Icon(

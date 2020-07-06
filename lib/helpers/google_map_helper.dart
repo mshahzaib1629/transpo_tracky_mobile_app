@@ -71,7 +71,7 @@ class MapHelper {
   }
 
   // under testing mode
-  static Future<void> getDirections(
+  static Future<dynamic> getDirections(
       LocationData currentPosition, Stop nextStop) async {
     try {
       final baseURL = 'https://maps.googleapis.com/maps/api/directions/json';
@@ -79,11 +79,55 @@ class MapHelper {
       final request =
           '$baseURL?origin=${currentPosition.latitude},${currentPosition.longitude}&destination=${nextStop.latitude},${nextStop.longitude}&key=$GOOGLE_API_KEY';
       final response = await http.get(request).timeout(requestTimeout);
-      final pipeline = json.decode(response.body);
-      print(pipeline);
+      final routeData = json.decode(response.body);
+      return routeData;
     } catch (error) {
       print(error);
     }
+  }
+
+  // This function converts the decoded list of points received from Google's Directions API
+  static List<LatLng> convertToLatLng(String poly) {
+    List points = decodePoly(poly);
+    List<LatLng> result = <LatLng>[];
+    for (int i = 0; i < points.length; i++) {
+      if (i % 2 != 0) {
+        result.add(LatLng(points[i - 1], points[i]));
+      }
+    }
+    return result;
+  }
+
+  // This function decodes the string recevied from the Google's Directions API into the list of decimal points
+  static List decodePoly(String poly) {
+    var list = poly.codeUnits;
+    var lList = new List();
+    int index = 0;
+    int len = poly.length;
+    int c = 0;
+// repeating until all attributes are decoded
+    do {
+      var shift = 0;
+      int result = 0;
+
+      // for decoding value of one attribute
+      do {
+        c = list[index] - 63;
+        result |= (c & 0x1F) << (shift * 5);
+        index++;
+        shift++;
+      } while (c >= 32);
+      /* if value is negetive then bitwise not the value */
+      if (result & 1 == 1) {
+        result = ~result;
+      }
+      var result1 = (result >> 1) * 0.00001;
+      lList.add(result1);
+    } while (index < len);
+
+/*adding to previous value as done in encoding */
+    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    return lList;
   }
 
   static String generateMapPreviewImage({List<Stop> stopList}) {

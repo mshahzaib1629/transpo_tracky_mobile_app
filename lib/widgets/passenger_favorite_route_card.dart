@@ -6,17 +6,16 @@ import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class FavoriteRouteCard extends StatelessWidget {
+  final favorite;
+  Function fetchFavoriteTrips;
 
-final favorite;
-
-FavoriteRouteCard(this.favorite);
+  FavoriteRouteCard(this.favorite, this.fetchFavoriteTrips);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Provider.of<TripProvider>(context, listen: false)
-            .fetchFavoriteSuggested(favorite);
+        fetchFavoriteTrips(favorite);
       },
       onLongPress: () {
         showDialog(

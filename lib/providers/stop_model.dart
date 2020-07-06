@@ -9,7 +9,7 @@ class Stop {
   // EstToReachBus (estimated time to reach bus) &
   // distanceFromUser (estimated time to walk towards stop) is for trip suggestions to passengers
   // these times will be calculated by 3rd party API's
-  DateTime estToReachBus;
+  String estToReachBus;
   String distanceFromUser;
   // timeReached attribute is only for record trips, it is not necessary for trip suggestion routes
   DateTime timeReached;
@@ -31,12 +31,21 @@ class Stop {
 List<Stop> dummy_stops_1 = [
   Stop(
       id: 1,
+      name: 'Shadrah Chowk',
+      longitude: 74.1896793,
+      latitude: 31.6500968,
+      timeToReach: DateFormat('Hms', 'en_US').parse('09:45:00'),
+      // timeReached: '7:10 AM',
+      estToReachBus: '16 mins',
+      distanceFromUser: '8 mins'),
+  Stop(
+      id: 1,
       name: 'Muridke',
       longitude: 74.2475891,
       latitude: 31.6240714,
-      timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
+      timeToReach: DateFormat('Hms', 'en_US').parse('14:32:01'),
       // timeReached: '6:50 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -45,16 +54,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '6:55 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
-      distanceFromUser: '8 mins'),
-  Stop(
-      id: 1,
-      name: 'Shadrah Round About',
-      longitude: 74.2475891,
-      latitude: 31.6240714,
-      timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
-      // timeReached: '7:10 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -63,7 +63,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:20 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -72,7 +72,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.569135,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:30 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -81,7 +81,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:45 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -90,7 +90,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:50 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -99,7 +99,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:55 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -108,7 +108,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:10 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -117,7 +117,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:15 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -126,7 +126,7 @@ List<Stop> dummy_stops_1 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
 ];
 
@@ -138,7 +138,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '6:45 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -147,7 +147,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '6:55 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -156,7 +156,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:15 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -165,7 +165,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:20 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -174,7 +174,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.5516476,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:30 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -183,7 +183,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:50 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -192,7 +192,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:55 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -201,7 +201,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:58 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -210,7 +210,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:10 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -219,7 +219,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:20 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -228,7 +228,7 @@ List<Stop> dummy_stops_2 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
 ];
 
@@ -240,7 +240,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -249,7 +249,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -258,7 +258,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -267,7 +267,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -276,7 +276,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -285,7 +285,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -294,7 +294,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -303,7 +303,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -312,7 +312,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -321,7 +321,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -330,7 +330,7 @@ List<Stop> dummy_stops_3 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
 ];
 
@@ -342,7 +342,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '6:40 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -351,7 +351,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '6:50 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -360,7 +360,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:20 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -369,7 +369,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -378,7 +378,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:40 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -387,7 +387,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:45 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -396,7 +396,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:45 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -405,7 +405,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '7:55 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -414,7 +414,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:10 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -423,7 +423,7 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:20 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
   Stop(
       id: 1,
@@ -432,6 +432,6 @@ List<Stop> dummy_stops_4 = [
       latitude: 31.6240714,
       timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
       // timeReached: '8:25 AM',
-      estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+      estToReachBus: '16 mins',
       distanceFromUser: '8 mins'),
 ];

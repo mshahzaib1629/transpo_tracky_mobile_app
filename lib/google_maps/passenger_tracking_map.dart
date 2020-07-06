@@ -17,6 +17,9 @@ class PassengerTrackingMap extends StatefulWidget {
 }
 
 class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
+
+  TripProvider tripProvider;
+  Trip trip;
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   Set<Marker> _setOfMarkers = {};
@@ -32,23 +35,23 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   @override
   void initState() {
     super.initState();
+    tripProvider = Provider.of<TripProvider>(context, listen: false);
+    trip = tripProvider.passengerSelectedTrip;
     getCurrentLocation();
     getStopLocation();
   }
 
   void getStopLocation() async {
-    final selectedStop = Provider.of<TripProvider>(context, listen: false)
-        .passengerSelectedTrip
-        .passengerStop;
+    
     setState(() {
       _setOfMarkers.add(Marker(
-        markerId: MarkerId(selectedStop.id.toString()),
+        markerId: MarkerId(trip.passengerStop.id.toString()),
         position: LatLng(
-          selectedStop.latitude,
-          selectedStop.longitude,
+          trip.passengerStop.latitude,
+          trip.passengerStop.longitude,
         ),
         draggable: false,
-        infoWindow: InfoWindow(title: 'Stop Name', snippet: selectedStop.name),
+        infoWindow: InfoWindow(title: 'Stop Name', snippet: trip.passengerStop.name),
         icon: BitmapDescriptor.defaultMarker,
       ));
     });

@@ -13,11 +13,29 @@ class PassengerHomePage extends StatefulWidget {
 }
 
 class _PassengerHomePageState extends State<PassengerHomePage> {
+  Trip passengerSelectedTrip;
+
+  void setSelectedTrip({Trip selectedTrip}) {
+    setState(() {
+      passengerSelectedTrip = selectedTrip;
+    });
+    print('trip selected');
+  }
+
+  Future<void> joinTrip(Trip passengerTrip) async {
+    try {
+      await Provider.of<TripProvider>(context, listen: false)
+          .joinTrip(selectedTrip: passengerTrip);
+    } catch (error) {
+      print(error);
+    }
+  }
+
   Widget _buildGoButton(BuildContext context) {
     return Consumer<TripProvider>(
       builder: (context, tripConsumer, child) => GestureDetector(
         onTap: () {
-          if (tripConsumer.passengerSelectedTrip == null) {
+          if (passengerSelectedTrip == null) {
             showDialog(
                 context: context,
                 child: AlertDialog(
@@ -29,12 +47,29 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
                   ],
                 ));
           } else {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => PassengerTrackingPage(
-                          trip: tripConsumer.passengerSelectedTrip,
-                        )));
+            print(
+                'id: ${passengerSelectedTrip.id}, stopId: ${passengerSelectedTrip.passengerStop.id}');
+            tripConsumer
+                .joinTrip(selectedTrip: passengerSelectedTrip)
+                .then((_) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => PassengerTrackingPage()));
+            }).catchError((error) {
+              print(error);
+              showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: Text('Oh no!'),
+                        content: Text('Something went wrong.'),
+                        actions: [
+                          FlatButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text('Okay'))
+                        ],
+                      ));
+            });
           }
         },
         child: Container(
@@ -95,10 +130,10 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
       drawer: AppDrawer(),
       body: WillPopScope(
         onWillPop: _onBackPressed,
-              child: SafeArea(
+        child: SafeArea(
             child: Stack(
           children: <Widget>[
-            PassengerHomePageMap(),
+            PassengerHomePageMap(passengerSelectedTrip),
             Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: 4.5 * SizeConfig.widthMultiplier,
@@ -107,7 +142,9 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  PassengerHomePageTopBar(),
+                  PassengerHomePageTopBar(
+                      selectedTrip: passengerSelectedTrip,
+                      setSelectedTrip: setSelectedTrip),
                   _buildGoButton(context),
                 ],
               ),

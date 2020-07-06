@@ -65,41 +65,6 @@ class LastTripsDetailPage extends StatelessWidget {
         Row(
           children: <Widget>[
             Icon(
-              Icons.access_time,
-              color: Theme.of(context).accentColor,
-            ),
-            SizedBox(
-              width: 5.56 * SizeConfig.widthMultiplier,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(DateFormat.jm().format(trip.startTime)),
-                    Text(trip.meter.initialReading.toStringAsFixed(1) + ' km'),
-                  ],
-                ),
-                horizontalLine(context),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(DateFormat.jm().format(trip.endTime)),
-                    Text(trip.meter.finalReading.toStringAsFixed(1) + ' km'),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 1.25 * SizeConfig.heightMultiplier,
-        ),
-        Row(
-          children: <Widget>[
-            Icon(
               Icons.supervised_user_circle,
               color: Theme.of(context).accentColor,
             ),
@@ -114,6 +79,56 @@ class LastTripsDetailPage extends StatelessWidget {
                       : Theme.of(context).accentColor),
             ),
             Text(' Passengers were on Board'),
+          ],
+        ),
+        SizedBox(
+          height: 1.25 * SizeConfig.heightMultiplier,
+        ),
+        Row(
+          children: <Widget>[
+            Icon(
+              Icons.access_time,
+              color: Theme.of(context).accentColor,
+            ),
+            SizedBox(
+              width: 5.56 * SizeConfig.widthMultiplier,
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(DateFormat.jm().format(trip.startTime)),
+                        Text(trip.meter.initialReading.toStringAsFixed(1) +
+                            ' km'),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: horizontalLine(context),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(DateFormat.jm().format(trip.endTime)),
+                        Text(
+                            trip.meter.finalReading.toStringAsFixed(1) + ' km'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ],

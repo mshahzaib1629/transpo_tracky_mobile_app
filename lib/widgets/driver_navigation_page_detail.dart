@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -8,7 +9,6 @@ import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../helpers/size_config.dart';
 
 class DriverNavigationPageDetail extends StatefulWidget {
-  
   @override
   _DriverNavigationPageDetailState createState() =>
       _DriverNavigationPageDetailState();
@@ -16,10 +16,8 @@ class DriverNavigationPageDetail extends StatefulWidget {
 
 class _DriverNavigationPageDetailState
     extends State<DriverNavigationPageDetail> {
-
   Trip currentTrip;
   bool _isExpanded = false;
-
 
   Widget _buildBusDetail(BuildContext context) {
     return Row(
@@ -126,9 +124,13 @@ class _DriverNavigationPageDetailState
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeReached != null ? currentStop.timeReached : DateFormat.jm().format(currentStop.timeToReach)),
+                      Text(currentStop.timeReached != null
+                          ? currentStop.timeReached
+                          : DateFormat.jm().format(currentStop.timeToReach)),
                       Text(
-                        currentStop.timeReached != null ? 'Reached' : 'est. Time',
+                        currentStop.timeReached != null
+                            ? 'Reached'
+                            : 'est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(
                             fontSize: 1.56 * SizeConfig.textMultiplier),
                       ),
@@ -230,30 +232,32 @@ class _DriverNavigationPageDetailState
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    // --------------------------------------------------------
-                    // here should come the next stop's estimated time to reach
-                    DateFormat.jm().format(currentTrip.driverNextStop.timeToReach ?? '0'),
-                    // --------------------------------------------------------
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  Text('Estimated Time')
-                ],
-              ),
+              currentTrip.mode == TripMode.PICK_UP
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          DateFormat.jm().format(
+                              currentTrip.driverNextStop.timeToReach ?? '0'),
+                          style: Theme.of(context).textTheme.title,
+                        ),
+                        Text('Estimated Time')
+                      ],
+                    )
+                  : Text(
+                      currentTrip.driverNextStop.distanceFromUser ?? '0 km',
+                      style: Theme.of(context).textTheme.title,
+                    ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    // --------------------------------------------------------------------
-                    // here should come the google's calculated time to reach the next stop
-                    '05 mins',
-                    // --------------------------------------------------------------------
+                    currentTrip.driverNextStop.estToReachBus != null
+                        ? currentTrip.driverNextStop.estToReachBus
+                        : '0 mins',
                     style: Theme.of(context).textTheme.title,
                   ),
-                  Text('are left')
+                  Text('away')
                 ],
               ),
             ],
@@ -320,7 +324,6 @@ class _DriverNavigationPageDetailState
 
   @override
   Widget build(BuildContext context) {
-    
     final selectedTrip = Provider.of<TripProvider>(context).driverCreatedTrip;
     setState(() {
       this.currentTrip = selectedTrip;

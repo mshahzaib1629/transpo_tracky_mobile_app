@@ -8,6 +8,10 @@ import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class PassengerHomePageTopBar extends StatefulWidget {
+  final Trip selectedTrip;
+  final Function setSelectedTrip;
+
+  PassengerHomePageTopBar({this.selectedTrip, this.setSelectedTrip});
   @override
   _PassengerHomePageTopBarState createState() =>
       _PassengerHomePageTopBarState();
@@ -73,13 +77,14 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
     );
   }
 
-  void showFavoriteOption(routeProvider, tripProvider) {
-    if (tripProvider.passengerSelectedTrip != null) {
+  void showFavoriteOption() {
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    if (widget.selectedTrip != null) {
       Future.delayed(Duration(milliseconds: 500), () {
         if (_isInit == true)
           setState(() {
-            _showFavoriteOption = !routeProvider.isFavoriteFound(
-                trip: tripProvider.passengerSelectedTrip);
+            _showFavoriteOption =
+                !routeProvider.isFavoriteFound(trip: widget.selectedTrip);
             _isInit = false;
           });
       });
@@ -89,11 +94,8 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
       });
   }
 
-  Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {
-    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    final tripProvider = Provider.of<TripProvider>(context, listen: false);
-
-    showFavoriteOption(routeProvider, tripProvider);
+  Widget _topBarExpanded(BuildContext context) {
+    showFavoriteOption();
     return Padding(
       padding: EdgeInsets.only(
           top: 1.56 * SizeConfig.heightMultiplier,
@@ -123,9 +125,9 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                         1.38 * SizeConfig.imageSizeMultiplier),
                   ),
                   child: Text(
-                    selectedTrip.mode == TripMode.PICK_UP
-                        ? selectedTrip.passengerStop.name
-                        : selectedTrip.route.stopList[0].name,
+                    widget.selectedTrip.mode == TripMode.PICK_UP
+                        ? widget.selectedTrip.passengerStop.name
+                        : widget.selectedTrip.route.stopList[0].name,
                     style: Theme.of(context)
                         .textTheme
                         .body2
@@ -150,12 +152,12 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                         1.38 * SizeConfig.imageSizeMultiplier),
                   ),
                   child: Text(
-                    selectedTrip.mode == TripMode.PICK_UP
-                        ? selectedTrip
+                    widget.selectedTrip.mode == TripMode.PICK_UP
+                        ? widget.selectedTrip
                             .route
-                            .stopList[selectedTrip.route.stopList.length - 1]
+                            .stopList[widget.selectedTrip.route.stopList.length - 1]
                             .name
-                        : selectedTrip.passengerStop.name,
+                        : widget.selectedTrip.passengerStop.name,
                     style: Theme.of(context)
                         .textTheme
                         .body2
@@ -171,8 +173,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
   }
 
   Widget _favoriteOptionBar(BuildContext context) {
-    return Consumer<TripProvider>(
-      builder: (context, tripConsumer, child) => Container(
+    return Container(
         decoration: BoxDecoration(
           color: Theme.of(context).accentColor.withOpacity(0.1),
           borderRadius: BorderRadius.only(
@@ -203,7 +204,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                       // Modification required here, pass the id of current logged in passenger, currently
                       // passing '1' as the dummy id
                       .addFavorite(
-                          trip: tripConsumer.passengerSelectedTrip,
+                          trip: widget.selectedTrip,
                           currentPassengerId: 1);
                   // --------------------------------------------------------------------------------
                   setState(() {
@@ -212,7 +213,7 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                   Scaffold.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                          '${tripConsumer.passengerSelectedTrip.passengerStop.name} added to favorites'),
+                          '${widget.selectedTrip.passengerStop.name} added to favorites'),
                       duration: Duration(seconds: 1),
                     ),
                   );
@@ -226,39 +227,36 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                 ))
           ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildTopBar(BuildContext context) {
-    return Consumer<TripProvider>(
-      builder: (context, tripConsumer, child) => Row(
-        crossAxisAlignment: tripConsumer.passengerSelectedTrip == null
-            ? CrossAxisAlignment.center
-            : CrossAxisAlignment.start,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.menu),
-            color: Theme.of(context).iconTheme.color,
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-          Expanded(
-            child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => PassengerRouteSelectionPage()));
-                },
-                child: tripConsumer.passengerSelectedTrip == null
-                    ? _topBarShrinked(context)
-                    : _topBarExpanded(
-                        context, tripConsumer.passengerSelectedTrip)),
-          )
-        ],
-      ),
+    return Row(
+      crossAxisAlignment: widget.selectedTrip == null
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.menu),
+          color: Theme.of(context).iconTheme.color,
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        Expanded(
+          child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PassengerRouteSelectionPage(
+                            widget.setSelectedTrip)));
+              },
+              child: widget.selectedTrip == null
+                  ? _topBarShrinked(context)
+                  : _topBarExpanded(context)),
+        )
+      ],
     );
   }
 

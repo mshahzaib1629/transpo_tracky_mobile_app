@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
@@ -25,8 +26,12 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
   Location _locationTracker = Location();
   Set<Marker> _setOfMarkers = {};
   Set<Circle> _setOfCircles = {};
+  Set<Polyline> _setOfPolylines = {};
   GoogleMapController _controller;
-  Timer _throttle;
+  LocationData _lastCheckpoint;
+  // _threshold is the value after which the coordinates in firebase, _lastCheckpoint and polylines are getting updated.
+  // e.g at _threshold = 0.02 (0.02 km / 20 m), update values whenever lastCheckpoint is 20 m away from current location.
+  double _threshold = 0.15;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -66,6 +71,37 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
     return byteData.buffer.asUint8List();
   }
 
+  void updateDirections(LocationData updatedLocation) async {
+    try {
+      List<LatLng> directionPoints =
+          await tripProvider.getDirections(updatedLocation);
+      setState(() {
+        _lastCheckpoint = updatedLocation;
+        _setOfPolylines.removeWhere((p) => p.polylineId.value == 'direction');
+        _setOfPolylines.add(Polyline(
+          polylineId: PolylineId('direction'),
+          color: Theme.of(context).accentColor,
+          width: 8,
+          points: directionPoints,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+        ));
+      });
+      await MapHelper.updateDriverLocation(trip.mapTraceKey, updatedLocation);
+    } catch (error) {
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            content: Text('Internet Connection Failed!'),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Try Again'))
+            ],
+          ));
+    }
+  }
+
   void updateMarkerAndCircle(LocationData newLocalData, Uint8List imageData) {
     LatLng latlng = LatLng(newLocalData.latitude, newLocalData.longitude);
     this.setState(() {
@@ -100,6 +136,10 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
 
       updateMarkerAndCircle(location, imageData);
 
+      if (_lastCheckpoint == null) {
+        updateDirections(location);
+      }
+
       if (_locationSubscription != null) {
         _locationSubscription.cancel();
       }
@@ -107,33 +147,25 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
       _locationSubscription =
           _locationTracker.onLocationChanged.listen((newLocalData) {
         tripProvider.checkDistanceToNextStop(newLocalData);
-        if (_throttle?.isActive ?? false) _throttle.cancel();
-        _throttle = Timer(locationUpdatePeriod, () async {
-          try {
-            // await MapHelper.getDirections(
-            //     newLocalData, tripProvider.driverCreatedTrip.driverNextStop);
-            await MapHelper.updateDriverLocation(
-                trip.mapTraceKey, newLocalData);
-          } catch (error) {
-            showDialog(
-                context: context,
-                child: AlertDialog(
-                  content: Text('Internet Connection Failed!'),
-                  actions: [
-                    FlatButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('Try Again'))
-                  ],
-                ));
-          }
-        });
+        var locDiff = tripProvider.calculateDistance(
+            newLocalData.latitude,
+            newLocalData.longitude,
+            _lastCheckpoint.latitude,
+            _lastCheckpoint.longitude);
+
+        print('last checkpoint: $_lastCheckpoint');
+        print('distance from last checkpoint: $locDiff');
+
+        if (locDiff > _threshold) {
+          updateDirections(newLocalData);
+        }
         if (_controller != null) {
           _controller.animateCamera(CameraUpdate.newCameraPosition(
               new CameraPosition(
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 10.00)));
+                  zoom: 18.00)));
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });
@@ -152,22 +184,66 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
     super.dispose();
   }
 
+  Widget _buildDistanceInfo(BuildContext context) {
+    return Container(
+      height: 5.625 * SizeConfig.heightMultiplier,
+      width: 23.89 * SizeConfig.widthMultiplier,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.black26),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
+            blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+          ),
+          BoxShadow(
+            color: Colors.black12,
+            offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
+            blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+          ),
+        ],
+        borderRadius:
+            BorderRadius.circular(4.45 * SizeConfig.imageSizeMultiplier),
+      ),
+      child: Center(
+          child: Text(
+        trip.driverNextStop.distanceFromUser ?? '0 km',
+        style: Theme.of(context).textTheme.body2,
+        overflow: TextOverflow.ellipsis,
+      )),
+    );
+  }
+
   Widget _buildCurrentLocationButton(BuildContext context) {
-    return Positioned(
-      bottom: 22.24 * SizeConfig.heightMultiplier,
-      right: 4.86 * SizeConfig.widthMultiplier,
-      child: FloatingActionButton(
-        onPressed: () {
-          getCurrentLocation();
-        },
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        child: Icon(
-          Icons.location_searching,
-          color: Colors.black54,
-          size: 7.78 * SizeConfig.imageSizeMultiplier,
-        ),
+    return FloatingActionButton(
+      onPressed: () {
+        getCurrentLocation();
+      },
+      backgroundColor: Colors.white,
+      child: Icon(
+        Icons.location_searching,
+        color: Colors.black54,
+        size: 7.78 * SizeConfig.imageSizeMultiplier,
       ),
     );
+  }
+
+  Widget _buildFloatingWidgets(BuildContext context) {
+    return Positioned(
+        bottom: 22.24 * SizeConfig.heightMultiplier,
+        right: 4.86 * SizeConfig.widthMultiplier,
+        left: 4.86 * SizeConfig.widthMultiplier,
+        child: Row(
+          mainAxisAlignment: trip.mode == TripMode.PICK_UP
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (trip.mode == TripMode.PICK_UP) _buildDistanceInfo(context),
+            _buildCurrentLocationButton(context),
+          ],
+        ));
   }
 
   Widget _buildMap(BuildContext context) {
@@ -177,6 +253,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
       initialCameraPosition: initialLocation,
       markers: _setOfMarkers,
       circles: _setOfCircles,
+      polylines: _setOfPolylines,
       compassEnabled: false,
       mapToolbarEnabled: false,
       myLocationEnabled: false,
@@ -196,7 +273,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
     return Stack(
       children: <Widget>[
         _buildMap(context),
-        _buildCurrentLocationButton(context),
+        _buildFloatingWidgets(context),
       ],
     );
   }

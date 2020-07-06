@@ -1,10 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
+import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -56,6 +58,7 @@ class TripProvider with ChangeNotifier {
   int _driverNextStopIndex = 0;
 
   // assigning dummy trip data for testing purpose only
+  // Trip _driverCreatedTrip;
   Trip _driverCreatedTrip = Trip(
       route: r.Route(id: 1, name: 'Route Test', stopList: dummy_stops_1),
       bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'New Bus'),
@@ -67,7 +70,7 @@ class TripProvider with ChangeNotifier {
         latitude: 31.6240714,
         timeToReach: DateFormat('Hms', 'en_US').parse('14:23:01'),
         // timeReached: '6:50 AM',
-        estToReachBus: DateFormat('Hms', 'en_US').parse('7:23:01'),
+        estToReachBus: '16 mins',
       ),
       mode: TripMode.PICK_UP,
       drivers: [
@@ -92,153 +95,82 @@ class TripProvider with ChangeNotifier {
 
   List<Trip> _suggestedTrips = [];
 
-  List<Trip> _tripsRecord = [
-    // Trip(
-    //   id: 1,
-    //   route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-    //   passengerStop: Stop(
-    //       id: 1,
-    //       name: 'Sagian Pull',
-    //       longitude: 1235.05,
-    //       latitude: 78453,
-    //       timeReached: '7:35 AM'),
-    //   mode: TripMode.PICK_UP,
-    //   drivers: [
-    //     Driver(
-    //         registrationID: 'EMP-DR-107',
-    //         firstName: 'Mushtaq',
-    //         lastName: 'Sidique'),
-    //     Driver(
-    //       registrationID: 'EMP-CD-108',
-    //       firstName: 'Shakeel',
-    //       lastName: 'Ahmed',
-    //     )
-    //   ],
-    //   bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-    //   passengersOnBoard: 45,
-    //   meter: BusMeterReading(initialReading: 1720.3, finalReading: 1850.5),
-    //   startTime: '6:20 AM',
-    //   endTime: '8:25 AM',
-    //   mapTraceKey: 'ABC321e2',
-    // ),
-    // Trip(
-    //   id: 2,
-    //   route: r.Route(
-    //       id: 2, name: 'Route# 2', stopList: dummy_stops_2.reversed.toList()),
-    //   passengerStop: Stop(
-    //       id: 1,
-    //       name: 'Sagian Pull',
-    //       longitude: 1235.05,
-    //       latitude: 78453,
-    //       timeReached: '7:35 AM'),
-    //   mode: TripMode.DROP_OFF,
-    //   drivers: [
-    //     Driver(
-    //         registrationID: 'EMP-DR-107',
-    //         firstName: 'Mushtaq',
-    //         lastName: 'Sidique'),
-    //     Driver(
-    //       registrationID: 'EMP-CD-108',
-    //       firstName: 'Shakeel',
-    //       lastName: 'Ahmed',
-    //     )
-    //   ],
-    //   bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-    //   passengersOnBoard: 45,
-    //   meter: BusMeterReading(initialReading: 1720.3, finalReading: 1850.5),
-    //   startTime: '6:20 AM',
-    //   endTime: '8:25 AM',
-    //   mapTraceKey: 'ABC321e2',
-    // ),
-    // Trip(
-    //   id: 2,
-    //   route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-    //   passengerStop: Stop(
-    //       id: 1,
-    //       name: 'Sagian Pull',
-    //       longitude: 1235.05,
-    //       latitude: 78453,
-    //       timeReached: '7:35 AM'),
-    //   mode: TripMode.PICK_UP,
-    //   drivers: [
-    //     Driver(
-    //         registrationID: 'EMP-DR-107',
-    //         firstName: 'Mushtaq',
-    //         lastName: 'Sidique'),
-    //     Driver(
-    //       registrationID: 'EMP-CD-108',
-    //       firstName: 'Shakeel',
-    //       lastName: 'Ahmed',
-    //     )
-    //   ],
-    //   bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-    //   passengersOnBoard: 45,
-    //   meter: BusMeterReading(initialReading: 1720.3, finalReading: 1850.5),
-    //   startTime: '6:20 AM',
-    //   endTime: '8:25 AM',
-    //   mapTraceKey: 'ABC321e2',
-    // ),
-    // Trip(
-    //   id: 2,
-    //   route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-    //   passengerStop: Stop(
-    //       id: 1,
-    //       name: 'Sagian Pull',
-    //       longitude: 1235.05,
-    //       latitude: 78453,
-    //       timeReached: '7:35 AM'),
-    //   mode: TripMode.PICK_UP,
-    //   drivers: [
-    //     Driver(
-    //         registrationID: 'EMP-DR-107',
-    //         firstName: 'Mushtaq',
-    //         lastName: 'Sidique'),
-    //     Driver(
-    //       registrationID: 'EMP-CD-108',
-    //       firstName: 'Shakeel',
-    //       lastName: 'Ahmed',
-    //     )
-    //   ],
-    //   bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-    //   passengersOnBoard: 45,
-    //   meter: BusMeterReading(initialReading: 1720.3, finalReading: 1850.5),
-    //   startTime: '6:20 AM',
-    //   endTime: '8:25 AM',
-    //   mapTraceKey: 'ABC321e2',
-    // ),
-    // Trip(
-    //   id: 2,
-    //   route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-    //   passengerStop: Stop(
-    //       id: 1,
-    //       name: 'Sagian Pull',
-    //       longitude: 1235.05,
-    //       latitude: 78453,
-    //       timeReached: '7:35 AM'),
-    //   mode: TripMode.PICK_UP,
-    //   drivers: [
-    //     Driver(
-    //         registrationID: 'EMP-DR-107',
-    //         firstName: 'Mushtaq',
-    //         lastName: 'Sidique'),
-    //     Driver(
-    //       registrationID: 'EMP-CD-108',
-    //       firstName: 'Shakeel',
-    //       lastName: 'Ahmed',
-    //     )
-    //   ],
-    //   bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-    //   passengersOnBoard: 45,
-    //   meter: BusMeterReading(initialReading: 1720.3, finalReading: 1850.5),
-    //   startTime: '6:20 AM',
-    //   endTime: '8:25 AM',
-    //   mapTraceKey: 'ABC321e2',
-    // ),
-  ];
+  List<Trip> _tripsRecord = [];
 
 // for passenger
-  void setSelectedTrip({Trip selectedTrip}) {
-    this._passengerSelectedTrip = selectedTrip;
+// ------------------------------------------------------------------
+  // selectedTrip removed from here
+  // rename passengerSelectedTrip to passengerJoinedTrip in this file
+  // ----------------------------------------------------------------
+
+  Future<void> joinTrip({Trip selectedTrip}) async {
+    final passenger = Passenger(id: 1);
+    try {
+      final response = await http
+          .put(
+              '$connectionString/trips/joinTrip/tripId=${selectedTrip.id},passengerId=${passenger.id},stopId=${selectedTrip.passengerStop.id}')
+          .timeout(requestTimeout);
+      print(json.decode(response.body));
+      var tripData = json.decode(response.body)['data'] as Map<String, dynamic>;
+
+      if (tripData != null) {
+        _passengerSelectedTrip = Trip(
+            id: tripData['id'],
+            route: r.Route(
+                id: tripData['route']['id'],
+                name: tripData['route']['name'],
+                stopList: []),
+            bus: Bus(
+              id: tripData['bus']['id'],
+              name: tripData['bus']['name'],
+              plateNumber: tripData['bus']['plate'],
+              capacity: tripData['bus']['capacity'],
+            ),
+            mode: tripData['mode'] == 'PICK_UP'
+                ? TripMode.PICK_UP
+                : TripMode.DROP_OFF,
+            startTime: DateFormat('yyyy-MM-ddTHH:mm:ss', 'en_US')
+                .parse(tripData['startTime']),
+            passengersOnBoard: tripData['no_of_passengers'],
+            drivers: [],
+            mapTraceKey: tripData['mapTraceKey'],
+            shareLiveLocation:
+                tripData['shareLiveLocation'] == 1 ? true : false);
+
+        tripData['route']['stops'].forEach((stopData) {
+          var stop = Stop(
+            id: stopData['id'],
+            name: stopData['name'],
+            timeToReach:
+                DateFormat('Hms', 'en_US').parse(stopData['estimatedTime']),
+            timeReached: stopData['timeReached'] != null
+                ? DateFormat('Hms', 'en_US').parse(stopData['timeReached'])
+                : null,
+            longitude: stopData['location']['longitude'],
+            latitude: stopData['location']['latitude'],
+          );
+          _passengerSelectedTrip.route.stopList.add(stop);
+
+          if (selectedTrip.passengerStop.id == stop.id)
+            _passengerSelectedTrip.passengerStop = stop;
+        });
+
+        tripData['drivers'].forEach((driverData) {
+          var driver = Driver(
+              id: driverData['id'],
+              registrationID: driverData['registrationId'],
+              firstName: driverData['firstName'],
+              lastName: driverData['lastName'],
+              contact: driverData['contact']);
+          _passengerSelectedTrip.drivers.add(driver);
+        });
+      } else {
+        // throw an exception here
+        print('throw an exception here');
+      }
+    } catch (error) {
+      throw error;
+    }
     notifyListeners();
   }
 
@@ -261,29 +193,72 @@ class TripProvider with ChangeNotifier {
         "initialMeterReading": config.meter.initialReading
       };
 
-      final response = await http.post(
-        '$connectionString/trips',
-        headers: {
-          "accept": "application/json",
-          "content-type": "application/json"
-        },
-        body: json.encode(requestBody),
-      );
+      final response = await http
+          .post(
+            '$connectionString/trips',
+            headers: {
+              "accept": "application/json",
+              "content-type": "application/json",
+              "connection": "keep-alive",
+            },
+            body: json.encode(requestBody),
+          )
+          .timeout(requestTimeout);
 
-      print(json.decode(response.body));
-      print('status: ${response.statusCode}');
+      var tripData = json.decode(response.body)['data'] as Map<String, dynamic>;
+
+      print('data fetched: $tripData');
+
+      _driverCreatedTrip = Trip(
+          id: tripData['id'],
+          route: r.Route(
+              id: tripData['route']['id'],
+              name: tripData['route']['name'],
+              stopList: []),
+          bus: Bus(
+            id: tripData['bus']['id'],
+            name: tripData['bus']['name'],
+            plateNumber: tripData['bus']['plate'],
+            capacity: tripData['bus']['capacity'],
+          ),
+          meter: BusMeterReading(
+              initialReading: tripData['meterReading']['initial'].toDouble()),
+          mode: tripData['mode'] == 'PICK_UP'
+              ? TripMode.PICK_UP
+              : TripMode.DROP_OFF,
+          drivers: [],
+          mapTraceKey: tripData['mapTraceKey']);
+
+      tripData['route']['stops'].forEach((stopData) {
+        var stop = Stop(
+          id: stopData['id'],
+          name: stopData['name'],
+          timeToReach:
+              DateFormat('Hms', 'en_US').parse(stopData['estimatedTime']),
+          timeReached: stopData['timeReached'] != null
+              ? DateFormat('Hms', 'en_US').parse(stopData['timeReached'])
+              : null,
+          longitude: stopData['location']['longitude'],
+          latitude: stopData['location']['latitude'],
+        );
+        _driverCreatedTrip.route.stopList.add(stop);
+      });
+
+      tripData['drivers'].forEach((driverData) {
+        var driver = Driver(
+            id: driverData['id'],
+            registrationID: driverData['registrationId'],
+            firstName: driverData['firstName'],
+            lastName: driverData['lastName'],
+            contact: driverData['contact']);
+        _driverCreatedTrip.drivers.add(driver);
+      });
+      _driverCreatedTrip.driverNextStop = _driverCreatedTrip.route.stopList[0];
     } catch (error) {
+      print(error);
       throw error;
     }
 
-    _driverCreatedTrip = Trip(
-        route: config.route,
-        bus: config.bus,
-        meter: config.meter,
-        mode: config.mode,
-        drivers: driversList,
-        mapTraceKey: trackingKey);
-    _driverCreatedTrip.driverNextStop = _driverCreatedTrip.route.stopList[0];
     notifyListeners();
     // ---------------------
     // add server notify logic here
@@ -296,17 +271,33 @@ class TripProvider with ChangeNotifier {
     // ---------------------
     // add server notify / review logic here
     // ---------------------
-    _passengerSelectedTrip = null;
+    // _passengerSelectedTrip = null;
     notifyListeners();
   }
 
   Future<void> driverEndTrip(BusMeterReading reading) async {
     _driverCreatedTrip.meter.finalReading = reading.finalReading;
-    // ---------------------
-    // add server notify logic here
-    // ---------------------
-    // _driverCreatedTrip = null;
-    _driverNextStopIndex = 0;
+
+    try {
+      final response = await http.put(
+        '$connectionString/trips/endTrip/${_driverCreatedTrip.id}',
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json"
+          // "connection": "keep-alive",
+        },
+        body: json.encode(
+            {"finalMeterReading": _driverCreatedTrip.meter.finalReading}),
+      );
+      print('status code: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        // _driverCreatedTrip = null;
+        _driverNextStopIndex = 0;
+      }
+    } catch (error) {
+      print(error);
+      throw error;
+    }
     notifyListeners();
   }
 
@@ -380,142 +371,99 @@ class TripProvider with ChangeNotifier {
     } catch (error) {
       throw error;
     }
+    _suggestedTrips.sort((t1, t2) => t1.passengerStop.distanceFromUser
+        .compareTo(t2.passengerStop.distanceFromUser));
     notifyListeners();
   }
 
   get getSuggestedTrips {
-    _suggestedTrips.sort((t1, t2) => t1.passengerStop.distanceFromUser
-        .compareTo(t2.passengerStop.distanceFromUser));
     return _suggestedTrips;
   }
 
-  void fetchFavoriteSuggested(r.FavoriteRoute favorite) {
-    // How it will work?
-    // we get routeId, favorite stop's name & mode from the
-    // favorite and pass it to the server, where we'll find for
-    // the trip with same routeId, stop's name & mode from the current
-    // active trips. If some are found, we return a list of trips
-    // back to the mobile app.
-    List<Trip> dummy_trips_on_server = [
-      Trip(
-        id: 1,
-        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-        mode: TripMode.PICK_UP,
-        bus: Bus(id: 1, plateNumber: 'LEZ 2327', name: 'HINO 17', capacity: 65),
-        drivers: [
-          Driver(
-              registrationID: 'EMP-DR-107',
-              firstName: 'Mushtaq',
-              lastName: 'Sidique'),
-          Driver(
-            registrationID: 'EMP-CD-108',
-            firstName: 'Shakeel',
-            lastName: 'Ahmed',
-          )
-        ],
-        passengersOnBoard: 45,
-        shareLiveLocation: true,
-        mapTraceKey: 'ABC321e2',
-      ),
-      Trip(
-        id: 2,
-        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
-        mode: TripMode.PICK_UP,
-        bus: Bus(
-            id: 1, plateNumber: 'LEZ 4421', name: 'Coaseter VU', capacity: 40),
-        drivers: [
-          Driver(
-              registrationID: 'EMP-DR-107',
-              firstName: 'Mushtaq',
-              lastName: 'Sidique'),
-          Driver(
-            registrationID: 'EMP-CD-108',
-            firstName: 'Shakeel',
-            lastName: 'Ahmed',
-          )
-        ],
-        passengersOnBoard: 36,
-        shareLiveLocation: true,
-        mapTraceKey: 'ABC321e2',
-      ),
-      Trip(
-        id: 3,
-        route: r.Route(id: 2, name: 'Route# 2', stopList: dummy_stops_2),
-        mode: TripMode.PICK_UP,
-        bus:
-            Bus(id: 1, plateNumber: 'LOY 7741', name: 'Mazda 17', capacity: 55),
-        drivers: [
-          Driver(
-              registrationID: 'EMP-DR-107',
-              firstName: 'Mushtaq',
-              lastName: 'Sidique'),
-          Driver(
-            registrationID: 'EMP-CD-108',
-            firstName: 'Shakeel',
-            lastName: 'Ahmed',
-          )
-        ],
-        passengersOnBoard: 56,
-        shareLiveLocation: false,
-        mapTraceKey: 'ABC321e2',
-      ),
-      Trip(
-        id: 4,
-        route: r.Route(id: 1, name: 'Route# 1', stopList: dummy_stops_1),
-        mode: TripMode.PICK_UP,
-        bus: Bus(
-            id: 1,
-            plateNumber: 'LOY 7714',
-            name: 'Hondai Coaster',
-            capacity: 65),
-        drivers: [
-          Driver(
-              registrationID: 'EMP-DR-107',
-              firstName: 'Mushtaq',
-              lastName: 'Sidique'),
-          Driver(
-            registrationID: 'EMP-CD-108',
-            firstName: 'Shakeel',
-            lastName: 'Ahmed',
-          )
-        ],
-        passengersOnBoard: 45,
-        shareLiveLocation: true,
-        mapTraceKey: 'ABC321e2',
-      ),
-      Trip(
-        id: 5,
-        route: r.Route(id: 3, name: 'Route# 3', stopList: dummy_stops_3),
-        mode: TripMode.PICK_UP,
-        bus: Bus(
-            id: 1, plateNumber: 'LZF 8218', name: 'Coaseter VU', capacity: 40),
-        drivers: [
-          Driver(
-              registrationID: 'EMP-DR-107',
-              firstName: 'Mushtaq',
-              lastName: 'Sidique'),
-          Driver(
-            registrationID: 'EMP-CD-108',
-            firstName: 'Shakeel',
-            lastName: 'Ahmed',
-          )
-        ],
-        passengersOnBoard: 36,
-        shareLiveLocation: true,
-        mapTraceKey: 'ABC321e2',
-      ),
-    ];
-
+  Future<void> fetchFavoriteSuggested(r.FavoriteRoute favorite) async {
     _suggestedTrips = [];
-    dummy_trips_on_server.map((trip) {
+    List<Trip> tripsFetched = [];
+
+    try {
+      print('favorite route id: ${favorite.routeId}');
+      final response = await http
+          .get(
+              '$connectionString/trips/tripsOnFavouriteRoute/routeId=${favorite.routeId}')
+          .timeout(requestTimeout);
+      print(json.decode(response.body)['message']);
+      final fetchedData = json.decode(response.body)['data'] as List;
+      fetchedData.forEach((data) {
+        var trip = Trip(
+          id: data['id'],
+          route: r.Route(
+            id: data['route']['id'],
+            name: data['route']['name'],
+            stopList: [],
+          ),
+          drivers: [],
+          bus: Bus(
+            id: data['bus']['id'],
+            plateNumber: data['bus']['plate'],
+            name: data['bus']['name'],
+            capacity: data['bus']['capacity'],
+          ),
+          passengersOnBoard: data['no_of_passengers'],
+          mapTraceKey: data['mapTraceKey'],
+          mode:
+              data['mode'] == 'PICK_UP' ? TripMode.PICK_UP : TripMode.DROP_OFF,
+          shareLiveLocation: data['shareLiveLocation'] == 1 ? true : false,
+        );
+
+        data['route']['stops'].forEach((data2) {
+          var stop = Stop(
+            id: data2['id'],
+            name: data2['name'],
+            timeToReach:
+                DateFormat('Hms', 'en_US').parse(data2['estimatedTime']),
+            longitude: data2['location']['longitude'],
+            latitude: data2['location']['latitude'],
+          );
+          trip.route.stopList.add(stop);
+        });
+
+        data['drivers'].forEach((data3) {
+          var driver = Driver(
+              id: data3['id'],
+              registrationID: data3['registrationId'],
+              firstName: data3['firstName'],
+              lastName: data3['lastName'],
+              contact: data3['contact']);
+          trip.drivers.add(driver);
+        });
+        tripsFetched.add(trip);
+      });
+      _suggestedTrips = tripsFetched;
+    } catch (error) {
+      throw error;
+    }
+
+    tripsFetched.map((trip) async {
       if (trip.route.id == favorite.routeId) {
         trip.passengerStop = trip.route.stopList
             .firstWhere((stop) => stop.name == favorite.favoriteStop.name);
         if (trip.passengerStop != null) {
+          var userLocation = await Location().getLocation();
+          if (userLocation != null) {
+            trip.passengerStop.distanceFromUser = calculateDistance(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    trip.passengerStop.latitude,
+                    trip.passengerStop.longitude)
+                .toStringAsFixed(2);
+          }
+          print(trip.passengerStop.distanceFromUser);
           _suggestedTrips.add(trip);
         }
       }
     }).toList();
+
+    _suggestedTrips.sort((t1, t2) => t1.passengerStop.distanceFromUser
+        .compareTo(t2.passengerStop.distanceFromUser));
     notifyListeners();
   }
 
@@ -527,7 +475,7 @@ class TripProvider with ChangeNotifier {
     try {
       final response = await http
           .get(
-              '$connectionString/trips/tripsRecord/userType=${userType == LoginMode.Driver ? "EMPLOYEE" : "PASSENGER"},userId=${13},limit=${30}')
+              '$connectionString/trips/tripsRecord/userType=${userType == LoginMode.Driver ? "EMPLOYEE" : "PASSENGER"},userId=${3},limit=${30}')
           .timeout(requestTimeout);
       print(json.decode(response.body)['message']);
 
@@ -552,13 +500,13 @@ class TripProvider with ChangeNotifier {
               plateNumber: data['bus']['plate'],
               capacity: data['bus']['capacity'],
             ),
-            startTime: DateFormat('yyyy-MM-ddTHH:mm:ss', 'en_US')
+            startTime: DateFormat('yyyy-MM-ddThh:mm:ss', 'en_US')
                 .parse(data['startTime']),
             endTime: DateFormat('yyyy-MM-ddTHH:mm:ss', 'en_US')
                 .parse(data['endTime']),
             mapTraceKey: data['mapTraceKey'],
             passengersOnBoard: data['no_of_passengers']);
-
+        print('start time: ${trip.startTime}');
         data['route']['stops'].forEach((data2) {
           var stop = Stop(
             id: data2['id'],
@@ -606,7 +554,7 @@ class TripProvider with ChangeNotifier {
                       .timeToReach,
               latitude: data['passengerStop']['location']['latitude'],
               longitude: data['passengerStop']['location']['longitude']);
-              
+
         if (trip.route.stopList.length != 0) fetchedTrips.add(trip);
       });
 
@@ -628,7 +576,7 @@ class TripProvider with ChangeNotifier {
         driverLocation.longitude,
         driverCreatedTrip.driverNextStop.latitude,
         driverCreatedTrip.driverNextStop.longitude);
-    print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
+    // print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
     if (distance < 0.5 &&
         _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length - 1)) {
       _driverNextStopIndex++;
@@ -656,6 +604,19 @@ class TripProvider with ChangeNotifier {
 
     double dist = earthRadius * c;
 
-    return dist; // output distance, in MILES
+    return dist; // output distance, in KM
+  }
+
+  Future<List<LatLng>> getDirections(LocationData userLocaiton) async {
+    final route = await MapHelper.getDirections(
+        userLocaiton, driverCreatedTrip.driverNextStop);
+    List<LatLng> pointsList = MapHelper.convertToLatLng(route['routes'][0]['overview_polyline']['points']);
+    _driverCreatedTrip.driverNextStop.estToReachBus = route['routes'][0]['legs'][0]['duration']['text'];
+    _driverCreatedTrip.driverNextStop.distanceFromUser = route['routes'][0]['legs'][0]['distance']['text'];
+    // print('duration: ${route['routes'][0]['legs'][0]['duration']['text']}');
+    // print('distance: ${route['routes'][0]['legs'][0]['distance']['text']}');
+    // print(pointsList);
+    notifyListeners();
+    return pointsList;
   }
 }

@@ -49,16 +49,17 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
         try {
           predictionsFetched = await MapHelper.getLocationAutoFills(
               _locationTextController.text);
+
+          for (int i = 0; i < predictionsFetched.length; i++) {
+            predictions.add({
+              'id': predictionsFetched[i]['place_id'],
+              'name': predictionsFetched[i]['description'],
+            });
+          }
+          widget.setLocationPredictions(predictions);
         } catch (error) {
           print(error);
         }
-        for (int i = 0; i < predictionsFetched.length; i++) {
-          predictions.add({
-            'id': predictionsFetched[i]['place_id'],
-            'name': predictionsFetched[i]['description'],
-          });
-        }
-        widget.setLocationPredictions(predictions);
         _lastValue = _locationTextController.text;
       });
     }
@@ -74,7 +75,8 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
             latitude: location.latitude,
             longitude: location.longitude);
         if (_userLocation != null)
-          _locationTextController.text = _userLocation.address;
+          // _locationTextController.text = _userLocation.address;
+          _locationTextController.text = '';
       });
     }
     print(_userLocation.id);

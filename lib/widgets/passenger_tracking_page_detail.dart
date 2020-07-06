@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class PassengerTrackingPageDetail extends StatefulWidget {
-  final Trip trip;
-
-  PassengerTrackingPageDetail({@required this.trip});
   @override
   _PassengerTrackingPageDetailState createState() =>
       _PassengerTrackingPageDetailState();
@@ -16,7 +14,7 @@ class PassengerTrackingPageDetail extends StatefulWidget {
 class _PassengerTrackingPageDetailState
     extends State<PassengerTrackingPageDetail> {
   bool _isExpanded = false;
-
+  Trip currentTrip;
   Widget _buildTopBarLead(BuildContext context) {
     return Positioned(
       top: 0.0,
@@ -36,7 +34,7 @@ class _PassengerTrackingPageDetailState
           width: 36.11 * SizeConfig.widthMultiplier,
           alignment: Alignment.center,
           child: Text(
-            widget.trip.route.name,
+            currentTrip.route.name,
             style:
                 Theme.of(context).textTheme.body2.copyWith(color: Colors.white),
             overflow: TextOverflow.ellipsis,
@@ -64,7 +62,7 @@ class _PassengerTrackingPageDetailState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                widget.trip.bus.plateNumber,
+                currentTrip.bus.plateNumber,
                 style: Theme.of(context)
                     .textTheme
                     .body2
@@ -73,7 +71,7 @@ class _PassengerTrackingPageDetailState
               Container(
                 width: 43.1 * SizeConfig.widthMultiplier,
                 child: Text(
-                  widget.trip.bus.name,
+                  currentTrip.bus.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.subhead,
@@ -99,7 +97,7 @@ class _PassengerTrackingPageDetailState
             padding: EdgeInsets.only(top: 4.68 * SizeConfig.heightMultiplier),
             width: 74.88 * SizeConfig.widthMultiplier,
             child: Text(
-              widget.trip.passengerStop.name,
+              currentTrip.passengerStop.name,
               style: TextStyle(
                 fontSize: 5.44 * SizeConfig.widthMultiplier,
               ),
@@ -114,7 +112,7 @@ class _PassengerTrackingPageDetailState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    // DateFormat.jm().format(widget.trip.passengerStop.estToReachBus),
+                    // DateFormat.jm().format(currentTrip.passengerStop.estToReachBus),
                     '07 mins',
                     style: Theme.of(context)
                         .textTheme
@@ -128,7 +126,8 @@ class _PassengerTrackingPageDetailState
           ),
           // ---------------------------------------------------------------------------
           // Here goes the estimated time defined by the institute to reach current stop
-          Text('Estimated Time: ' + DateFormat.jm().format(widget.trip.passengerStop.timeToReach)),
+          Text('Estimated Time: ' +
+              DateFormat.jm().format(currentTrip.passengerStop.timeToReach)),
           // ---------------------------------------------------------------------------
         ],
       ),
@@ -203,7 +202,7 @@ class _PassengerTrackingPageDetailState
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: getDriversList(context, widget.trip.drivers),
+                  children: getDriversList(context, currentTrip.drivers),
                 ),
               ],
             ),
@@ -213,6 +212,10 @@ class _PassengerTrackingPageDetailState
 
   @override
   Widget build(BuildContext context) {
+    final joinedTrip = Provider.of<TripProvider>(context).passengerSelectedTrip;
+    setState(() {
+      this.currentTrip = joinedTrip;
+    });
     return AnimatedPositioned(
       duration: Duration(milliseconds: 250),
       top: _isExpanded

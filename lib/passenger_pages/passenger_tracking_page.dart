@@ -9,10 +9,7 @@ import 'package:transpo_tracky_mobile_app/widgets/passenger_tracking_page_detail
 import '../helpers/size_config.dart';
 
 class PassengerTrackingPage extends StatefulWidget {
-// this is the user's selected trip
-  final Trip trip;
 
-  PassengerTrackingPage({@required this.trip});
   @override
   _PassengerTrackingPageState createState() => _PassengerTrackingPageState();
 }
@@ -88,7 +85,7 @@ class _PassengerTrackingPageState extends State<PassengerTrackingPage> {
             children: <Widget>[
               PassengerTrackingMap(),
               _buildFloatingButtons(context),
-              PassengerTrackingPageDetail(trip: widget.trip),
+              PassengerTrackingPageDetail(),
             ],
           ),
         ),

@@ -8,7 +8,9 @@ import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 
 class PassengerHomePageMap extends StatefulWidget {
-  PassengerHomePageMap({Key key}) : super(key: key);
+  final passengerSelectedTrip;
+
+  PassengerHomePageMap(this.passengerSelectedTrip);
 
   @override
   _PassengerHomePageMapState createState() => _PassengerHomePageMapState();
@@ -30,6 +32,26 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   void initState() {
     super.initState();
     getCurrentLocation();
+  }
+
+  void getStopLocation() async {
+    if (widget.passengerSelectedTrip != null) {
+      setState(() {
+        _setOfMarkers.removeWhere((m) => m.markerId.value == "stop");
+        _setOfMarkers.add(Marker(
+          markerId: MarkerId('stop'),
+          position: LatLng(
+            widget.passengerSelectedTrip.passengerStop.latitude,
+            widget.passengerSelectedTrip.passengerStop.longitude,
+          ),
+          draggable: false,
+          infoWindow: InfoWindow(
+              title: 'Stop Name',
+              snippet: widget.passengerSelectedTrip.passengerStop.name),
+          icon: BitmapDescriptor.defaultMarker,
+        ));
+      });
+    }
   }
 
   Future<Uint8List> getMarker() async {
@@ -144,6 +166,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
 
   @override
   Widget build(BuildContext context) {
+    getStopLocation();
     return Stack(
       children: <Widget>[
         _buildMap(context),
