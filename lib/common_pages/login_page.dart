@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/helpers/styling.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_signup_page.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
@@ -22,6 +23,27 @@ class _LoginPageState extends State<LoginPage> {
 
   LoginMode _loginMode = LoginMode.Passenger;
 
+  final _inputDecoration = InputDecoration(
+    filled: true,
+    fillColor: Colors.white,
+    enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.white,
+          width: 2,
+        ),
+        borderRadius:
+            BorderRadius.circular(3.33 * SizeConfig.imageSizeMultiplier),
+        gapPadding: 5),
+    focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: AppTheme.accentColor,
+          width: 2,
+        ),
+        borderRadius:
+            BorderRadius.circular(3.33 * SizeConfig.imageSizeMultiplier),
+        gapPadding: 5),
+  );
+
   void _toggleLoginMode() {
     if (_loginMode == LoginMode.Passenger)
       setState(() {
@@ -41,12 +63,10 @@ class _LoginPageState extends State<LoginPage> {
           TextFormField(
             cursorColor: Colors.black,
             style: TextStyle(color: Colors.black),
-            decoration: InputDecoration(
-              labelText: _loginMode == LoginMode.Passenger
+            decoration: _inputDecoration.copyWith(
+              hintText: _loginMode == LoginMode.Passenger
                   ? 'Enter Passenger ID'
                   : 'Enter Driver ID',
-              filled: true,
-              fillColor: Colors.white,
             ),
           ),
           SizedBox(
@@ -55,12 +75,10 @@ class _LoginPageState extends State<LoginPage> {
           TextFormField(
             cursorColor: Colors.black,
             obscureText: true,
-            style: TextStyle(color: Colors.black,),
-            decoration: InputDecoration(
-              labelText: 'Enter Password',
-              filled: true,
-              fillColor: Colors.white,
+            style: TextStyle(
+              color: Colors.black,
             ),
+            decoration: _inputDecoration.copyWith(hintText: 'Enter Password'),
           ),
         ],
       ),
@@ -79,17 +97,17 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Container(
-        height: 45,
+        height: 7.81 * SizeConfig.heightMultiplier,
         width: double.infinity,
         decoration: BoxDecoration(
             color: Color(0xFFF0F55F),
             borderRadius:
-                BorderRadius.circular(0.78 * SizeConfig.heightMultiplier),
+                BorderRadius.circular(3.33 * SizeConfig.imageSizeMultiplier),
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,
                 offset: Offset(0.0, 0.5),
-                blurRadius: 15,
+                blurRadius: 4.16 * SizeConfig.imageSizeMultiplier,
               ),
               BoxShadow(
                 color: Colors.black12,
@@ -153,7 +171,10 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildSignUpButton() {
     return FlatButton(
-      // padding: EdgeInsets.only(bottom: 20, top: 10),
+      padding: EdgeInsets.only(
+        bottom: 1.5 * SizeConfig.heightMultiplier,
+        top: 3.12 * SizeConfig.heightMultiplier,
+      ),
       onPressed: () {
         final _sessionProvider =
             Provider.of<SessionProvider>(context, listen: false);
@@ -217,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
           margin: EdgeInsets.only(
             left: 12.5 * SizeConfig.widthMultiplier,
             right: 12.5 * SizeConfig.widthMultiplier,
-            top: 11.84 * SizeConfig.heightMultiplier,
+            top: 9.84 * SizeConfig.heightMultiplier,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
