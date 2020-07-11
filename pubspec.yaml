@@ -32,6 +32,7 @@ dependencies:
   http: ^0.12.1
   intl: ^0.16.1
   google_maps_flutter: ^0.5.27
+  cloud_firestore: ^0.13.7
   location: ^3.0.1
   uuid: ^2.0.4
 
@@ -55,6 +56,7 @@ flutter:
   assets:
    - assets/logo_files/portrait.png
    - assets/location_icons/user_location.png
+   - assets/location_icons/bus_location.png
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
@@ -7,13 +8,14 @@ import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/user_location.dart';
 import 'dart:math';
 import 'package:vector_math/vector_math.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
-
+import '../helpers/firebase_helper.dart';
 import 'driver_model.dart';
 import '../helpers/enums.dart';
 import 'route_model.dart' as r;
@@ -174,6 +176,15 @@ class TripProvider with ChangeNotifier {
     notifyListeners();
   }
 
+// updating estimated distance to reach the bus on passenger stop
+  updateEsdToReachBus(LatLng driverLocation) {
+    Stop stop = passengerSelectedTrip.passengerStop;
+    var distance = calculateDistance(driverLocation.latitude,
+        driverLocation.longitude, stop.latitude, stop.longitude);
+    passengerSelectedTrip.passengerStop.estToReachBus = distance.toStringAsFixed(2);
+    notifyListeners();
+  }
+
 // for driver
   Future<void> startTrip({TripConfig config}) async {
     final trackingKey = Uuid().v1();
@@ -182,7 +193,7 @@ class TripProvider with ChangeNotifier {
     driversList.add(config.currentDriver);
     if (config.partnerDriver != null) driversList.add(config.partnerDriver);
     try {
-      await MapHelper.updateDriverLocation(trackingKey, currentLocation);
+      await FirebaseHelper.updateDriverLocation(trackingKey, currentLocation);
 
       final requestBody = {
         "routeId": config.route.id,
@@ -610,9 +621,12 @@ class TripProvider with ChangeNotifier {
   Future<List<LatLng>> getDirections(LocationData userLocaiton) async {
     final route = await MapHelper.getDirections(
         userLocaiton, driverCreatedTrip.driverNextStop);
-    List<LatLng> pointsList = MapHelper.convertToLatLng(route['routes'][0]['overview_polyline']['points']);
-    _driverCreatedTrip.driverNextStop.estToReachBus = route['routes'][0]['legs'][0]['duration']['text'];
-    _driverCreatedTrip.driverNextStop.distanceFromUser = route['routes'][0]['legs'][0]['distance']['text'];
+    List<LatLng> pointsList = MapHelper.convertToLatLng(
+        route['routes'][0]['overview_polyline']['points']);
+    _driverCreatedTrip.driverNextStop.estToReachBus =
+        route['routes'][0]['legs'][0]['duration']['text'];
+    _driverCreatedTrip.driverNextStop.distanceFromUser =
+        route['routes'][0]['legs'][0]['distance']['text'];
     // print('duration: ${route['routes'][0]['legs'][0]['duration']['text']}');
     // print('distance: ${route['routes'][0]['legs'][0]['distance']['text']}');
     // print(pointsList);

@@ -11,6 +11,7 @@ import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
+import '../helpers/firebase_helper.dart';
 
 class DriverNavigationMap extends StatefulWidget {
   DriverNavigationMap({Key key}) : super(key: key);
@@ -31,7 +32,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
   LocationData _lastCheckpoint;
   // _threshold is the value after which the coordinates in firebase, _lastCheckpoint and polylines are getting updated.
   // e.g at _threshold = 0.02 (0.02 km / 20 m), update values whenever lastCheckpoint is 20 m away from current location.
-  double _threshold = 0.15;
+  double _threshold = 0.01;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -71,7 +72,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
     return byteData.buffer.asUint8List();
   }
 
-  void updateDirections(LocationData updatedLocation) async {
+  Future<void> updateDirections(LocationData updatedLocation) async {
     try {
       List<LatLng> directionPoints =
           await tripProvider.getDirections(updatedLocation);
@@ -87,7 +88,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
           endCap: Cap.roundCap,
         ));
       });
-      await MapHelper.updateDriverLocation(trip.mapTraceKey, updatedLocation);
+      await FirebaseHelper.updateDriverLocation(trip.mapTraceKey, updatedLocation);
     } catch (error) {
       showDialog(
           context: context,
@@ -137,7 +138,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
       updateMarkerAndCircle(location, imageData);
 
       if (_lastCheckpoint == null) {
-        updateDirections(location);
+        await updateDirections(location);
       }
 
       if (_locationSubscription != null) {
@@ -145,7 +146,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
       }
 
       _locationSubscription =
-          _locationTracker.onLocationChanged.listen((newLocalData) {
+          _locationTracker.onLocationChanged.listen((newLocalData) async {
         tripProvider.checkDistanceToNextStop(newLocalData);
         var locDiff = tripProvider.calculateDistance(
             newLocalData.latitude,
@@ -157,7 +158,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
         print('distance from last checkpoint: $locDiff');
 
         if (locDiff > _threshold) {
-          updateDirections(newLocalData);
+          await updateDirections(newLocalData);
         }
         if (_controller != null) {
           _controller.animateCamera(CameraUpdate.newCameraPosition(

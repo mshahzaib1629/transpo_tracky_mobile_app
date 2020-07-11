@@ -43,7 +43,6 @@ class MapHelper {
       final baseURL =
           'https://maps.googleapis.com/maps/api/place/autocomplete/json';
       final components = 'country:pk';
-      // TODO Add session token
       print('location auto-fill api called');
       final request =
           '$baseURL?input=$input&key=$GOOGLE_API_KEY&components=$components';
@@ -55,20 +54,20 @@ class MapHelper {
     }
   }
 
-  static Future<void> updateDriverLocation(
-      String trackingKey, LocationData location) async {
-    try {
-      var url =
-          "https://transpo-tracky.firebaseio.com/trackings/$trackingKey.json";
-      await http
-          .post(url,
-              body: json.encode(
-                  {'lat': location.latitude, 'lng': location.longitude}))
-          .timeout(requestTimeout);
-    } catch (error) {
-      throw error;
-    }
-  }
+  // static Future<void> updateDriverLocation(
+  //     String trackingKey, LocationData location) async {
+  //   try {
+  //     var url =
+  //         "https://transpo-tracky.firebaseio.com/trackings/$trackingKey.json";
+  //     await http
+  //         .post(url,
+  //             body: json.encode(
+  //                 {'lat': location.latitude, 'lng': location.longitude}))
+  //         .timeout(requestTimeout);
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   // under testing mode
   static Future<dynamic> getDirections(

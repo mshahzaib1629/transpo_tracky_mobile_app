@@ -112,14 +112,13 @@ class _PassengerTrackingPageDetailState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text(
-                    // DateFormat.jm().format(currentTrip.passengerStop.estToReachBus),
-                    '07 mins',
+                    (currentTrip.passengerStop.estToReachBus ?? '0') + ' km',
                     style: Theme.of(context)
                         .textTheme
                         .title
                         .copyWith(color: Theme.of(context).accentColor),
                   ),
-                  Text('are left'),
+                  Text('away'),
                 ],
               ),
             ],
