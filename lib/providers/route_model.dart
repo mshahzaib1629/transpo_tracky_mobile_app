@@ -47,36 +47,7 @@ class FavoriteRoute {
 class RouteProvider with ChangeNotifier {
   List<FavoriteRoute> passengerFavoriteRoutes = [];
 
-  List<Route> routes = [
-    // Route(
-    //   id: 1,
-    //   name: 'Route# 1',
-    //   pickUpTime: '8:30 AM',
-    //   dropOffTime: '5:30 PM',
-    //   stopList: dummy_stops_1,
-    // ),
-    // Route(
-    //   id: 2,
-    //   name: 'Route# 2',
-    //   pickUpTime: '8:30 AM',
-    //   dropOffTime: '5:30 PM',
-    //   stopList: dummy_stops_2,
-    // ),
-    // Route(
-    //   id: 3,
-    //   name: 'Route# 3',
-    //   pickUpTime: '8:30 AM',
-    //   dropOffTime: '5:30 PM',
-    //   stopList: dummy_stops_3,
-    // ),
-    // Route(
-    //   id: 4,
-    //   name: 'Route# 4',
-    //   pickUpTime: '8:30 AM',
-    //   dropOffTime: '5:30 PM',
-    //   stopList: dummy_stops_4,
-    // ),
-  ];
+  List<Route> routes = [];
 
   Future<void> fetchRoutes() async {
     List<Route> fetchedRoutes = [];
@@ -186,6 +157,10 @@ class RouteProvider with ChangeNotifier {
     else if (filter == RouteFilter.Hostel) {
       filteredRoutes =
           routes.where((route) => route.name.startsWith('H')).toList();
+    }
+    else if (filter == RouteFilter.Testing) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('T')).toList();
     }
     return filteredRoutes;
   }

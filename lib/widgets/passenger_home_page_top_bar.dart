@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
 import '../helpers/enums.dart';
@@ -153,9 +154,11 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                   ),
                   child: Text(
                     widget.selectedTrip.mode == TripMode.PICK_UP
-                        ? widget.selectedTrip
+                        ? widget
+                            .selectedTrip
                             .route
-                            .stopList[widget.selectedTrip.route.stopList.length - 1]
+                            .stopList[
+                                widget.selectedTrip.route.stopList.length - 1]
                             .name
                         : widget.selectedTrip.passengerStop.name,
                     style: Theme.of(context)
@@ -174,60 +177,60 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
 
   Widget _favoriteOptionBar(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor.withOpacity(0.1),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(
-              2.78 * SizeConfig.imageSizeMultiplier,
-            ),
-            bottomRight: Radius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+      decoration: BoxDecoration(
+        color: Theme.of(context).accentColor.withOpacity(0.1),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(
+            2.78 * SizeConfig.imageSizeMultiplier,
           ),
+          bottomRight: Radius.circular(2.78 * SizeConfig.imageSizeMultiplier),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.times,
-                  color: Theme.of(context).accentColor,
-                  size: 5 * SizeConfig.imageSizeMultiplier,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _showFavoriteOption = false;
-                  });
-                }),
-            FlatButton(
-                onPressed: () {
-                  Provider.of<RouteProvider>(context, listen: false)
-                      // --------------------------------------------------------------------------------
-                      // Modification required here, pass the id of current logged in passenger, currently
-                      // passing '1' as the dummy id
-                      .addFavorite(
-                          trip: widget.selectedTrip,
-                          currentPassengerId: 1);
-                  // --------------------------------------------------------------------------------
-                  setState(() {
-                    _showFavoriteOption = false;
-                  });
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${widget.selectedTrip.passengerStop.name} added to favorites'),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                },
-                child: Text(
-                  '+ Mark Favorite',
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(color: Theme.of(context).accentColor),
-                ))
-          ],
-        ),
-      );
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          IconButton(
+              icon: Icon(
+                FontAwesomeIcons.times,
+                color: Theme.of(context).accentColor,
+                size: 5 * SizeConfig.imageSizeMultiplier,
+              ),
+              onPressed: () {
+                setState(() {
+                  _showFavoriteOption = false;
+                });
+              }),
+          FlatButton(
+              onPressed: () {
+                Provider.of<RouteProvider>(context, listen: false)
+                    // --------------------------------------------------------------------------------
+                    // Modification required here, pass the id of current logged in passenger, currently
+                    // passing '1' as the dummy id
+                    .addFavorite(
+                        trip: widget.selectedTrip,
+                        currentPassengerId: Constants.dummyPassenger.id);
+                // --------------------------------------------------------------------------------
+                setState(() {
+                  _showFavoriteOption = false;
+                });
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        '${widget.selectedTrip.passengerStop.name} added to favorites'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+              child: Text(
+                '+ Mark Favorite',
+                style: Theme.of(context)
+                    .textTheme
+                    .body2
+                    .copyWith(color: Theme.of(context).accentColor),
+              ))
+        ],
+      ),
+    );
   }
 
   Widget _buildTopBar(BuildContext context) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 
 class PassengerHomePageMap extends StatefulWidget {
@@ -101,12 +102,16 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
       _locationSubscription =
           _locationTracker.onLocationChanged.listen((newLocalData) {
         if (_controller != null) {
-          _controller.animateCamera(CameraUpdate.newCameraPosition(
+          _controller.animateCamera(
+            CameraUpdate.newCameraPosition(
               new CameraPosition(
-                  bearing: newLocalData.heading,
-                  target: LatLng(newLocalData.latitude, newLocalData.longitude),
-                  tilt: 0,
-                  zoom: 18.00)));
+                bearing: newLocalData.heading,
+                target: LatLng(newLocalData.latitude, newLocalData.longitude),
+                tilt: 0,
+                zoom: Constants.mapZoomHomePage,
+              ),
+            ),
+          );
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });

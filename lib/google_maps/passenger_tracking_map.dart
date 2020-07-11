@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/firebase_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -50,8 +51,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
           trip.passengerStop.longitude,
         ),
         draggable: false,
-        infoWindow:
-            InfoWindow(title: trip.passengerStop.name),
+        infoWindow: InfoWindow(title: trip.passengerStop.name),
         icon: BitmapDescriptor.defaultMarker,
       ));
     });
@@ -115,7 +115,7 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 16.00)));
+                  zoom: Constants.mapZoomTrackPage)));
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });
@@ -153,9 +153,8 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   }
 
   void _updateDriverLocation(LatLng driverLocation) async {
-
     tripProvider.updateEsdToReachBus(driverLocation);
-    
+
     Uint8List imageData = await getBusMarker();
     this.setState(() {
       _setOfMarkers.removeWhere((m) => m.markerId.value == "driver");

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
@@ -13,7 +14,6 @@ import 'package:transpo_tracky_mobile_app/widgets/suggestion_card.dart';
 import '../helpers/size_config.dart';
 
 class PassengerRouteSelectionPage extends StatefulWidget {
-
   final Function setSelectedTrip;
 
   PassengerRouteSelectionPage(this.setSelectedTrip);
@@ -103,16 +103,16 @@ class _PassengerRouteSelectionPageState
     } catch (error) {
       print(error);
       showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Oh no!'),
-            content: Text('Someting went wrong.'),
-            actions: [
-              FlatButton(
-                  onPressed: () => Navigator.pop(context), child: Text('Okay'))
-            ],
-          ),
-        );
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Oh no!'),
+          content: Text('Someting went wrong.'),
+          actions: [
+            FlatButton(
+                onPressed: () => Navigator.pop(context), child: Text('Okay'))
+          ],
+        ),
+      );
     }
     setState(() {
       _isLoading = false;
@@ -125,7 +125,8 @@ class _PassengerRouteSelectionPageState
       // Modification required here, pass the id of current logged in passenger, currently
       // passing '1' as the dummy id
       future: Provider.of<RouteProvider>(context, listen: false)
-          .fetchAndSetFavorites(currentPassengerId: 1),
+          .fetchAndSetFavorites(
+              currentPassengerId: Constants.dummyPassenger.id),
       // --------------------------------------------------------------------------------
       builder: (context, snapshot) => Consumer<RouteProvider>(
         builder: (context, routeConsumer, child) => Container(
@@ -152,7 +153,8 @@ class _PassengerRouteSelectionPageState
                         itemBuilder: (context, index) {
                           FavoriteRoute favoriteRoute =
                               routeConsumer.passengerFavoriteRoutes[index];
-                          return FavoriteRouteCard(favoriteRoute, fetchFavoriteTrips);
+                          return FavoriteRouteCard(
+                              favoriteRoute, fetchFavoriteTrips);
                         },
                       ),
                     ),
@@ -208,9 +210,8 @@ class _PassengerRouteSelectionPageState
                   itemBuilder: (context, index) {
                     Trip trip = tripProvider.getSuggestedTrips[index];
                     return SuggestionCard(
-                      prefTrip: trip,
-                      setSelectedTrip: widget.setSelectedTrip
-                    );
+                        prefTrip: trip,
+                        setSelectedTrip: widget.setSelectedTrip);
                   },
                 )
               : Center(

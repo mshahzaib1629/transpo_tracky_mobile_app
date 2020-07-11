@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 
 class BroadCastMessage {
@@ -9,39 +10,24 @@ class BroadCastMessage {
   BroadCastMessage({this.sender, this.messageData, this.datetime});
 }
 
-class BroadCastProvider with ChangeNotifier{
+class BroadCastProvider with ChangeNotifier {
   List<BroadCastMessage> _dummy_broadCastedMessages = [
     BroadCastMessage(
-      sender: Driver(
-        id: 1,
-        registrationID: 'EMP-DR-1',
-        firstName: 'Mushtaq',
-        lastName: 'Ahmed',
-      ),
+      sender: Constants.dummyDriver,
       datetime: DateTime.now(),
-      messageData: 'Hello there! bus will be late today because there is a huge traffic jam on band road, this one is a really big announcment',
+      messageData:
+          'Hello there! bus will be late today because there is a huge traffic jam on band road, this one is a really big announcment',
     ),
     BroadCastMessage(
-      sender: Driver(
-        id: 1,
-        registrationID: 'EMP-DR-1',
-        firstName: 'Mushtaq',
-        lastName: 'Ahmed',
-      ),
+      sender: Constants.dummyDriver,
       datetime: DateTime.now(),
       messageData: 'Hello there!',
     ),
     BroadCastMessage(
-      sender: Driver(
-        id: 1,
-        registrationID: 'EMP-DR-1',
-        firstName: 'Mushtaq',
-        lastName: 'Ahmed',
-      ),
+      sender: Constants.dummyDriver,
       datetime: DateTime.now(),
       messageData: 'Hello there!',
     ),
-    
   ];
 
   List<BroadCastMessage> get broadcastMessages {

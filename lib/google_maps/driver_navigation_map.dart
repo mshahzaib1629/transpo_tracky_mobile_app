@@ -7,8 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/enums.dart';
-import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
-import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
+import '../helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../helpers/firebase_helper.dart';
@@ -30,9 +29,6 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
   Set<Polyline> _setOfPolylines = {};
   GoogleMapController _controller;
   LocationData _lastCheckpoint;
-  // _threshold is the value after which the coordinates in firebase, _lastCheckpoint and polylines are getting updated.
-  // e.g at _threshold = 0.02 (0.02 km / 20 m), update values whenever lastCheckpoint is 20 m away from current location.
-  double _threshold = 0.01;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -157,7 +153,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
         print('last checkpoint: $_lastCheckpoint');
         print('distance from last checkpoint: $locDiff');
 
-        if (locDiff > _threshold) {
+        if (locDiff > Constants.thresholdDistance) {
           await updateDirections(newLocalData);
         }
         if (_controller != null) {
@@ -166,7 +162,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
                   bearing: newLocalData.heading,
                   target: LatLng(newLocalData.latitude, newLocalData.longitude),
                   tilt: 0,
-                  zoom: 18.00)));
+                  zoom: Constants.mapZoomNavPage)));
           updateMarkerAndCircle(newLocalData, imageData);
         }
       });

@@ -71,15 +71,8 @@ class _LastTripsPageState extends State<LastTripsPage> {
               _title,
               style: Theme.of(context).textTheme.display3,
             ),
-            // TextField(
-            //   decoration: InputDecoration(
-            //     border: InputBorder.none,
-            //     hintText: 'Search Here',
-            //   ),
-            //   onSubmitted: (vale) {},
-            // ),
           ),
-          // For Fetching User's Location automatically
+          // For Fetching Trips w.r.t selected date
           IconButton(
             icon: Icon(FontAwesomeIcons.calendarAlt),
             onPressed: () {

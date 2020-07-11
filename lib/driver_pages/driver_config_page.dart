@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
@@ -92,11 +93,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     _driverConfigFormKey.currentState.save();
     // -----------------------------------------
     // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
-    _tripConfig.currentDriver = Driver(
-        id: 3,
-        registrationID: 'EMP-DR-3',
-        firstName: 'Ejaz',
-        lastName: 'Khan');
+    _tripConfig.currentDriver = Constants.dummyDriver;
     // -----------------------------------------
   }
 
@@ -241,7 +238,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         // later, it should be passed of current logged in user
         // =====================================================================
         future: Provider.of<TripConfigProvider>(context, listen: false)
-            .fetchAndSetConfigs(currentDriverId: 1),
+            .fetchAndSetConfigs(currentDriverId: Constants.dummyDriver.id),
         // =====================================================================
         builder: (context, snapshot) => Consumer<TripConfigProvider>(
               builder: (context, configConsumer, child) {

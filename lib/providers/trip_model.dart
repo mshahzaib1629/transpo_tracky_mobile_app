@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
@@ -76,15 +77,7 @@ class TripProvider with ChangeNotifier {
       ),
       mode: TripMode.PICK_UP,
       drivers: [
-        Driver(
-            registrationID: 'EMP-DR-107',
-            firstName: 'Mushtaq',
-            lastName: 'Sidique'),
-        Driver(
-          registrationID: 'EMP-CD-108',
-          firstName: 'Shakeel',
-          lastName: 'Ahmed',
-        )
+        Constants.dummyDriver
       ]);
 
   Trip get passengerSelectedTrip {
@@ -314,11 +307,11 @@ class TripProvider with ChangeNotifier {
 
   Future<void> fetchSuggestedTrips(double latitude, double longitude) async {
     _suggestedTrips = [];
-    var range = 5;
+    
     try {
       final response = await http
           .get(
-              '$connectionString/trips/suggest/latitude=$latitude,longitude=$longitude,range=$range')
+              '$connectionString/trips/suggest/latitude=$latitude,longitude=$longitude,range=${Constants.passengerRange}')
           .timeout(requestTimeout);
       print(json.decode(response.body)['message']);
       final fetchedData = json.decode(response.body)['data'] as List;
@@ -588,7 +581,7 @@ class TripProvider with ChangeNotifier {
         driverCreatedTrip.driverNextStop.latitude,
         driverCreatedTrip.driverNextStop.longitude);
     // print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
-    if (distance < 0.5 &&
+    if (distance < Constants.stopRadius &&
         _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length - 1)) {
       _driverNextStopIndex++;
       driverCreatedTrip.driverNextStop =

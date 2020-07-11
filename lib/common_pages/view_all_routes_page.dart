@@ -89,18 +89,10 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
             },
           ),
           Expanded(
-            // Let user enter location manually
             child: Text(
               _title,
               style: Theme.of(context).textTheme.display3,
             ),
-            // TextField(
-            //   decoration: InputDecoration(
-            //     border: InputBorder.none,
-            //     hintText: 'Search Here',
-            //   ),
-            //   onSubmitted: (vale) {},
-            // ),
           ),
           PopupMenuButton(
             itemBuilder: (context) => [
@@ -120,6 +112,10 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
                 child: Text('Hostel'),
                 value: RouteFilter.Hostel,
               ),
+              PopupMenuItem(
+                child: Text('Testing'),
+                value: RouteFilter.Testing,
+              ),
             ],
             onSelected: (value) {
               setState(() {
@@ -130,6 +126,7 @@ class _ViewAllRoutesPageState extends State<ViewAllRoutesPage> {
                   if (value == RouteFilter.Evening) _title = 'Evening Routes';
                   if (value == RouteFilter.Faculty) _title = 'Faculty Routes';
                   if (value == RouteFilter.Hostel) _title = 'Hostel Routes';
+                  if (value == RouteFilter.Testing) _title = 'Testing Routes';
                 });
               });
             },
