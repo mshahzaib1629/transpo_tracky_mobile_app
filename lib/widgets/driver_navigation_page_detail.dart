@@ -125,7 +125,7 @@ class _DriverNavigationPageDetailState
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
                       Text(currentStop.timeReached != null
-                          ? currentStop.timeReached
+                          ? DateFormat.jm().format(currentStop.timeReached)
                           : DateFormat.jm().format(currentStop.timeToReach)),
                       Text(
                         currentStop.timeReached != null

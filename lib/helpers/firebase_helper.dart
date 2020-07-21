@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:location/location.dart';
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import 'package:uuid/uuid.dart';
 
 // // collection reference
@@ -10,10 +11,9 @@ class FirebaseHelper {
   static Future<void> updateDriverLocation(
       String trackingKey, LocationData location) async {
     try {
-      final uid = Uuid().v1();
       await trackingCollection
           .document(trackingKey)
-          .setData({'lat': location.latitude, 'lng': location.longitude});
+          .setData({'lat': location.latitude, 'lng': location.longitude}).timeout(requestTimeout);
     } catch (error) {
       throw error;
     }

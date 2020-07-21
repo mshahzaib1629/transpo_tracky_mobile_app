@@ -15,7 +15,8 @@ import '../helpers/size_config.dart';
 
 class DriverConfigurationPage extends StatefulWidget {
   bool isExpanded;
-  DriverConfigurationPage({this.isExpanded});
+  Function checkIfOnTrip;
+  DriverConfigurationPage({this.isExpanded, this.checkIfOnTrip});
 
   createState() => _DriverConfigurationPageState();
 }
@@ -108,6 +109,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildTopBar(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        widget.checkIfOnTrip();
         setState(() {
           widget.isExpanded = !widget.isExpanded;
           if (widget.isExpanded) {
@@ -522,6 +524,27 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  Widget _buildBusSubDetail() {
+    Text message;
+    if (_tripConfig.bus != null) {
+      if (_tripConfig.bus.onTrip == 1)
+        message = Text(
+          'The bus is on another trip!',
+          style: Theme.of(context).textTheme.body2.copyWith(color: Colors.red),
+        );
+      else
+        message = Text(
+          _tripConfig.bus.name,
+          style: Theme.of(context).textTheme.body2,
+        );
+    } else
+      message = Text(
+        'No bus found',
+        style: Theme.of(context).textTheme.body2.copyWith(color: Colors.red),
+      );
+    return message;
+  }
+
   Widget _busDetail(BuildContext context) {
     final busProvider = Provider.of<BusProvider>(context, listen: false);
 
@@ -576,18 +599,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               });
             },
           ),
-          _tripConfig.bus != null
-              ? Text(
-                  _tripConfig.bus.name,
-                  style: Theme.of(context).textTheme.body2,
-                )
-              : Text(
-                  'No bus found',
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(color: Colors.red),
-                ),
+          _buildBusSubDetail(),
         ],
       ),
     );
@@ -762,6 +774,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onPressed: () {
               _saveForm();
               if (_tripConfig.bus != null &&
+                  _tripConfig.bus.onTrip == 0 &&
                   (takingParnterDriver == false ||
                       (takingParnterDriver == true &&
                           _tripConfig.partnerDriver != null)))

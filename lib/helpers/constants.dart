@@ -7,7 +7,7 @@ class Constants {
   static const double thresholdDistance = 0.05;
 
 // [2]
-  static const double stopRadius = 0.5;
+  static const double stopRadius = 0.05;
 
 // [3]
   static const double passengerRange = 5;

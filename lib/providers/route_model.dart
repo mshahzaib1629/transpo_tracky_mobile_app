@@ -13,6 +13,7 @@ import 'stop_model.dart';
 class Route {
   int id;
   String name;
+  RouteType routeType;
   DateTime pickUpTime;
   DateTime dropOffTime;
   List<Stop> stopList;
@@ -21,6 +22,7 @@ class Route {
   Route({
     this.id,
     this.name,
+    this.routeType,
     this.pickUpTime,
     this.dropOffTime,
     this.stopList,
@@ -62,6 +64,8 @@ class RouteProvider with ChangeNotifier {
         var route = Route(
           id: data['id'],
           name: data['name'],
+          routeType:
+              data['type'] == 'IN_LINE' ? RouteType.IN_LINE : RouteType.IN_LOOP,
           pickUpTime: DateFormat('Hms', 'en_US').parse(data['pickUpTime']),
           dropOffTime: DateFormat('Hms', 'en_US').parse(data['dropOffTime']),
           stopList: [],
@@ -72,16 +76,15 @@ class RouteProvider with ChangeNotifier {
             id: data2['id'],
             name: data2['name'],
             timeToReach: DateFormat('Hms', 'en_US').parse(data2['timeToReach']),
-            longitude: data2['longitude'],
-            latitude: data2['latitude'],
+            longitude: data2['location']['longitude'],
+            latitude: data2['location']['latitude'],
           );
           route.stopList.add(stop);
         });
         if (route.stopList.length != 0) fetchedRoutes.add(route);
       });
       routes = fetchedRoutes;
-      routes
-          .sort((a, b) => a.name.compareTo(b.name));
+      routes.sort((a, b) => a.name.compareTo(b.name));
       notifyListeners();
     } catch (error) {
       throw (error);
@@ -149,16 +152,13 @@ class RouteProvider with ChangeNotifier {
     } else if (filter == RouteFilter.Evening) {
       filteredRoutes =
           routes.where((route) => route.name.startsWith('E')).toList();
-    }
-    else if (filter == RouteFilter.Faculty) {
+    } else if (filter == RouteFilter.Faculty) {
       filteredRoutes =
           routes.where((route) => route.name.startsWith('F')).toList();
-    }
-    else if (filter == RouteFilter.Hostel) {
+    } else if (filter == RouteFilter.Hostel) {
       filteredRoutes =
           routes.where((route) => route.name.startsWith('H')).toList();
-    }
-    else if (filter == RouteFilter.Testing) {
+    } else if (filter == RouteFilter.Testing) {
       filteredRoutes =
           routes.where((route) => route.name.startsWith('T')).toList();
     }

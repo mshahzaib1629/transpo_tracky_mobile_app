@@ -76,9 +76,7 @@ class TripProvider with ChangeNotifier {
         estToReachBus: '16 mins',
       ),
       mode: TripMode.PICK_UP,
-      drivers: [
-        Constants.dummyDriver
-      ]);
+      drivers: [Constants.dummyDriver]);
 
   Trip get passengerSelectedTrip {
     return _passengerSelectedTrip;
@@ -97,6 +95,20 @@ class TripProvider with ChangeNotifier {
   // selectedTrip removed from here
   // rename passengerSelectedTrip to passengerJoinedTrip in this file
   // ----------------------------------------------------------------
+  Future<bool> checkLiveStatus(int tripId) async {
+    try {
+      String url = '$connectionString/trips/check-live-status/tripId=$tripId';
+      final response = await http.get(url).timeout(requestTimeout);
+      final responseData = json.decode(response.body);
+      print(responseData['message']);
+      print('status: ${responseData['status']}');
+
+      return responseData['status'] == 1 ? true : false;
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
 
   Future<void> joinTrip({Trip selectedTrip}) async {
     final passenger = Passenger(id: 1);
@@ -114,6 +126,9 @@ class TripProvider with ChangeNotifier {
             route: r.Route(
                 id: tripData['route']['id'],
                 name: tripData['route']['name'],
+                routeType: tripData['route']['type'] == 'IN_LINE'
+                    ? RouteType.IN_LINE
+                    : RouteType.IN_LOOP,
                 stopList: []),
             bus: Bus(
               id: tripData['bus']['id'],
@@ -174,7 +189,8 @@ class TripProvider with ChangeNotifier {
     Stop stop = passengerSelectedTrip.passengerStop;
     var distance = calculateDistance(driverLocation.latitude,
         driverLocation.longitude, stop.latitude, stop.longitude);
-    passengerSelectedTrip.passengerStop.estToReachBus = distance.toStringAsFixed(2);
+    passengerSelectedTrip.passengerStop.estToReachBus =
+        distance.toStringAsFixed(2);
     notifyListeners();
   }
 
@@ -218,6 +234,9 @@ class TripProvider with ChangeNotifier {
           route: r.Route(
               id: tripData['route']['id'],
               name: tripData['route']['name'],
+              routeType: tripData['route']['type'] == 'IN_LINE'
+                  ? RouteType.IN_LINE
+                  : RouteType.IN_LOOP,
               stopList: []),
           bus: Bus(
             id: tripData['bus']['id'],
@@ -269,6 +288,75 @@ class TripProvider with ChangeNotifier {
     // ---------------------
   }
 
+  // for driver (if he is already on trip)
+  Future<bool> checkIfOnTrip(int driverId) async {
+    try {
+      final response = await http
+          .get('$connectionString/trips/take-driver-on-trip/driverId=$driverId')
+          .timeout(requestTimeout);
+
+      var tripData = json.decode(response.body)['data'] as Map<String, dynamic>;
+
+      print('data fetched: $tripData');
+
+      if (tripData != null) {
+        _driverCreatedTrip = Trip(
+            id: tripData['id'],
+            route: r.Route(
+                id: tripData['route']['id'],
+                name: tripData['route']['name'],
+                routeType: tripData['route']['type'] == 'IN_LINE'
+                    ? RouteType.IN_LINE
+                    : RouteType.IN_LOOP,
+                stopList: []),
+            bus: Bus(
+              id: tripData['bus']['id'],
+              name: tripData['bus']['name'],
+              plateNumber: tripData['bus']['plate'],
+              capacity: tripData['bus']['capacity'],
+            ),
+            meter: BusMeterReading(
+                initialReading: tripData['meterReading']['initial'].toDouble()),
+            mode: tripData['mode'] == 'PICK_UP'
+                ? TripMode.PICK_UP
+                : TripMode.DROP_OFF,
+            drivers: [],
+            mapTraceKey: tripData['mapTraceKey']);
+
+        tripData['route']['stops'].forEach((stopData) {
+          var stop = Stop(
+            id: stopData['id'],
+            name: stopData['name'],
+            timeToReach:
+                DateFormat('Hms', 'en_US').parse(stopData['estimatedTime']),
+            timeReached: stopData['timeReached'] != null
+                ? DateFormat('Hms', 'en_US').parse(stopData['timeReached'])
+                : null,
+            longitude: stopData['location']['longitude'],
+            latitude: stopData['location']['latitude'],
+          );
+          _driverCreatedTrip.route.stopList.add(stop);
+        });
+
+        tripData['drivers'].forEach((driverData) {
+          var driver = Driver(
+              id: driverData['id'],
+              registrationID: driverData['registrationId'],
+              firstName: driverData['firstName'],
+              lastName: driverData['lastName'],
+              contact: driverData['contact']);
+          _driverCreatedTrip.drivers.add(driver);
+        });
+        _driverCreatedTrip.driverNextStop =
+            _driverCreatedTrip.route.stopList[0];
+        return true;
+      } else
+        return false;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // for passenger
   Future<void> passengerEndTrip() async {
     print('passenger trip ended');
@@ -307,7 +395,7 @@ class TripProvider with ChangeNotifier {
 
   Future<void> fetchSuggestedTrips(double latitude, double longitude) async {
     _suggestedTrips = [];
-    
+
     try {
       final response = await http
           .get(
@@ -321,6 +409,9 @@ class TripProvider with ChangeNotifier {
           route: r.Route(
             id: data['trip']['route']['id'],
             name: data['trip']['route']['name'],
+            routeType: data['trip']['route']['type'] == 'IN_LINE'
+                ? RouteType.IN_LINE
+                : RouteType.IN_LOOP,
             stopList: [],
           ),
           drivers: [],
@@ -402,6 +493,9 @@ class TripProvider with ChangeNotifier {
           route: r.Route(
             id: data['route']['id'],
             name: data['route']['name'],
+            routeType: data['route']['type'] == 'IN_LINE'
+                ? RouteType.IN_LINE
+                : RouteType.IN_LOOP,
             stopList: [],
           ),
           drivers: [],
@@ -495,6 +589,9 @@ class TripProvider with ChangeNotifier {
             route: r.Route(
               id: data['route']['id'],
               name: data['route']['name'],
+              routeType: data['route']['type'] == 'IN_LINE'
+                  ? RouteType.IN_LINE
+                  : RouteType.IN_LOOP,
               stopList: [],
             ),
             drivers: [],
@@ -574,6 +671,28 @@ class TripProvider with ChangeNotifier {
     return [..._tripsRecord];
   }
 
+  Future<void> _updateNextStop() async {
+    String url =
+        '$connectionString/trips/stop-reached/stopId=${_driverCreatedTrip.driverNextStop.id}';
+    try {
+      final response = await http.put(url).timeout(requestTimeout);
+      _driverCreatedTrip.driverNextStop.timeReached = DateTime.now();
+      print('/////////////////////////');
+      print('updating next stop');
+      print(json.decode(response.body));
+      print('/////////////////////////');
+      if (_driverNextStopIndex <
+          (_driverCreatedTrip.route.stopList.length - 1)) {
+        _driverNextStopIndex++;
+        driverCreatedTrip.driverNextStop =
+            _driverCreatedTrip.route.stopList[_driverNextStopIndex];
+      }
+      notifyListeners();
+    } catch (error) {
+      print(error);
+    }
+  }
+
   void checkDistanceToNextStop(LocationData driverLocation) {
     double distance = calculateDistance(
         driverLocation.latitude,
@@ -581,13 +700,7 @@ class TripProvider with ChangeNotifier {
         driverCreatedTrip.driverNextStop.latitude,
         driverCreatedTrip.driverNextStop.longitude);
     // print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
-    if (distance < Constants.stopRadius &&
-        _driverNextStopIndex < (_driverCreatedTrip.route.stopList.length - 1)) {
-      _driverNextStopIndex++;
-      driverCreatedTrip.driverNextStop =
-          _driverCreatedTrip.route.stopList[_driverNextStopIndex];
-      notifyListeners();
-    }
+    if (distance < Constants.stopRadius) _updateNextStop();
   }
 
   // calculates the distance between two locations in KM
