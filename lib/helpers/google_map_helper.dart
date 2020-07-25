@@ -54,22 +54,6 @@ class MapHelper {
     }
   }
 
-  // static Future<void> updateDriverLocation(
-  //     String trackingKey, LocationData location) async {
-  //   try {
-  //     var url =
-  //         "https://transpo-tracky.firebaseio.com/trackings/$trackingKey.json";
-  //     await http
-  //         .post(url,
-  //             body: json.encode(
-  //                 {'lat': location.latitude, 'lng': location.longitude}))
-  //         .timeout(requestTimeout);
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
-
-  // under testing mode
   static Future<dynamic> getDirections(
       LocationData currentPosition, Stop nextStop) async {
     try {

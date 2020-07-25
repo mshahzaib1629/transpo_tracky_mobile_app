@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/firebase_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
+import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class PassengerTrackingMap extends StatefulWidget {
@@ -22,11 +23,13 @@ class PassengerTrackingMap extends StatefulWidget {
 class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   TripProvider tripProvider;
   Trip trip;
+  LatLng _busLocation;
   StreamSubscription _locationSubscription;
   Location _locationTracker = Location();
   Set<Marker> _setOfMarkers = {};
   Set<Circle> _setOfCircles = {};
   GoogleMapController _controller;
+  bool _isInit = true;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -34,18 +37,37 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
   );
 
   @override
-  void initState() {
-    super.initState();
-    tripProvider = Provider.of<TripProvider>(context, listen: false);
-    trip = tripProvider.passengerSelectedTrip;
-    getCurrentLocation();
-    getStopLocation();
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        tripProvider = Provider.of<TripProvider>(context);
+        trip = tripProvider.passengerSelectedTrip;
+        _isInit = false;
+      });
+      getCurrentLocation();
+      getStopLocation();
+    }
+    super.didChangeDependencies();
   }
 
-  void getStopLocation() async {
+// calculating distance b/w user & the bus
+  void _checkDistanceToBus(LocationData currentLocation) {
+    double _distance = tripProvider.calculateDistance(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        _busLocation.latitude,
+        _busLocation.longitude);
+    if (_distance < Constants.thresholdDistance) {
+      tripProvider.updateOnBoardStatus();
+      getStopLocation();
+    }
+  }
+
+  void getStopLocation() {
     setState(() {
+      _setOfMarkers.removeWhere((m) => m.markerId.value == "destination");
       _setOfMarkers.add(Marker(
-        markerId: MarkerId(trip.passengerStop.id.toString()),
+        markerId: MarkerId('destination'),
         position: LatLng(
           trip.passengerStop.latitude,
           trip.passengerStop.longitude,
@@ -109,6 +131,9 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
 
       _locationSubscription =
           _locationTracker.onLocationChanged.listen((newLocalData) {
+        if (trip.onBoard == false) {
+          _checkDistanceToBus(newLocalData);
+        }
         if (_controller != null) {
           _controller.animateCamera(CameraUpdate.newCameraPosition(
               new CameraPosition(
@@ -152,15 +177,15 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
     );
   }
 
-  void _updateDriverLocation(LatLng driverLocation) async {
-    tripProvider.updateEsdToReachBus(driverLocation);
+  void _updateBusLocation() async {
+    tripProvider.updateEsdToReachBus(_busLocation);
 
     Uint8List imageData = await getBusMarker();
     this.setState(() {
-      _setOfMarkers.removeWhere((m) => m.markerId.value == "driver");
+      _setOfMarkers.removeWhere((m) => m.markerId.value == "bus");
       _setOfMarkers.add(Marker(
-          markerId: MarkerId("driver"),
-          position: driverLocation,
+          markerId: MarkerId("bus"),
+          position: _busLocation,
           infoWindow: InfoWindow(title: trip.bus.plateNumber),
           // rotation: newLocalData.heading,
           draggable: false,
@@ -177,11 +202,9 @@ class _PassengerTrackingMapState extends State<PassengerTrackingMap> {
         stream: FirebaseHelper.getDriverLocation(trip.mapTraceKey),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.active) {
-            LatLng driverLocation =
-                LatLng(snapshot.data['lat'], snapshot.data['lng']);
-
+            _busLocation = LatLng(snapshot.data['lat'], snapshot.data['lng']);
             Future.delayed(Duration(milliseconds: 500))
-                .then((value) => _updateDriverLocation(driverLocation));
+                .then((_) => _updateBusLocation());
           }
           return GoogleMap(
             mapType: MapType.normal,

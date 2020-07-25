@@ -31,6 +31,7 @@ class Trip {
   List<Driver> drivers;
   Bus bus;
   BusMeterReading meter;
+  bool onBoard;
   int passengersOnBoard;
   String mapTraceKey;
   TripMode mode;
@@ -46,6 +47,7 @@ class Trip {
     this.driverNextStop,
     this.bus,
     this.meter,
+    this.onBoard = false,
     this.passengersOnBoard,
     this.mapTraceKey,
     this.mode,
@@ -337,7 +339,6 @@ class TripProvider with ChangeNotifier {
           );
           _driverCreatedTrip.route.stopList.add(stop);
         });
-
         tripData['drivers'].forEach((driverData) {
           var driver = Driver(
               id: driverData['id'],
@@ -348,7 +349,12 @@ class TripProvider with ChangeNotifier {
           _driverCreatedTrip.drivers.add(driver);
         });
         _driverCreatedTrip.driverNextStop =
-            _driverCreatedTrip.route.stopList[0];
+            _driverCreatedTrip.route.stopList.firstWhere(
+          (stop) => stop.timeReached == null,
+          orElse: () => _driverCreatedTrip
+              .route.stopList[_driverCreatedTrip.route.stopList.length - 1],
+        );
+        print(_driverCreatedTrip.driverNextStop.name);
         return true;
       } else
         return false;
@@ -432,7 +438,7 @@ class TripProvider with ChangeNotifier {
             capacity: data['trip']['bus']['capacity'],
           ),
           passengersOnBoard: data['trip']['no_of_passengers'],
-          mapTraceKey: data['mapTraceKey'],
+          mapTraceKey: data['trip']['mapTraceKey'],
           mode: data['trip']['mode'] == 'PICK_UP'
               ? TripMode.PICK_UP
               : TripMode.DROP_OFF,
@@ -671,6 +677,19 @@ class TripProvider with ChangeNotifier {
     return [..._tripsRecord];
   }
 
+  // For passengers
+  void updateOnBoardStatus() {
+    print('on board status called');
+    _passengerSelectedTrip.onBoard = true;
+    if (_passengerSelectedTrip.mode == TripMode.PICK_UP) {
+      List<Stop> _stopList = _passengerSelectedTrip.route.stopList;
+      _passengerSelectedTrip.passengerStop = _stopList[_stopList.length - 1];
+      print('passenger stop: ${_passengerSelectedTrip.passengerStop.name}');
+    }
+    notifyListeners();
+  }
+
+  // For drivers
   Future<void> _updateNextStop() async {
     String url =
         '$connectionString/trips/stop-reached/stopId=${_driverCreatedTrip.driverNextStop.id}';

@@ -97,7 +97,7 @@ class _PassengerRouteSelectionPageState
     try {
       LatLng selectedLocation = await MapHelper.getPlaceLatLng(locationId);
       if (selectedLocation != null)
-        Provider.of<TripProvider>(context, listen: false).fetchSuggestedTrips(
+        await Provider.of<TripProvider>(context, listen: false).fetchSuggestedTrips(
             selectedLocation.latitude, selectedLocation.longitude);
       print('trips fetched');
     } catch (error) {

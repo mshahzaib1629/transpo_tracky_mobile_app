@@ -66,6 +66,7 @@ class _RouteSelectionTopBarState extends State<RouteSelectionTopBar> {
   }
 
   Future<void> _getCurrentLocation() async {
+    FocusScope.of(context).unfocus();
     var location = await locationPkg.Location().getLocation();
     if (location != null) {
       setState(() {

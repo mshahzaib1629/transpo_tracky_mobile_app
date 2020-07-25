@@ -14,7 +14,22 @@ class PassengerTrackingPageDetail extends StatefulWidget {
 class _PassengerTrackingPageDetailState
     extends State<PassengerTrackingPageDetail> {
   bool _isExpanded = false;
-  Trip currentTrip;
+  bool _isInit = true;
+  TripProvider _tripProvider;
+  Trip _currentTrip;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _tripProvider = Provider.of<TripProvider>(context);
+        _currentTrip = _tripProvider.passengerSelectedTrip;
+        _isInit = false;
+      });
+    }
+    super.didChangeDependencies();
+  }
+
   Widget _buildTopBarLead(BuildContext context) {
     return Positioned(
       top: 0.0,
@@ -34,7 +49,7 @@ class _PassengerTrackingPageDetailState
           width: 36.11 * SizeConfig.widthMultiplier,
           alignment: Alignment.center,
           child: Text(
-            currentTrip.route.name,
+            _currentTrip.route.name,
             style:
                 Theme.of(context).textTheme.body2.copyWith(color: Colors.white),
             overflow: TextOverflow.ellipsis,
@@ -62,16 +77,16 @@ class _PassengerTrackingPageDetailState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                currentTrip.bus.plateNumber,
+                _currentTrip.bus.plateNumber,
                 style: Theme.of(context)
                     .textTheme
                     .body2
                     .copyWith(color: Theme.of(context).accentColor),
               ),
               Container(
-                width: 43.1 * SizeConfig.widthMultiplier,
+                width: 40.1 * SizeConfig.widthMultiplier,
                 child: Text(
-                  currentTrip.bus.name,
+                  _currentTrip.bus.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.subhead,
@@ -83,6 +98,48 @@ class _PassengerTrackingPageDetailState
       ),
     );
   }
+
+  Widget _buildDistanceFromBus() => Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            'Bus is',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Theme.of(context).accentColor),
+          ),
+          Text(
+            (_currentTrip.passengerStop.estToReachBus ?? '0') + ' km',
+            style: Theme.of(context)
+                .textTheme
+                .title
+                .copyWith(color: Theme.of(context).accentColor),
+          ),
+          Text('away'),
+        ],
+      );
+
+  Widget _buildDistanceFromDestination() => Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Text(
+            'Destination is',
+            style: Theme.of(context)
+                .textTheme
+                .bodyText1
+                .copyWith(color: Theme.of(context).accentColor),
+          ),
+          Text(
+            (_currentTrip.passengerStop.estToReachBus ?? '0') + ' km',
+            style: Theme.of(context)
+                .textTheme
+                .title
+                .copyWith(color: Theme.of(context).accentColor),
+          ),
+          Text('away'),
+        ],
+      );
 
   Widget _buildTopBarBody(BuildContext context) {
     return Container(
@@ -97,7 +154,7 @@ class _PassengerTrackingPageDetailState
             padding: EdgeInsets.only(top: 4.68 * SizeConfig.heightMultiplier),
             width: 74.88 * SizeConfig.widthMultiplier,
             child: Text(
-              currentTrip.passengerStop.name,
+              _currentTrip.passengerStop.name,
               style: TextStyle(
                 fontSize: 5.44 * SizeConfig.widthMultiplier,
               ),
@@ -108,25 +165,15 @@ class _PassengerTrackingPageDetailState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               _buildBusDetail(context),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    (currentTrip.passengerStop.estToReachBus ?? '0') + ' km',
-                    style: Theme.of(context)
-                        .textTheme
-                        .title
-                        .copyWith(color: Theme.of(context).accentColor),
-                  ),
-                  Text('away'),
-                ],
-              ),
+              _currentTrip.onBoard
+                  ? _buildDistanceFromDestination()
+                  : _buildDistanceFromBus()
             ],
           ),
           // ---------------------------------------------------------------------------
           // Here goes the estimated time defined by the institute to reach current stop
           Text('Estimated Time: ' +
-              DateFormat.jm().format(currentTrip.passengerStop.timeToReach)),
+              DateFormat.jm().format(_currentTrip.passengerStop.timeToReach)),
           // ---------------------------------------------------------------------------
         ],
       ),
@@ -201,7 +248,7 @@ class _PassengerTrackingPageDetailState
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: getDriversList(context, currentTrip.drivers),
+                  children: getDriversList(context, _currentTrip.drivers),
                 ),
               ],
             ),
@@ -211,10 +258,6 @@ class _PassengerTrackingPageDetailState
 
   @override
   Widget build(BuildContext context) {
-    final joinedTrip = Provider.of<TripProvider>(context).passengerSelectedTrip;
-    setState(() {
-      this.currentTrip = joinedTrip;
-    });
     return AnimatedPositioned(
       duration: Duration(milliseconds: 250),
       top: _isExpanded

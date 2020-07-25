@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/helpers/firebase_helper.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 
 class PassengerHomePageMap extends StatefulWidget {
@@ -47,8 +48,7 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
           ),
           draggable: false,
           infoWindow: InfoWindow(
-              title: 'Stop Name',
-              snippet: widget.passengerSelectedTrip.passengerStop.name),
+              title: widget.passengerSelectedTrip.passengerStop.name),
           icon: BitmapDescriptor.defaultMarker,
         ));
       });
@@ -58,6 +58,12 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
   Future<Uint8List> getMarker() async {
     ByteData byteData = await DefaultAssetBundle.of(context)
         .load("assets/location_icons/user_location.png");
+    return byteData.buffer.asUint8List();
+  }
+
+  Future<Uint8List> getBusMarker() async {
+    ByteData byteData = await DefaultAssetBundle.of(context)
+        .load("assets/location_icons/bus_location.png");
     return byteData.buffer.asUint8List();
   }
 
@@ -122,6 +128,24 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
     }
   }
 
+  void _updateBusLocation(LatLng busLocation) async {
+    Uint8List imageData = await getBusMarker();
+    this.setState(() {
+      _setOfMarkers.removeWhere((m) => m.markerId.value == "bus");
+      _setOfMarkers.add(Marker(
+          markerId: MarkerId("bus"),
+          position: busLocation,
+          infoWindow:
+              InfoWindow(title: widget.passengerSelectedTrip.bus.plateNumber),
+          // rotation: newLocalData.heading,
+          draggable: false,
+          zIndex: 2,
+          flat: true,
+          anchor: Offset(0.5, 0.5),
+          icon: BitmapDescriptor.fromBytes(imageData)));
+    });
+  }
+
   @override
   void dispose() {
     if (_locationSubscription != null) {
@@ -148,25 +172,41 @@ class _PassengerHomePageMapState extends State<PassengerHomePageMap> {
     );
   }
 
+  Widget _googleMap() => GoogleMap(
+        mapType: MapType.normal,
+        initialCameraPosition: initialLocation,
+        markers: _setOfMarkers,
+        circles: _setOfCircles,
+        zoomControlsEnabled: false,
+        compassEnabled: false,
+        mapToolbarEnabled: false,
+        myLocationEnabled: false,
+        myLocationButtonEnabled: false,
+        onMapCreated: (GoogleMapController controller) {
+          _controller = controller;
+          print('---------------------------------');
+          print('home page map created');
+          print('---------------------------------');
+        },
+      );
+
   Widget _buildMap(BuildContext context) {
     print("no. of markers in homepage: ${_setOfMarkers.length}");
-    return GoogleMap(
-      mapType: MapType.normal,
-      initialCameraPosition: initialLocation,
-      markers: _setOfMarkers,
-      circles: _setOfCircles,
-      zoomControlsEnabled: false,
-      compassEnabled: false,
-      mapToolbarEnabled: false,
-      myLocationEnabled: false,
-      myLocationButtonEnabled: false,
-      onMapCreated: (GoogleMapController controller) {
-        _controller = controller;
-        print('---------------------------------');
-        print('home page map created');
-        print('---------------------------------');
-      },
-    );
+    return widget.passengerSelectedTrip != null
+        ? StreamBuilder(
+            stream: FirebaseHelper.getDriverLocation(
+                widget.passengerSelectedTrip.mapTraceKey),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.active) {
+                LatLng busLocation =
+                    LatLng(snapshot.data['lat'], snapshot.data['lng']);
+
+                Future.delayed(Duration(milliseconds: 500))
+                    .then((value) => _updateBusLocation(busLocation));
+              }
+              return _googleMap();
+            })
+        : _googleMap();
   }
 
   @override
