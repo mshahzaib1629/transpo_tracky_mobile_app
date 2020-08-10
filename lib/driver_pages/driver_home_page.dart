@@ -5,6 +5,7 @@ import 'package:transpo_tracky_mobile_app/driver_pages/driver_config_page.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
 import 'package:transpo_tracky_mobile_app/google_maps/driver_hp_map.dart';
 import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
@@ -72,7 +73,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
   Future<void> _checkIfOnTrip() async {
     try {
       bool status = await Provider.of<TripProvider>(context, listen: false)
-          .checkIfOnTrip(Constants.dummyDriver.id);
+          .checkIfOnTrip();
       if (status) _showOnTripDialog();
     } catch (error) {
       print(error);
@@ -80,10 +81,11 @@ class _DriverHomePageState extends State<DriverHomePage> {
   }
 
   void _showOnTripDialog() async {
+    Driver driver = Provider.of<Auth>(context, listen: false).currentUser;
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Welcome Captain!'),
+              title: Text('Welcome ${driver.firstName}!'),
               content: Text('You are already on a trip\nJoin now?'),
               actions: [
                 FlatButton(

@@ -11,6 +11,12 @@ class BroadCastMessage {
 }
 
 class BroadCastProvider with ChangeNotifier {
+
+  final token;
+  final currentUser;
+  final userType;
+
+  BroadCastProvider({this.token, this.currentUser, this.userType});
   List<BroadCastMessage> _dummy_broadCastedMessages = [
     BroadCastMessage(
       sender: Constants.dummyDriver,

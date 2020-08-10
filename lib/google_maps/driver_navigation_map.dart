@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/driver_pages/driver_rest_page.dart';
 import 'package:transpo_tracky_mobile_app/helpers/enums.dart';
 import '../helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
@@ -13,8 +14,9 @@ import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../helpers/firebase_helper.dart';
 
 class DriverNavigationMap extends StatefulWidget {
-  DriverNavigationMap({Key key}) : super(key: key);
+  Function showEndTripDialog;
 
+  DriverNavigationMap(this.showEndTripDialog);
   @override
   _DriverNavigationMapState createState() => _DriverNavigationMapState();
 }
@@ -29,6 +31,7 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
   Set<Polyline> _setOfPolylines = {};
   GoogleMapController _controller;
   LocationData _lastCheckpoint;
+  bool _restPageDisplayed = false;
 
   static final CameraPosition initialLocation = CameraPosition(
     target: LatLng(31.4826352, 74.0541966),
@@ -84,7 +87,8 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
           endCap: Cap.roundCap,
         ));
       });
-      await FirebaseHelper.updateDriverLocation(trip.mapTraceKey, updatedLocation);
+      await FirebaseHelper.updateDriverLocation(
+          trip.mapTraceKey, updatedLocation);
     } catch (error) {
       showDialog(
           context: context,
@@ -149,6 +153,38 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
             newLocalData.longitude,
             _lastCheckpoint.latitude,
             _lastCheckpoint.longitude);
+
+        if (trip.shareLiveLocation == false &&
+            trip.driverNextStop.id == trip.route.stopList[0].id) {
+          var distanceFromStop = tripProvider.calculateDistance(
+            newLocalData.latitude,
+            newLocalData.longitude,
+            trip.driverNextStop.latitude,
+            trip.driverNextStop.longitude,
+          );
+          if (distanceFromStop < (Constants.stopRadius + 0.5) &&
+              _restPageDisplayed == false) {
+            setState(() {
+              _restPageDisplayed = true;
+            });
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => RestPage()));
+          }
+        }
+
+        if (trip.driverNextStop.id ==
+            trip.route.stopList[trip.route.stopList.length - 1].id) {
+          var distanceFromDestination = tripProvider.calculateDistance(
+            newLocalData.latitude,
+            newLocalData.longitude,
+            trip.driverNextStop.latitude,
+            trip.driverNextStop.longitude,
+          );
+          if (distanceFromDestination <= Constants.stopRadius)
+            widget.showEndTripDialog();
+        }
+
+        //------------------------------------------------------
 
         print('last checkpoint: $_lastCheckpoint');
         print('distance from last checkpoint: $locDiff');

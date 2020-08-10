@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/passenger_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
@@ -68,38 +69,49 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
   void _submitForm() {
     if (_passengerSignupKey.currentState.validate()) {
       _saveForm();
-      showDialog(
-          context: context,
-          child: AlertDialog(
-            title: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Thanks for your time')),
-            content: Text(
-                'Your request is pending for admin approval. You\'ll be notified soon.'),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'))
-            ],
-          ));
-      print(_passengerForm.registrationID +
-          ' f-Name: ' +
-          _passengerForm.firstName +
-          ' l-Name: ' +
-          _passengerForm.lastName +
-          ' contact: ' +
-          _passengerForm.contact +
-          ' email: ' +
-          _passengerForm.email +
-          ' gender: ' +
-          _passengerForm.gender.toString() +
-          ' password: ' +
-          _passengerForm.password +
-          ' session: ' +
-          _passengerForm.session.name);
+
+      Provider.of<Auth>(context, listen: false)
+          .passengerSignup(
+            regId: _passengerForm.registrationID,
+            firstName: _passengerForm.firstName,
+            lastName: _passengerForm.lastName,
+            contact: _passengerForm.contact,
+            email: _passengerForm.email,
+            gender: _passengerForm.gender,
+            currentSession: _passengerForm.session,
+            password: _passengerForm.password,
+          )
+          .then((value) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Thanks for your time')),
+                content: Text(
+                    'Your request is pending for admin approval. You\'ll be notified soon.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )))
+          .catchError((error) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft, child: Text('Oh no!')),
+                content: Text('Something is went wrong.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )));
     }
   }
 
@@ -175,6 +187,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
                   border: InputBorder.none,
                   labelText: 'Registration ID *',
                   hintText: 'FA00-AAA-000'),
+              textCapitalization: TextCapitalization.characters,
               textInputAction: TextInputAction.done,
               onFieldSubmitted: (value) {},
               onSaved: (value) {
@@ -550,7 +563,7 @@ class _PassengerSignUpPageState extends State<PassengerSignUpPage> {
     );
   }
 
-Future<bool> _onBackPressed() {
+  Future<bool> _onBackPressed() {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -577,8 +590,8 @@ Future<bool> _onBackPressed() {
     return Scaffold(
       backgroundColor: Colors.white,
       body: WillPopScope(
-      onWillPop: _onBackPressed,
-              child: SafeArea(
+        onWillPop: _onBackPressed,
+        child: SafeArea(
             child: Container(
           padding: EdgeInsets.symmetric(
               vertical: 3.75 * SizeConfig.heightMultiplier,

@@ -168,106 +168,70 @@ class _DriverNavigationPageDetailState
     );
   }
 
+  Future<void> _skipStop() async {
+    print('skiping next stop');
+    return await Provider.of<TripProvider>(context, listen: false)
+        .updateNextStop();
+  }
+
   Widget _buildTopBarLead(BuildContext context) {
-    return Center(
-      heightFactor: 0,
-      child: Container(
-        width: 50 * SizeConfig.widthMultiplier,
-        height: 7.81 * SizeConfig.heightMultiplier,
-        padding: EdgeInsets.symmetric(
-          vertical: 1.25 * SizeConfig.heightMultiplier,
-          horizontal: 1.38 * SizeConfig.widthMultiplier,
-        ),
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor,
-          borderRadius:
-              BorderRadius.circular(8.33 * SizeConfig.imageSizeMultiplier),
-        ),
-        alignment: Alignment.center,
-        child: Column(
-          children: <Widget>[
-            Container(
-              alignment: Alignment.center,
-              width: 38.8 * SizeConfig.widthMultiplier,
-              child: Text(
-                // -------------------------------------
-                // here should come the next stop's name
-                currentTrip.driverNextStop.name,
-                // --------------------------------------
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 2.5 * SizeConfig.textMultiplier),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(
-              height: 0.15 * SizeConfig.heightMultiplier,
-            ),
-            Container(
-              alignment: Alignment.center,
-              width: 30.56 * SizeConfig.widthMultiplier,
-              child: Text(
-                currentTrip.route.name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 1.73 * SizeConfig.textMultiplier,
-                  letterSpacing: 0.167 * SizeConfig.widthMultiplier,
+    return GestureDetector(
+      onTap: _skipStop,
+      child: Center(
+        heightFactor: 0,
+        child: Container(
+          width: 50 * SizeConfig.widthMultiplier,
+          height: 7.81 * SizeConfig.heightMultiplier,
+          padding: EdgeInsets.symmetric(
+            vertical: 1.25 * SizeConfig.heightMultiplier,
+            horizontal: 1.38 * SizeConfig.widthMultiplier,
+          ),
+          decoration: BoxDecoration(
+            color: Theme.of(context).accentColor,
+            borderRadius:
+                BorderRadius.circular(8.33 * SizeConfig.imageSizeMultiplier),
+          ),
+          alignment: Alignment.center,
+          child: Column(
+            children: <Widget>[
+              Container(
+                alignment: Alignment.center,
+                width: 38.8 * SizeConfig.widthMultiplier,
+                child: Text(
+                  // -------------------------------------
+                  // here should come the next stop's name
+                  currentTrip.driverNextStop.name,
+                  // --------------------------------------
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 2.5 * SizeConfig.textMultiplier),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+              SizedBox(
+                height: 0.15 * SizeConfig.heightMultiplier,
+              ),
+              Container(
+                alignment: Alignment.center,
+                width: 30.56 * SizeConfig.widthMultiplier,
+                child: Text(
+                  currentTrip.route.name,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 1.73 * SizeConfig.textMultiplier,
+                    letterSpacing: 0.167 * SizeConfig.widthMultiplier,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildTopBarBody(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-          top: 6.25 * SizeConfig.heightMultiplier,
-          bottom: 4.84 * SizeConfig.heightMultiplier),
-      child: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              currentTrip.mode == TripMode.PICK_UP
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          DateFormat.jm().format(
-                              currentTrip.driverNextStop.timeToReach ?? '0'),
-                          style: Theme.of(context).textTheme.title,
-                        ),
-                        Text('Estimated Time')
-                      ],
-                    )
-                  : Text(
-                      currentTrip.driverNextStop.distanceFromUser ?? '0 km',
-                      style: Theme.of(context).textTheme.title,
-                    ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text(
-                    currentTrip.driverNextStop.estToReachBus != null
-                        ? currentTrip.driverNextStop.estToReachBus
-                        : '0 mins',
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  Text('away')
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context) {
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -275,21 +239,66 @@ class _DriverNavigationPageDetailState
         });
       },
       child: Container(
-        padding:
-            EdgeInsets.symmetric(horizontal: 5.56 * SizeConfig.widthMultiplier),
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor.withOpacity(0.0),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
-            topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
-          ),
-        ),
-        child: Stack(
+        padding: EdgeInsets.only(
+            top: 6.25 * SizeConfig.heightMultiplier,
+            bottom: 4.84 * SizeConfig.heightMultiplier),
+        color: Colors.white.withOpacity(0.0),
+        child: Column(
           children: <Widget>[
-            _buildTopBarBody(context),
-            _buildTopBarLead(context),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                currentTrip.mode == TripMode.PICK_UP
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            DateFormat.jm().format(
+                                currentTrip.driverNextStop.timeToReach ?? '0'),
+                            style: Theme.of(context).textTheme.title,
+                          ),
+                          Text('Estimated Time')
+                        ],
+                      )
+                    : Text(
+                        currentTrip.driverNextStop.distanceFromUser ?? '0 km',
+                        style: Theme.of(context).textTheme.title,
+                      ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      currentTrip.driverNextStop.estToReachBus != null
+                          ? currentTrip.driverNextStop.estToReachBus
+                          : '0 mins',
+                      style: Theme.of(context).textTheme.title,
+                    ),
+                    Text('away')
+                  ],
+                ),
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Container(
+      padding:
+          EdgeInsets.symmetric(horizontal: 5.56 * SizeConfig.widthMultiplier),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
+          topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
+        ),
+      ),
+      child: Stack(
+        children: <Widget>[
+          _buildTopBarBody(context),
+          _buildTopBarLead(context),
+        ],
       ),
     );
   }

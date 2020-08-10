@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
 import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
@@ -24,6 +25,7 @@ class DriverConfigurationPage extends StatefulWidget {
 class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   bool takingParnterDriver = false;
 
+  Driver currentDriver;
   List<r.Route> availableRoutes = [];
 
   var _tripConfig = TripConfig(
@@ -55,6 +57,9 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     if (_isInit) {
       setState(() {
         _isLoading = true;
+      });
+      setState(() {
+       currentDriver =Provider.of<Auth>(context, listen: false).currentUser;
       });
       Provider.of<RouteProvider>(context, listen: false)
           .fetchRoutes()
@@ -94,7 +99,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     _driverConfigFormKey.currentState.save();
     // -----------------------------------------
     // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
-    _tripConfig.currentDriver = Constants.dummyDriver;
+    _tripConfig.currentDriver = currentDriver;
     // -----------------------------------------
   }
 
@@ -240,7 +245,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         // later, it should be passed of current logged in user
         // =====================================================================
         future: Provider.of<TripConfigProvider>(context, listen: false)
-            .fetchAndSetConfigs(currentDriverId: Constants.dummyDriver.id),
+            .fetchAndSetConfigs(currentDriverId: currentDriver.id),
         // =====================================================================
         builder: (context, snapshot) => Consumer<TripConfigProvider>(
               builder: (context, configConsumer, child) {

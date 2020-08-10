@@ -50,7 +50,9 @@ class DriverProvider with ChangeNotifier {
       designation: Designation(id: 1, name: 'Driver'),
     ),
   ];
-
+// @TODO ---------------------------
+// ADD get all active drivers from the server
+// ----------------------------------
   Driver getDriver(int id) {
     return dummy_available_drivers.firstWhere((driver) => driver.id == id,
         orElse: () {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
@@ -9,19 +11,30 @@ import 'package:transpo_tracky_mobile_app/widgets/trip_record_card.dart';
 
 import '../helpers/size_config.dart';
 
-class LastTripsDetailPage extends StatelessWidget {
+class LastTripsDetailPage extends StatefulWidget {
   // In this page, we check either driver is logged in to the app or passenger, bases on that we share the details accordingly
-  final LoginMode loginMode = LoginMode.Driver;
   final Trip trip;
 
   LastTripsDetailPage({@required this.trip});
 
+  @override
+  _LastTripsDetailPageState createState() => _LastTripsDetailPageState();
+}
+
+class _LastTripsDetailPageState extends State<LastTripsDetailPage> {
+  LoginMode loginMode;
+
+  @override
+  void initState() {
+    loginMode = Provider.of<Auth>(context, listen: false).loginMode;
+  }
+
   Widget _buildMap(BuildContext context) {
     final staticMapImageUrl =
-        MapHelper.generateMapPreviewImage(stopList: trip.route.stopList);
+        MapHelper.generateMapPreviewImage(stopList: widget.trip.route.stopList);
 
-    if (trip.route.staticMapImage == null) {
-      trip.route.staticMapImage = Image.network(
+    if (widget.trip.route.staticMapImage == null) {
+      widget.trip.route.staticMapImage = Image.network(
         staticMapImageUrl,
         fit: BoxFit.fill,
         width: double.infinity,
@@ -33,12 +46,12 @@ class LastTripsDetailPage extends StatelessWidget {
         color: Colors.black12,
         alignment: Alignment.center,
         height: 32.8125 * SizeConfig.heightMultiplier,
-        child: trip.route.staticMapImage == null
+        child: widget.trip.route.staticMapImage == null
             ? Text(
                 'Something went wrong!',
                 textAlign: TextAlign.center,
               )
-            : trip.route.staticMapImage);
+            : widget.trip.route.staticMapImage);
   }
 
   Widget horizontalLine(BuildContext context) => Container(
@@ -52,7 +65,7 @@ class LastTripsDetailPage extends StatelessWidget {
       );
 
   int _passengerStrength() {
-    int difference = trip.bus.capacity - trip.passengersOnBoard;
+    int difference = widget.trip.bus.capacity - widget.trip.passengersOnBoard;
     return difference;
   }
 
@@ -72,7 +85,7 @@ class LastTripsDetailPage extends StatelessWidget {
               width: 5.56 * SizeConfig.widthMultiplier,
             ),
             Text(
-              '${trip.passengersOnBoard}/${trip.bus.capacity}',
+              '${widget.trip.passengersOnBoard}/${widget.trip.bus.capacity}',
               style: Theme.of(context).textTheme.body2.copyWith(
                   color: _passengerStrength() < 2
                       ? Colors.red
@@ -104,8 +117,9 @@ class LastTripsDetailPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: <Widget>[
-                        Text(DateFormat.jm().format(trip.startTime)),
-                        Text(trip.meter.initialReading.toStringAsFixed(1) +
+                        Text(DateFormat.jm().format(widget.trip.startTime)),
+                        Text(widget.trip.meter.initialReading
+                                .toStringAsFixed(1) +
                             ' km'),
                       ],
                     ),
@@ -120,9 +134,9 @@ class LastTripsDetailPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(DateFormat.jm().format(trip.endTime)),
-                        Text(
-                            trip.meter.finalReading.toStringAsFixed(1) + ' km'),
+                        Text(DateFormat.jm().format(widget.trip.endTime)),
+                        Text(widget.trip.meter.finalReading.toStringAsFixed(1) +
+                            ' km'),
                       ],
                     ),
                   ),
@@ -162,7 +176,7 @@ class LastTripsDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  trip.bus.plateNumber,
+                  widget.trip.bus.plateNumber,
                   style: Theme.of(context)
                       .textTheme
                       .body2
@@ -171,7 +185,7 @@ class LastTripsDetailPage extends StatelessWidget {
                 Container(
                   width: 61.1 * SizeConfig.widthMultiplier,
                   child: Text(
-                    trip.bus.name,
+                    widget.trip.bus.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.subhead,
@@ -286,7 +300,7 @@ class LastTripsDetailPage extends StatelessWidget {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: getDriversList(context, trip.drivers),
+              children: getDriversList(context, widget.trip.drivers),
             ),
           ],
         ),
@@ -311,7 +325,7 @@ class LastTripsDetailPage extends StatelessWidget {
           height: 0.78 * SizeConfig.heightMultiplier,
         ),
         Column(
-          children: getStopList(context, trip.route.stopList),
+          children: getStopList(context, widget.trip.route.stopList),
         )
       ],
     );
@@ -384,7 +398,7 @@ class LastTripsDetailPage extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 TripRecordCard(
-                  trip: trip,
+                  trip: widget.trip,
                 ),
                 _buildDetailCard(context),
               ],

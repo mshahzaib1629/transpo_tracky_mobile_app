@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_home_page.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/helpers/manual_exception.dart';
 import 'package:transpo_tracky_mobile_app/helpers/styling.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_home_page.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_signup_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 
 import '../helpers/enums.dart';
@@ -22,7 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   LoginMode _loginMode = LoginMode.Passenger;
+  final _passwordFocusNode = FocusNode();
 
+  Map<String, String> _authData = {
+    'regId': '',
+    'password': '',
+  };
   final _inputDecoration = InputDecoration(
     filled: true,
     fillColor: Colors.white,
@@ -68,16 +75,28 @@ class _LoginPageState extends State<LoginPage> {
                   ? 'Enter Passenger ID'
                   : 'Enter Driver ID',
             ),
+            textInputAction: TextInputAction.next,
+            textCapitalization: TextCapitalization.characters,
+            onSaved: (value) {
+              _authData['regId'] = value;
+            },
+            onFieldSubmitted: (_) =>
+                FocusScope.of(context).requestFocus(_passwordFocusNode),
+            // onChanged: (value) => _regController.text = value,
           ),
           SizedBox(
             height: 3.1 * SizeConfig.heightMultiplier,
           ),
           TextFormField(
+            focusNode: _passwordFocusNode,
             cursorColor: Colors.black,
             obscureText: true,
             style: TextStyle(
               color: Colors.black,
             ),
+            onSaved: (value) {
+              _authData['password'] = value;
+            },
             decoration: _inputDecoration.copyWith(hintText: 'Enter Password'),
           ),
         ],
@@ -85,16 +104,58 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  void _submitForm() async {
+    _formKey.currentState.validate();
+    _formKey.currentState.save();
+    // print('${_authData['regId']}, ${_authData['password']}');
+    try {
+      await Provider.of<Auth>(context, listen: false)
+          .login(_authData['regId'], _authData['password'], _loginMode);
+    } on ManualException catch (error) {
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            title: Align(
+                alignment: Alignment.centerLeft, child: Text(error.title)),
+            content: Text(error.message),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('OK'))
+            ],
+          ));
+    } catch (error) {
+      showDialog(
+          context: context,
+          child: AlertDialog(
+            title:
+                Align(alignment: Alignment.centerLeft, child: Text('Oh no!')),
+            content: Text('Something went wrong.'),
+            actions: <Widget>[
+              FlatButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('OK'))
+            ],
+          ));
+    }
+  }
+
   Widget _buildLoginButton() {
     return GestureDetector(
       onTap: () {
-        if (_loginMode == LoginMode.Driver) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => DriverHomePage()));
-        } else {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => PassengerHomePage()));
-        }
+        // if (_loginMode == LoginMode.Driver) {
+        //   Navigator.pushReplacement(context,
+        //       MaterialPageRoute(builder: (context) => DriverHomePage()));
+        // } else {
+        //   Navigator.pushReplacement(context,
+        //       MaterialPageRoute(builder: (context) => PassengerHomePage()));
+        // }
+
+        _submitForm();
       },
       child: Container(
         height: 7.81 * SizeConfig.heightMultiplier,

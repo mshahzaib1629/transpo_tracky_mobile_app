@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
@@ -30,7 +32,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
 
   final List<Designation> designations = [
     Designation(id: 1, name: "Driver"),
-    Designation(id: 2, name: "Conductor"),
+    Designation(id: 4, name: "Conductor"),
   ];
   var _driverForm = Driver(
     registrationID: '',
@@ -74,40 +76,51 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
   void _submitForm() {
     if (_driverSignupKey.currentState.validate()) {
       _saveForm();
-      showDialog(
-          context: context,
-          child: AlertDialog(
-            title: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Thanks for your time')),
-            content: Text(
-                'Your request is pending for admin approval. You\'ll be notified soon.'),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'))
-            ],
-          ));
-      print(_driverForm.registrationID +
-          ' f-Name: ' +
-          _driverForm.firstName +
-          ' l-Name: ' +
-          _driverForm.lastName +
-          ' cnic: ' +
-          _driverForm.cnic +
-          ' address: ' +
-          _driverForm.address +
-          ' contact: ' +
-          _driverForm.contact +
-          ' gender: ' +
-          _driverForm.gender.toString() +
-          ' password: ' +
-          _driverForm.password +
-          ' designation: ' +
-          _driverForm.designation.name);
+      Provider.of<Auth>(context, listen: false)
+          .driverSignup(
+            regId: _driverForm.registrationID,
+            firstName: _driverForm.firstName,
+            lastName: _driverForm.lastName,
+            cnic: _driverForm.cnic,
+            address: _driverForm.address,
+            contact: _driverForm.contact,
+            designation: _driverForm.designation,
+            gender: _driverForm.gender,
+            password: _driverForm.password,
+          )
+          .then((_) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Thanks for your time')),
+                content: Text(
+                    'Your request is pending for admin approval. You\'ll be notified soon.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )))
+          .catchError((error) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Oh no!')),
+                content: Text(
+                    'Something went wrong.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )));
     }
   }
 
@@ -229,6 +242,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                   labelText: 'Registration ID *',
                   hintText: 'EMP-AAA-000'),
               textInputAction: TextInputAction.done,
+              textCapitalization: TextCapitalization.characters,
               onFieldSubmitted: (value) {},
               onSaved: (value) {
                 setState(() {
@@ -675,7 +689,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
       backgroundColor: Colors.white,
       body: WillPopScope(
         onWillPop: _onBackPressed,
-              child: SafeArea(
+        child: SafeArea(
             child: Container(
           padding: EdgeInsets.symmetric(
               vertical: 3.75 * SizeConfig.heightMultiplier,

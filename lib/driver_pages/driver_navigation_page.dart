@@ -29,7 +29,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
             icon: Icon(Icons.arrow_back,
                 size: 8.26 * SizeConfig.imageSizeMultiplier),
             onPressed: () {
-              _onBackPressed();
+              _showEndTripDialog();
             },
           ),
           IconButton(
@@ -47,7 +47,7 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
     );
   }
 
-  Future<bool> _onBackPressed() {
+  Future<bool> _showEndTripDialog() {
     final meterReadingController = TextEditingController();
     return showDialog(
         context: context,
@@ -110,11 +110,11 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: WillPopScope(
-        onWillPop: _onBackPressed,
+        onWillPop: _showEndTripDialog,
         child: SafeArea(
           child: Stack(
             children: <Widget>[
-              DriverNavigationMap(),
+              DriverNavigationMap(_showEndTripDialog),
               DriverNavigationPageDetail(),
               _buildFloatingButtons(context),
             ],

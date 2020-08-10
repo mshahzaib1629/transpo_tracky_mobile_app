@@ -58,6 +58,12 @@ class Trip {
 }
 
 class TripProvider with ChangeNotifier {
+  final token;
+  final currentUser;
+  final userType;
+
+  TripProvider({this.token, this.currentUser, this.userType});
+
   Trip _passengerSelectedTrip;
   // Trip _driverCreatedTrip;
   int _driverNextStopIndex = 0;
@@ -78,7 +84,7 @@ class TripProvider with ChangeNotifier {
         estToReachBus: '16 mins',
       ),
       mode: TripMode.PICK_UP,
-      drivers: [Constants.dummyDriver]);
+      drivers: [Driver(id: 1, registrationID: 'EMP-TEST-01', firstName: 'Testing', lastName: 'Driver')]);
 
   Trip get passengerSelectedTrip {
     return _passengerSelectedTrip;
@@ -100,7 +106,9 @@ class TripProvider with ChangeNotifier {
   Future<bool> checkLiveStatus(int tripId) async {
     try {
       String url = '$connectionString/trips/check-live-status/tripId=$tripId';
-      final response = await http.get(url).timeout(requestTimeout);
+      final response = await http.get(url, headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
       final responseData = json.decode(response.body);
       print(responseData['message']);
       print('status: ${responseData['status']}');
@@ -115,10 +123,11 @@ class TripProvider with ChangeNotifier {
   Future<void> joinTrip({Trip selectedTrip}) async {
     final passenger = Passenger(id: 1);
     try {
-      final response = await http
-          .put(
-              '$connectionString/trips/joinTrip/tripId=${selectedTrip.id},passengerId=${passenger.id},stopId=${selectedTrip.passengerStop.id}')
-          .timeout(requestTimeout);
+      String url =
+          '$connectionString/trips/joinTrip/tripId=${selectedTrip.id},passengerId=${passenger.id},stopId=${selectedTrip.passengerStop.id}';
+      final response = await http.put(url, headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
       print(json.decode(response.body));
       var tripData = json.decode(response.body)['data'] as Map<String, dynamic>;
 
@@ -222,6 +231,7 @@ class TripProvider with ChangeNotifier {
               "accept": "application/json",
               "content-type": "application/json",
               "connection": "keep-alive",
+              "authorization": "Bearer $token",
             },
             body: json.encode(requestBody),
           )
@@ -232,27 +242,29 @@ class TripProvider with ChangeNotifier {
       print('data fetched: $tripData');
 
       _driverCreatedTrip = Trip(
-          id: tripData['id'],
-          route: r.Route(
-              id: tripData['route']['id'],
-              name: tripData['route']['name'],
-              routeType: tripData['route']['type'] == 'IN_LINE'
-                  ? RouteType.IN_LINE
-                  : RouteType.IN_LOOP,
-              stopList: []),
-          bus: Bus(
-            id: tripData['bus']['id'],
-            name: tripData['bus']['name'],
-            plateNumber: tripData['bus']['plate'],
-            capacity: tripData['bus']['capacity'],
-          ),
-          meter: BusMeterReading(
-              initialReading: tripData['meterReading']['initial'].toDouble()),
-          mode: tripData['mode'] == 'PICK_UP'
-              ? TripMode.PICK_UP
-              : TripMode.DROP_OFF,
-          drivers: [],
-          mapTraceKey: tripData['mapTraceKey']);
+        id: tripData['id'],
+        route: r.Route(
+            id: tripData['route']['id'],
+            name: tripData['route']['name'],
+            routeType: tripData['route']['type'] == 'IN_LINE'
+                ? RouteType.IN_LINE
+                : RouteType.IN_LOOP,
+            stopList: []),
+        bus: Bus(
+          id: tripData['bus']['id'],
+          name: tripData['bus']['name'],
+          plateNumber: tripData['bus']['plate'],
+          capacity: tripData['bus']['capacity'],
+        ),
+        meter: BusMeterReading(
+            initialReading: tripData['meterReading']['initial'].toDouble()),
+        mode: tripData['mode'] == 'PICK_UP'
+            ? TripMode.PICK_UP
+            : TripMode.DROP_OFF,
+        drivers: [],
+        mapTraceKey: tripData['mapTraceKey'],
+        shareLiveLocation: tripData['shareLiveLocation'] == 1 ? true : false,
+      );
 
       tripData['route']['stops'].forEach((stopData) {
         var stop = Stop(
@@ -283,19 +295,31 @@ class TripProvider with ChangeNotifier {
       print(error);
       throw error;
     }
-
     notifyListeners();
-    // ---------------------
-    // add server notify logic here
-    // ---------------------
+  }
+
+  Future<void> setLiveStatus(int tripId) async {
+    try {
+      final response =
+          await http.put('$connectionString/trips/set-live/$tripId', headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
+      int updatedStatus = json.decode(response.body)['data']['statusUpdate'];
+      if (updatedStatus == 1) driverCreatedTrip.shareLiveLocation = true;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   // for driver (if he is already on trip)
-  Future<bool> checkIfOnTrip(int driverId) async {
+  Future<bool> checkIfOnTrip() async {
     try {
-      final response = await http
-          .get('$connectionString/trips/take-driver-on-trip/driverId=$driverId')
-          .timeout(requestTimeout);
+      final response = await http.get(
+          '$connectionString/trips/take-driver-on-trip/driverId=${currentUser.id}',
+          headers: {
+            "authorization": "Bearer $token",
+          }).timeout(requestTimeout);
 
       var tripData = json.decode(response.body)['data'] as Map<String, dynamic>;
 
@@ -303,27 +327,29 @@ class TripProvider with ChangeNotifier {
 
       if (tripData != null) {
         _driverCreatedTrip = Trip(
-            id: tripData['id'],
-            route: r.Route(
-                id: tripData['route']['id'],
-                name: tripData['route']['name'],
-                routeType: tripData['route']['type'] == 'IN_LINE'
-                    ? RouteType.IN_LINE
-                    : RouteType.IN_LOOP,
-                stopList: []),
-            bus: Bus(
-              id: tripData['bus']['id'],
-              name: tripData['bus']['name'],
-              plateNumber: tripData['bus']['plate'],
-              capacity: tripData['bus']['capacity'],
-            ),
-            meter: BusMeterReading(
-                initialReading: tripData['meterReading']['initial'].toDouble()),
-            mode: tripData['mode'] == 'PICK_UP'
-                ? TripMode.PICK_UP
-                : TripMode.DROP_OFF,
-            drivers: [],
-            mapTraceKey: tripData['mapTraceKey']);
+          id: tripData['id'],
+          route: r.Route(
+              id: tripData['route']['id'],
+              name: tripData['route']['name'],
+              routeType: tripData['route']['type'] == 'IN_LINE'
+                  ? RouteType.IN_LINE
+                  : RouteType.IN_LOOP,
+              stopList: []),
+          bus: Bus(
+            id: tripData['bus']['id'],
+            name: tripData['bus']['name'],
+            plateNumber: tripData['bus']['plate'],
+            capacity: tripData['bus']['capacity'],
+          ),
+          meter: BusMeterReading(
+              initialReading: tripData['meterReading']['initial'].toDouble()),
+          mode: tripData['mode'] == 'PICK_UP'
+              ? TripMode.PICK_UP
+              : TripMode.DROP_OFF,
+          drivers: [],
+          mapTraceKey: tripData['mapTraceKey'],
+          shareLiveLocation: tripData['shareLiveLocation'] == 1 ? true : false,
+        );
 
         tripData['route']['stops'].forEach((stopData) {
           var stop = Stop(
@@ -354,7 +380,6 @@ class TripProvider with ChangeNotifier {
           orElse: () => _driverCreatedTrip
               .route.stopList[_driverCreatedTrip.route.stopList.length - 1],
         );
-        print(_driverCreatedTrip.driverNextStop.name);
         return true;
       } else
         return false;
@@ -381,13 +406,12 @@ class TripProvider with ChangeNotifier {
         '$connectionString/trips/endTrip/${_driverCreatedTrip.id}',
         headers: {
           "accept": "application/json",
-          "content-type": "application/json"
-          // "connection": "keep-alive",
+          "content-type": "application/json",
+          "authorization": "Bearer $token",
         },
         body: json.encode(
             {"finalMeterReading": _driverCreatedTrip.meter.finalReading}),
       );
-      print('status code: ${response.statusCode}');
       if (response.statusCode == 200) {
         // _driverCreatedTrip = null;
         _driverNextStopIndex = 0;
@@ -403,10 +427,11 @@ class TripProvider with ChangeNotifier {
     _suggestedTrips = [];
 
     try {
-      final response = await http
-          .get(
-              '$connectionString/trips/suggest/latitude=$latitude,longitude=$longitude,range=${Constants.passengerRange}')
-          .timeout(requestTimeout);
+      String url =
+          '$connectionString/trips/suggest/latitude=$latitude,longitude=$longitude,range=${Constants.passengerRange}';
+      final response = await http.get(url, headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
       print(json.decode(response.body)['message']);
       final fetchedData = json.decode(response.body)['data'] as List;
       fetchedData.forEach((data) {
@@ -487,10 +512,11 @@ class TripProvider with ChangeNotifier {
 
     try {
       print('favorite route id: ${favorite.routeId}');
-      final response = await http
-          .get(
-              '$connectionString/trips/tripsOnFavouriteRoute/routeId=${favorite.routeId}')
-          .timeout(requestTimeout);
+      final response = await http.get(
+          '$connectionString/trips/tripsOnFavouriteRoute/routeId=${favorite.routeId}',
+          headers: {
+            "authorization": "Bearer $token",
+          }).timeout(requestTimeout);
       print(json.decode(response.body)['message']);
       final fetchedData = json.decode(response.body)['data'] as List;
       fetchedData.forEach((data) {
@@ -573,14 +599,15 @@ class TripProvider with ChangeNotifier {
 
   Future<void> fetchTripsRecord() async {
     // we send request to same url for both driver & passenger, just filter by userType variable for responding
-    LoginMode userType = LoginMode.Driver;
+    // LoginMode userType = LoginMode.Driver;
 
     List<Trip> fetchedTrips = [];
     try {
-      final response = await http
-          .get(
-              '$connectionString/trips/tripsRecord/userType=${userType == LoginMode.Driver ? "EMPLOYEE" : "PASSENGER"},userId=${3},limit=${30}')
-          .timeout(requestTimeout);
+      String url =
+          '$connectionString/trips/tripsRecord/userType=${userType == LoginMode.Driver ? "EMPLOYEE" : "PASSENGER"},userId=${currentUser.id},limit=${30}';
+      final response = await http.get(url, headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
       print(json.decode(response.body)['message']);
 
       print('trips record fetched!');
@@ -690,11 +717,13 @@ class TripProvider with ChangeNotifier {
   }
 
   // For drivers
-  Future<void> _updateNextStop() async {
+  Future<void> updateNextStop() async {
     String url =
         '$connectionString/trips/stop-reached/stopId=${_driverCreatedTrip.driverNextStop.id}';
     try {
-      final response = await http.put(url).timeout(requestTimeout);
+      final response = await http.put(url, headers: {
+        "authorization": "Bearer $token",
+      }).timeout(requestTimeout);
       _driverCreatedTrip.driverNextStop.timeReached = DateTime.now();
       print('/////////////////////////');
       print('updating next stop');
@@ -719,7 +748,7 @@ class TripProvider with ChangeNotifier {
         driverCreatedTrip.driverNextStop.latitude,
         driverCreatedTrip.driverNextStop.longitude);
     // print('distance to ${driverCreatedTrip.driverNextStop.name}: $distance');
-    if (distance < Constants.stopRadius) _updateNextStop();
+    if (distance < Constants.stopRadius) updateNextStop();
   }
 
   // calculates the distance between two locations in KM

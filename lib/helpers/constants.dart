@@ -4,8 +4,7 @@ import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
 
 class Constants {
 // [1]
-  static const double thresholdDistance = 0.5;
-// 0.15 is ok, 0.5 is set for testing purpose
+  static const double thresholdDistance = 0.15;
 
 // [2]
   static const double stopRadius = 0.05;
