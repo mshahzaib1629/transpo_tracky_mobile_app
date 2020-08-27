@@ -1,44 +1,59 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 
 class Bus {
   int id;
   String plateNumber;
   String name;
+  String model;
+  String type;
   int capacity;
+  int onTrip;
 
   Bus({
     this.id,
     this.plateNumber,
     this.name,
+    this.model,
+    this.type,
     this.capacity,
+    this.onTrip,
   });
 }
 
 class BusProvider with ChangeNotifier {
-  List<Bus> dummy_avalialbeBuses = [
-    Bus(
-      id: 1,
-      plateNumber: 'LEZ 2327',
-      name: 'HINO Coaster',
-      capacity: 45,
-    ),
-    Bus(
-      id: 2,
-      plateNumber: 'LOY 2135',
-      name: 'HINO Bus',
-      capacity: 65,
-    ),
-    Bus(
-      id: 3,
-      plateNumber: 'LZF 8218',
-      name: 'Hiace Coaster',
-      capacity: 50,
-    ),
-  ];
+  List<Bus> avalialbeBuses = [];
+
+  Future<void> fetchBuses() async {
+    List<Bus> fetchedBuses = [];
+    try {
+      final response =
+          await http.get('$connectionString/buses').timeout(requestTimeout);
+      final fetchedData = json.decode(response.body)['data'] as List;
+      fetchedData.forEach((data) {
+        var bus = Bus(
+          id: data['id'],
+          plateNumber: data['plate'],
+          name: data['manufacturerName'],
+          model: data['model'],
+          type: data['type'],
+          capacity: data['capacity'],
+          onTrip: data['onTrip']
+        );
+        fetchedBuses.add(bus);
+      });
+      avalialbeBuses = fetchedBuses;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
+  }
 
   Bus getBus(int id) {
-    return dummy_avalialbeBuses.firstWhere((bus) => bus.id == id, orElse: () {
+    return avalialbeBuses.firstWhere((bus) => bus.id == id, orElse: () {
       return null;
     });
   }

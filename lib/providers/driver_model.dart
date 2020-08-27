@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import './person.dart';
 
@@ -37,28 +36,23 @@ class Driver extends Person {
 class DriverProvider with ChangeNotifier {
   List<Driver> dummy_available_drivers = [
     Driver(
-      id: 1,
-      registrationID: 'EMP-DR-1',
+      id: 11,
+      registrationID: 'EMP-CD-1',
       firstName: 'Mushtaq',
       lastName: 'Ahmed',
       designation: Designation(id: 1, name: 'Driver'),
     ),
     Driver(
-      id: 2,
-      registrationID: 'EMP-DR-2',
+      id: 4,
+      registrationID: 'EMP-AD-01',
       firstName: 'Suleman',
       lastName: 'Shafique',
       designation: Designation(id: 1, name: 'Driver'),
     ),
-    Driver(
-      id: 3,
-      registrationID: 'EMP-DR-3',
-      firstName: 'Ejaz',
-      lastName: 'Khan',
-      designation: Designation(id: 1, name: 'Conductor'),
-    ),
   ];
-
+// @TODO ---------------------------
+// ADD get all active drivers from the server
+// ----------------------------------
   Driver getDriver(int id) {
     return dummy_available_drivers.firstWhere((driver) => driver.id == id,
         orElse: () {

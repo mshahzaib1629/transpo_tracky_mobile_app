@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/designation.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/session_model.dart';
-import 'package:transpo_tracky_mobile_app/size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverSignUpPage extends StatefulWidget {
   DriverSignUpPage({Key key}) : super(key: key);
@@ -20,22 +20,27 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
   final _registrationIdController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _cnicController = TextEditingController();
+  final _addressController = TextEditingController();
   final _contactController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   final _lastNameFocusNode = FocusNode();
+  final _cnicFocusNode = FocusNode();
   final _confirmPasswordFocusNode = FocusNode();
 
   final List<Designation> designations = [
     Designation(id: 1, name: "Driver"),
-    Designation(id: 2, name: "Conductor"),
+    Designation(id: 4, name: "Conductor"),
   ];
   var _driverForm = Driver(
     registrationID: '',
     designation: null,
     firstName: '',
     lastName: '',
+    cnic: '',
+    address: '',
     gender: null,
     contact: '',
     password: '',
@@ -58,6 +63,8 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     _registrationIdController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _cnicController.dispose();
+    _addressController.dispose();
     _contactController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -69,42 +76,55 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
   void _submitForm() {
     if (_driverSignupKey.currentState.validate()) {
       _saveForm();
-      showDialog(
-          context: context,
-          child: AlertDialog(
-            title: Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Thanks for your time')),
-            content: Text(
-                'Your request is pending for admin approval. You\'ll be notified soon.'),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'))
-            ],
-          ));
-      print(_driverForm.registrationID +
-          ' f-Name: ' +
-          _driverForm.firstName +
-          ' l-Name: ' +
-          _driverForm.lastName +
-          ' contact: ' +
-          _driverForm.contact +
-          ' gender: ' +
-          _driverForm.gender.toString() +
-          ' password: ' +
-          _driverForm.password +
-          ' designation: ' +
-          _driverForm.designation.name);
+      Provider.of<Auth>(context, listen: false)
+          .driverSignup(
+            regId: _driverForm.registrationID,
+            firstName: _driverForm.firstName,
+            lastName: _driverForm.lastName,
+            cnic: _driverForm.cnic,
+            address: _driverForm.address,
+            contact: _driverForm.contact,
+            designation: _driverForm.designation,
+            gender: _driverForm.gender,
+            password: _driverForm.password,
+          )
+          .then((_) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Thanks for your time')),
+                content: Text(
+                    'Your request is pending for admin approval. You\'ll be notified soon.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )))
+          .catchError((error) => showDialog(
+              context: context,
+              child: AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Oh no!')),
+                content: Text(
+                    'Something went wrong.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              )));
     }
   }
 
   Widget _welcomePage(BuildContext context) {
-    Session currentSession =
-        Provider.of<SessionProvider>(context, listen: false).currentSession;
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,8 +240,9 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                       EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
                   border: InputBorder.none,
                   labelText: 'Registration ID *',
-                  hintText: 'FA00-AAA-000'),
+                  hintText: 'EMP-AAA-000'),
               textInputAction: TextInputAction.done,
+              textCapitalization: TextCapitalization.characters,
               onFieldSubmitted: (value) {},
               onSaved: (value) {
                 setState(() {
@@ -257,6 +278,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _firstNameController,
+              textCapitalization: TextCapitalization.words,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
@@ -287,6 +309,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               autofocus: false,
               controller: _lastNameController,
+              textCapitalization: TextCapitalization.words,
               focusNode: _lastNameFocusNode,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
@@ -296,12 +319,44 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                 border: InputBorder.none,
                 labelText: 'Last Name',
               ),
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (value) {},
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (value) {
+                FocusScope.of(context).requestFocus(_cnicFocusNode);
+              },
               onSaved: (value) {
                 setState(() {
                   _driverForm.lastName = value;
                 });
+              },
+            ),
+          ),
+          SizedBox(
+            height: 1.8 * SizeConfig.heightMultiplier,
+          ),
+          _inputContainer(
+            input: TextFormField(
+              autofocus: false,
+              controller: _cnicController,
+              keyboardType: TextInputType.numberWithOptions(signed: true),
+              focusNode: _cnicFocusNode,
+              cursorColor: Colors.black,
+              style: TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
+                  border: InputBorder.none,
+                  labelText: 'CNIC# *',
+                  hintText: 'XXXXX-XXXXXXX-X'),
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (value) {},
+              onSaved: (value) {
+                setState(() {
+                  _driverForm.cnic = value;
+                });
+              },
+              validator: (value) {
+                if (value.isEmpty) return 'Please enter your cnic';
+                return null;
               },
             ),
           ),
@@ -390,6 +445,55 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     );
   }
 
+  Widget _addressPage(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          SizedBox(
+            height: _topPadding,
+          ),
+          Text('Where do you live?',
+              style: Theme.of(context)
+                  .textTheme
+                  .title
+                  .copyWith(fontSize: _titleSize)),
+          SizedBox(
+            height: _paddingAfterTitle,
+          ),
+          _inputContainer(
+            input: TextFormField(
+              autofocus: false,
+              controller: _addressController,
+              textCapitalization: TextCapitalization.sentences,
+              minLines: 2,
+              maxLines: 4,
+              cursorColor: Colors.black,
+              style: TextStyle(color: Colors.black),
+              decoration: InputDecoration(
+                  contentPadding:
+                      EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
+                  border: InputBorder.none,
+                  labelText: 'Address *',
+                  errorMaxLines: 2),
+              textInputAction: TextInputAction.done,
+              validator: (value) {
+                if (value.isEmpty)
+                  return 'Please provide your address, we keep it confidential';
+                return null;
+              },
+              onSaved: (value) {
+                setState(() {
+                  _driverForm.address = value;
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _passwordPage(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -409,6 +513,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
             input: TextFormField(
               controller: _passwordController,
               cursorColor: Colors.black,
+              obscureText: true,
               style: TextStyle(color: Colors.black),
               decoration: InputDecoration(
                 contentPadding:
@@ -436,6 +541,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
               focusNode: _confirmPasswordFocusNode,
               cursorColor: Colors.black,
               style: TextStyle(color: Colors.black),
+              obscureText: true,
               decoration: InputDecoration(
                 contentPadding:
                     EdgeInsets.only(top: 0, bottom: 0, left: 0, right: 0),
@@ -485,9 +591,11 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
         return _namePage(context);
         break;
       case 4:
+        return _addressPage(context);
+      case 5:
         return _contactPage(context);
         break;
-      case 5:
+      case 6:
         return _passwordPage(context);
         break;
     }
@@ -517,7 +625,7 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
                         fontSize: 3.37 * SizeConfig.textMultiplier,
                         fontWeight: FontWeight.w400),
                   )),
-            if (_pageCounter < 5)
+            if (_pageCounter < 6)
               FlatButton(
                   onPressed: () {
                     if (_driverSignupKey.currentState.validate()) {
@@ -553,20 +661,45 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
     );
   }
 
+  Future<bool> _onBackPressed() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('Exit signup form?'),
+        actions: [
+          FlatButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          FlatButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: Text('Exit'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-          child: Container(
-        padding: EdgeInsets.symmetric(
-            vertical: 3.75 * SizeConfig.heightMultiplier,
-            horizontal: 3.125 * SizeConfig.widthMultiplier),
-        child: Form(
-          key: _driverSignupKey,
-          child: _buildPages(context),
-        ),
-      )),
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+        child: SafeArea(
+            child: Container(
+          padding: EdgeInsets.symmetric(
+              vertical: 3.75 * SizeConfig.heightMultiplier,
+              horizontal: 3.125 * SizeConfig.widthMultiplier),
+          child: Form(
+            key: _driverSignupKey,
+            child: _buildPages(context),
+          ),
+        )),
+      ),
       bottomNavigationBar: _buildBottomBar(context),
     );
   }

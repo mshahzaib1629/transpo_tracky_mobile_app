@@ -1,220 +1,229 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
-import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
+import 'package:transpo_tracky_mobile_app/providers/user_location.dart';
+import 'package:transpo_tracky_mobile_app/widgets/passenger_favorite_route_card.dart';
+import 'package:transpo_tracky_mobile_app/widgets/passenger_route_selection_page_top_bar.dart';
+import 'package:transpo_tracky_mobile_app/widgets/suggested_location_card.dart';
 import 'package:transpo_tracky_mobile_app/widgets/suggestion_card.dart';
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
-class PassengerRouteSelectionPage extends StatelessWidget {
-  Widget _buildTopBar(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(
-          width: 0.28 * SizeConfig.widthMultiplier,
-          color: Colors.black12,
-        ),
-        borderRadius:
-            BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
-      ),
-      child: Row(
-        children: <Widget>[
-          IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          Expanded(
-            // Let user enter location manually
-            child: TextField(
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: 'Enter Your Location',
-              ),
-              onSubmitted: (value) {
-                // --------------------------------------------------------------------------------
-                // Modification required here, we should pass user's entered locations cordinates to
-                // this method, currently sending dummy values 12, 32
-                Provider.of<TripProvider>(context, listen: false)
-                    .fetchSuggestedTrips(12, 32);
-                // --------------------------------------------------------------------------------
-              },
-            ),
-          ),
-          // For Fetching User's Location automatically
-          IconButton(
-            icon: Icon(Icons.location_on),
-            onPressed: () {
-              // --------------------------------------------------------------------------------
-              // Modification required here, we should pass user's current locations cordinates to
-              // this method, currently sending dummy values 12, 32
-              Provider.of<TripProvider>(context, listen: false)
-                  .fetchSuggestedTrips(12, 32);
-              // --------------------------------------------------------------------------------
-            },
-          ),
-        ],
-      ),
-    );
+class PassengerRouteSelectionPage extends StatefulWidget {
+  final Function setSelectedTrip;
+
+  PassengerRouteSelectionPage(this.setSelectedTrip);
+
+  @override
+  _PassengerRouteSelectionPageState createState() =>
+      _PassengerRouteSelectionPageState();
+}
+
+class _PassengerRouteSelectionPageState
+    extends State<PassengerRouteSelectionPage> {
+  bool _isLoading = false;
+  List<Map<String, dynamic>> _locationPredictions = [];
+
+  void setLocationPredictions(List<Map<String, dynamic>> predictions) {
+    setState(() {
+      _isLoading = true;
+      this._locationPredictions = predictions;
+      _isLoading = false;
+    });
   }
 
-  Widget _buildFavoriteRouteCard(BuildContext context, FavoriteRoute favorite) {
-    return GestureDetector(
-      onTap: () {
-        Provider.of<TripProvider>(context, listen: false)
-            .fetchFavoriteSuggested(favorite);
-      },
-      onLongPress: () {
-        showDialog(
-            context: context,
-            child: AlertDialog(
-              content: Text('Delete \'${favorite.favoriteStop.name}\' card?'),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Cancel')),
-                FlatButton(
-                  onPressed: () {
-                    Provider.of<RouteProvider>(context, listen: false)
-                        .deleteConfig(favorite.id);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Delete'),
-                ),
-              ],
-            ));
-      },
-      child: Container(
-        // width: 140.0,
-        margin: EdgeInsets.only(right: 2.02 * SizeConfig.widthMultiplier),
-        padding: EdgeInsets.symmetric(
-          vertical: 0.78 * SizeConfig.heightMultiplier,
-          horizontal: 1.38 * SizeConfig.widthMultiplier,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            // width: 1.0,
-            color: Colors.black12,
-          ),
-          borderRadius:
-              BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 22.2 * SizeConfig.widthMultiplier,
-                  child: Text(
-                    favorite.routeName,
-                    style: Theme.of(context).textTheme.body2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(favorite.favoriteStop.timeToReach),
-                    Text(
-                      'Est. Time',
-                      style: Theme.of(context)
-                          .textTheme
-                          .body1
-                          .copyWith(fontSize: 0.93 * SizeConfig.textMultiplier),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Container(
-              width: 33.3 * SizeConfig.widthMultiplier,
-              child: Text(
-                favorite.favoriteStop.name,
-                style: Theme.of(context)
-                    .textTheme
-                    .body1
-                    .copyWith(fontSize: 2.18 * SizeConfig.textMultiplier),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+  Future<void> fetchFavoriteTrips(favorite) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await Provider.of<TripProvider>(context, listen: false)
+          .fetchFavoriteSuggested(favorite);
+    } catch (error) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Oh no!'),
+          content: Text('Someting went wrong.'),
+          actions: [
+            FlatButton(
+                onPressed: () => Navigator.pop(context), child: Text('Okay'))
           ],
         ),
-      ),
-    );
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
+    print('trips fetched');
+  }
+
+  Future<void> fetchTrips(UserLocation userLocation) async {
+    setState(() {
+      _isLoading = true;
+    });
+    if (userLocation != null)
+      try {
+        await Provider.of<TripProvider>(context, listen: false)
+            .fetchSuggestedTrips(userLocation.latitude, userLocation.longitude);
+      } catch (error) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Oh no!'),
+            content: Text('Someting went wrong.'),
+            actions: [
+              FlatButton(
+                  onPressed: () => Navigator.pop(context), child: Text('Okay'))
+            ],
+          ),
+        );
+      }
+    setState(() {
+      _isLoading = false;
+    });
+    print('trips fetched');
+  }
+
+  Future<void> fetchTripsByLocationId(String locationId) async {
+    setState(() {
+      _isLoading = true;
+      this._locationPredictions = [];
+    });
+    try {
+      LatLng selectedLocation = await MapHelper.getPlaceLatLng(locationId);
+      if (selectedLocation != null)
+        await Provider.of<TripProvider>(context, listen: false).fetchSuggestedTrips(
+            selectedLocation.latitude, selectedLocation.longitude);
+      print('trips fetched');
+    } catch (error) {
+      print(error);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Oh no!'),
+          content: Text('Someting went wrong.'),
+          actions: [
+            FlatButton(
+                onPressed: () => Navigator.pop(context), child: Text('Okay'))
+          ],
+        ),
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Widget _buildFavoriteRoutes(BuildContext context) {
-    Provider.of<RouteProvider>(context)
-        // --------------------------------------------------------------------------------
-        // Modification required here, pass the id of current logged in passenger, currently
-        // passing '1' as the dummy id
-        .fetchAndSetFavorites(currentPassengerId: 1);
-    // --------------------------------------------------------------------------------
-    return Consumer<RouteProvider>(
-      builder: (context, routeConsumer, child) => Container(
-        // height: 15.28 * SizeConfig.heightMultiplier,
-        child: routeConsumer.passengerFavoriteRoutes.length == 0
-            ? SizedBox(
-                height: 0.0,
-                width: 0.0,
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Favorite Routes',
-                    style: Theme.of(context).textTheme.display2,
-                  ),
-                  SizedBox(
-                    height: 0.78 * SizeConfig.heightMultiplier,
-                  ),
-                  Container(
-                    height: 8.59 * SizeConfig.heightMultiplier,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: routeConsumer.passengerFavoriteRoutes.length,
-                      itemBuilder: (context, index) {
-                        FavoriteRoute route =
-                            routeConsumer.passengerFavoriteRoutes[index];
-                        return _buildFavoriteRouteCard(context, route);
-                      },
+    return FutureBuilder(
+      // --------------------------------------------------------------------------------
+      // Modification required here, pass the id of current logged in passenger, currently
+      // passing '1' as the dummy id
+      future: Provider.of<RouteProvider>(context, listen: false)
+          .fetchAndSetFavorites(
+              currentPassengerId: Constants.dummyPassenger.id),
+      // --------------------------------------------------------------------------------
+      builder: (context, snapshot) => Consumer<RouteProvider>(
+        builder: (context, routeConsumer, child) => Container(
+          child: routeConsumer.passengerFavoriteRoutes.length == 0
+              ? SizedBox(
+                  height: 0.0,
+                  width: 0.0,
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Favorite Routes',
+                      style: Theme.of(context).textTheme.display2,
+                    ),
+                    SizedBox(
+                      height: 0.78 * SizeConfig.heightMultiplier,
+                    ),
+                    Container(
+                      height: 8.59 * SizeConfig.heightMultiplier,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: routeConsumer.passengerFavoriteRoutes.length,
+                        itemBuilder: (context, index) {
+                          FavoriteRoute favoriteRoute =
+                              routeConsumer.passengerFavoriteRoutes[index];
+                          return FavoriteRouteCard(
+                              favoriteRoute, fetchFavoriteTrips);
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 1.56 * SizeConfig.heightMultiplier,
+                    ),
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSuggestedLocations(BuildContext context) {
+    return Expanded(
+      child: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : (_locationPredictions.length != 0)
+              ? ListView.builder(
+                  itemCount: _locationPredictions.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> prediction =
+                        _locationPredictions[index];
+                    return SuggestedLocationCard(
+                      prediction: prediction,
+                      fetchTripsByLocationId: fetchTripsByLocationId,
+                    );
+                  },
+                )
+              : Center(
+                  child: Text(
+                    'No Locations to suggest!',
+                    style: TextStyle(
+                      fontSize: 2.63 * SizeConfig.textMultiplier,
                     ),
                   ),
-                  SizedBox(
-                    height: 1.56 * SizeConfig.heightMultiplier,
-                  ),
-                ],
-              ),
-      ),
+                ),
     );
   }
 
   Widget _buildSuggestedRoutes(BuildContext context) {
     final tripProvider = Provider.of<TripProvider>(context);
     return Expanded(
-      child: tripProvider.trips_suggested.length != 0
-          ? ListView.builder(
-              itemCount: tripProvider.trips_suggested.length,
-              itemBuilder: (context, index) {
-                Trip trip = tripProvider.trips_suggested[index];
-                // Add searching logics here
-                // Pass the nearest stop and times to reach them accordingly in future
-                return SuggestionCard(
-                  prefTrip: trip,
-                );
-              },
+      child: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
             )
-          : Center(
-              child: Text('No Routes to suggest!'),
-            ),
+          : (tripProvider.getSuggestedTrips.length != 0)
+              ? ListView.builder(
+                  itemCount: tripProvider.getSuggestedTrips.length,
+                  itemBuilder: (context, index) {
+                    Trip trip = tripProvider.getSuggestedTrips[index];
+                    return SuggestionCard(
+                        prefTrip: trip,
+                        setSelectedTrip: widget.setSelectedTrip);
+                  },
+                )
+              : Center(
+                  child: _isLoading
+                      ? CircularProgressIndicator()
+                      : Text(
+                          'No Routes to suggest!',
+                          style: TextStyle(
+                            fontSize: 2.63 * SizeConfig.textMultiplier,
+                          ),
+                        ),
+                ),
     );
   }
 
@@ -230,12 +239,17 @@ class PassengerRouteSelectionPage extends StatelessWidget {
         ),
         child: Column(
           children: <Widget>[
-            _buildTopBar(context),
+            RouteSelectionTopBar(
+              fetchTrips: fetchTrips,
+              setLocationPredictions: setLocationPredictions,
+            ),
             SizedBox(
               height: 1.56 * SizeConfig.heightMultiplier,
             ),
             _buildFavoriteRoutes(context),
-            _buildSuggestedRoutes(context),
+            _locationPredictions.length != 0
+                ? _buildSuggestedLocations(context)
+                : _buildSuggestedRoutes(context),
           ],
         ),
       )),

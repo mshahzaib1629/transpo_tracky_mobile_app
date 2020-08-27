@@ -1,25 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/trip_record_card.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
-class LastTripsDetailPage extends StatelessWidget {
+class LastTripsDetailPage extends StatefulWidget {
   // In this page, we check either driver is logged in to the app or passenger, bases on that we share the details accordingly
-  final LoginMode loginMode = LoginMode.Driver;
   final Trip trip;
 
   LastTripsDetailPage({@required this.trip});
 
+  @override
+  _LastTripsDetailPageState createState() => _LastTripsDetailPageState();
+}
+
+class _LastTripsDetailPageState extends State<LastTripsDetailPage> {
+  LoginMode loginMode;
+
+  @override
+  void initState() {
+    loginMode = Provider.of<Auth>(context, listen: false).loginMode;
+  }
+
   Widget _buildMap(BuildContext context) {
+    final staticMapImageUrl =
+        MapHelper.generateMapPreviewImage(stopList: widget.trip.route.stopList);
+
+    if (widget.trip.route.staticMapImage == null) {
+      widget.trip.route.staticMapImage = Image.network(
+        staticMapImageUrl,
+        fit: BoxFit.fill,
+        width: double.infinity,
+        height: double.infinity,
+      );
+      print('api called');
+    }
     return Container(
-      color: Colors.black12,
-      height: 32.8125 * SizeConfig.heightMultiplier,
-    );
+        color: Colors.black12,
+        alignment: Alignment.center,
+        height: 32.8125 * SizeConfig.heightMultiplier,
+        child: widget.trip.route.staticMapImage == null
+            ? Text(
+                'Something went wrong!',
+                textAlign: TextAlign.center,
+              )
+            : widget.trip.route.staticMapImage);
   }
 
   Widget horizontalLine(BuildContext context) => Container(
@@ -33,48 +65,13 @@ class LastTripsDetailPage extends StatelessWidget {
       );
 
   int _passengerStrength() {
-    int difference = trip.bus.capacity - trip.passengersOnBoard;
+    int difference = widget.trip.bus.capacity - widget.trip.passengersOnBoard;
     return difference;
   }
 
   Widget _busAdditionalDetail(BuildContext context) {
     return Column(
       children: <Widget>[
-        SizedBox(
-          height: 1.25 * SizeConfig.heightMultiplier,
-        ),
-        Row(
-          children: <Widget>[
-            Icon(
-              Icons.access_time,
-              color: Theme.of(context).accentColor,
-            ),
-            SizedBox(
-              width: 5.56 * SizeConfig.widthMultiplier,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(trip.startTime),
-                    Text(trip.meter.initialReading.toStringAsFixed(1) + ' km'),
-                  ],
-                ),
-                horizontalLine(context),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(trip.endTime),
-                    Text(trip.meter.finalReading.toStringAsFixed(1) + ' km'),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
         SizedBox(
           height: 1.25 * SizeConfig.heightMultiplier,
         ),
@@ -88,13 +85,64 @@ class LastTripsDetailPage extends StatelessWidget {
               width: 5.56 * SizeConfig.widthMultiplier,
             ),
             Text(
-              '${trip.passengersOnBoard}/${trip.bus.capacity}',
+              '${widget.trip.passengersOnBoard}/${widget.trip.bus.capacity}',
               style: Theme.of(context).textTheme.body2.copyWith(
                   color: _passengerStrength() < 2
                       ? Colors.red
                       : Theme.of(context).accentColor),
             ),
             Text(' Passengers were on Board'),
+          ],
+        ),
+        SizedBox(
+          height: 1.25 * SizeConfig.heightMultiplier,
+        ),
+        Row(
+          children: <Widget>[
+            Icon(
+              Icons.access_time,
+              color: Theme.of(context).accentColor,
+            ),
+            SizedBox(
+              width: 5.56 * SizeConfig.widthMultiplier,
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text(DateFormat.jm().format(widget.trip.startTime)),
+                        Text(widget.trip.meter.initialReading
+                                .toStringAsFixed(1) +
+                            ' km'),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    child: horizontalLine(context),
+                  ),
+                  Flexible(
+                    flex: 1,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(DateFormat.jm().format(widget.trip.endTime)),
+                        Text(widget.trip.meter.finalReading.toStringAsFixed(1) +
+                            ' km'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ],
@@ -128,7 +176,7 @@ class LastTripsDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  trip.bus.plateNumber,
+                  widget.trip.bus.plateNumber,
                   style: Theme.of(context)
                       .textTheme
                       .body2
@@ -137,7 +185,7 @@ class LastTripsDetailPage extends StatelessWidget {
                 Container(
                   width: 61.1 * SizeConfig.widthMultiplier,
                   child: Text(
-                    trip.bus.name,
+                    widget.trip.bus.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.subhead,
@@ -206,9 +254,14 @@ class LastTripsDetailPage extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: <Widget>[
-                      Text(currentStop.timeReached),
+                      Text(DateFormat.jm().format(
+                          currentStop.timeReached != null
+                              ? currentStop.timeReached
+                              : currentStop.timeToReach)),
                       Text(
-                        'Reached',
+                        currentStop.timeReached != null
+                            ? 'Reached'
+                            : 'Est. Time',
                         style: Theme.of(context).textTheme.subtitle.copyWith(
                             fontSize: 1.56 * SizeConfig.textMultiplier),
                       ),
@@ -247,7 +300,7 @@ class LastTripsDetailPage extends StatelessWidget {
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: getDriversList(context, trip.drivers),
+              children: getDriversList(context, widget.trip.drivers),
             ),
           ],
         ),
@@ -272,7 +325,7 @@ class LastTripsDetailPage extends StatelessWidget {
           height: 0.78 * SizeConfig.heightMultiplier,
         ),
         Column(
-          children: getStopList(context, trip.route.stopList),
+          children: getStopList(context, widget.trip.route.stopList),
         )
       ],
     );
@@ -301,11 +354,11 @@ class LastTripsDetailPage extends StatelessWidget {
               height: 0.78 * SizeConfig.heightMultiplier,
             ),
             _buildDriversDetail(context),
-            if (loginMode == LoginMode.Driver) Divider(),
+            Divider(),
             SizedBox(
               height: 0.78 * SizeConfig.heightMultiplier,
             ),
-            if (loginMode == LoginMode.Driver) _buildRouteDetail(context),
+            _buildRouteDetail(context),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
@@ -345,7 +398,7 @@ class LastTripsDetailPage extends StatelessWidget {
             child: Column(
               children: <Widget>[
                 TripRecordCard(
-                  trip: trip,
+                  trip: widget.trip,
                 ),
                 _buildDetailCard(context),
               ],

@@ -1,23 +1,32 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:transpo_tracky_mobile_app/helpers/local_db_helper.dart';
+import 'package:transpo_tracky_mobile_app/helpers/server_config.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
+import 'package:http/http.dart' as http;
 
 import 'stop_model.dart';
 
 class Route {
   int id;
   String name;
-  String pickUpTime;
-  String dropOffTime;
+  RouteType routeType;
+  DateTime pickUpTime;
+  DateTime dropOffTime;
   List<Stop> stopList;
+  Image staticMapImage;
 
   Route({
     this.id,
     this.name,
+    this.routeType,
     this.pickUpTime,
     this.dropOffTime,
     this.stopList,
+    this.staticMapImage,
   });
 }
 
@@ -40,40 +49,49 @@ class FavoriteRoute {
 class RouteProvider with ChangeNotifier {
   List<FavoriteRoute> passengerFavoriteRoutes = [];
 
-  List<Route> dummy_routes = [
-    Route(
-      id: 1,
-      name: 'Route# 1',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_1,
-    ),
-    Route(
-      id: 2,
-      name: 'Route# 2',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_2,
-    ),
-    Route(
-      id: 3,
-      name: 'Route# 3',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_3,
-    ),
-    Route(
-      id: 4,
-      name: 'Route# 4',
-      pickUpTime: '8:30 AM',
-      dropOffTime: '5:30 PM',
-      stopList: dummy_stops_4,
-    ),
-  ];
+  List<Route> routes = [];
+
+  Future<void> fetchRoutes() async {
+    List<Route> fetchedRoutes = [];
+    try {
+      final response = await http
+          .get('$connectionString/routes/live-routes')
+          .timeout(requestTimeout);
+      print(json.decode(response.body)['message']);
+      final fetchedData = json.decode(response.body)['data'] as List;
+
+      fetchedData.forEach((data) {
+        var route = Route(
+          id: data['id'],
+          name: data['name'],
+          routeType:
+              data['type'] == 'IN_LINE' ? RouteType.IN_LINE : RouteType.IN_LOOP,
+          pickUpTime: DateFormat('Hms', 'en_US').parse(data['pickUpTime']),
+          dropOffTime: DateFormat('Hms', 'en_US').parse(data['dropOffTime']),
+          stopList: [],
+        );
+
+        data['stopList'].forEach((data2) {
+          var stop = Stop(
+            id: data2['id'],
+            name: data2['name'],
+            timeToReach: DateFormat('Hms', 'en_US').parse(data2['timeToReach']),
+            longitude: data2['location']['longitude'],
+            latitude: data2['location']['latitude'],
+          );
+          route.stopList.add(stop);
+        });
+        if (route.stopList.length != 0) fetchedRoutes.add(route);
+      });
+      routes = fetchedRoutes;
+      routes.sort((a, b) => a.name.compareTo(b.name));
+      notifyListeners();
+    } catch (error) {
+      throw (error);
+    }
+  }
 
   void addFavorite({Trip trip, int currentPassengerId}) {
-    
-
     LocalDatabase.insert('favorite_routes', {
       'passengerId': currentPassengerId,
       'routeId': trip.route.id,
@@ -82,7 +100,7 @@ class RouteProvider with ChangeNotifier {
       // --------------------------------------------------------------------------------
       // Modification required here, set timeToReach of the stop as it is on PickUp Mode,
       // but on DropOff Mode, set time to reach that stop estimated by google maps api
-      'timeToReach': trip.passengerStop.timeToReach,
+      'timeToReach': trip.passengerStop.timeToReach.toIso8601String(),
       // --------------------------------------------------------------------------------
       'mode': trip.mode.toString(),
     });
@@ -100,7 +118,7 @@ class RouteProvider with ChangeNotifier {
               routeName: favorite['routeName'],
               favoriteStop: Stop(
                 name: favorite['stopName'],
-                timeToReach: favorite['timeToReach'],
+                timeToReach: DateTime.parse(favorite['timeToReach']),
               ),
               mode: favorite['mode'] == 'TripMode.PICK_UP'
                   ? TripMode.PICK_UP
@@ -112,6 +130,7 @@ class RouteProvider with ChangeNotifier {
 
   void deleteConfig(int id) {
     LocalDatabase.delete('favorite_routes', id);
+    passengerFavoriteRoutes.removeWhere((favorite) => favorite.id == id);
     notifyListeners();
   }
 
@@ -125,11 +144,24 @@ class RouteProvider with ChangeNotifier {
     return false;
   }
 
-  Route getRoute(int id) {
-    return dummy_routes.firstWhere((route) {
-      return route.id == id;
-    }, orElse: () {
-      return null;
-    });
+  List<Route> getFilteredRoutes(RouteFilter filter) {
+    List<Route> filteredRoutes = [];
+    if (filter == RouteFilter.Morning) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('M')).toList();
+    } else if (filter == RouteFilter.Evening) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('E')).toList();
+    } else if (filter == RouteFilter.Faculty) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('F')).toList();
+    } else if (filter == RouteFilter.Hostel) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('H')).toList();
+    } else if (filter == RouteFilter.Testing) {
+      filteredRoutes =
+          routes.where((route) => route.name.startsWith('T')).toList();
+    }
+    return filteredRoutes;
   }
 }

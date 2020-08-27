@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/google_map_helper.dart';
 import '../helpers/enums.dart';
-import 'package:transpo_tracky_mobile_app/providers/stop_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class SuggestionCard extends StatefulWidget {
   final Trip prefTrip;
+  final Function setSelectedTrip;
 
   SuggestionCard({
     @required this.prefTrip,
+    @required this.setSelectedTrip,
   });
   @override
   State<StatefulWidget> createState() {
@@ -21,6 +24,7 @@ class SuggestionCard extends StatefulWidget {
 
 class _SuggestionCardState extends State<SuggestionCard> {
   bool _expanded = false;
+  bool _isLoading = false;
 
   int _passengerStrength() {
     int difference =
@@ -53,11 +57,9 @@ class _SuggestionCardState extends State<SuggestionCard> {
       );
 
   Widget _buildHead(BuildContext context) {
-    final tripProvider = Provider.of<TripProvider>(context, listen: false);
-
     return GestureDetector(
       onTap: () {
-        tripProvider.setSelectedTrip(selectedTrip: widget.prefTrip);
+        widget.setSelectedTrip(selectedTrip: widget.prefTrip);
         Navigator.pop(context);
       },
       child: Container(
@@ -85,7 +87,8 @@ class _SuggestionCardState extends State<SuggestionCard> {
                     Text(
                       widget.prefTrip.passengerStop.estToReachBus != null
                           ? widget.prefTrip.passengerStop.estToReachBus
-                          : widget.prefTrip.passengerStop.timeToReach,
+                          : DateFormat.jm().format(
+                              widget.prefTrip.passengerStop.timeToReach),
                       style: Theme.of(context).textTheme.headline,
                     ),
                     Text(
@@ -124,12 +127,35 @@ class _SuggestionCardState extends State<SuggestionCard> {
     );
   }
 
+  void _fetchLocationAddress() async {
+    if (widget.prefTrip.passengerStop.stopAddress == null) {
+      try {
+        widget.prefTrip.passengerStop.stopAddress =
+            await MapHelper.getPlaceAddress(
+          widget.prefTrip.passengerStop.latitude,
+          widget.prefTrip.passengerStop.longitude,
+        );
+      } catch (error) {
+        widget.prefTrip.passengerStop.stopAddress = null;
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Widget _buildFooter(BuildContext context) {
     return GestureDetector(
       onTap: () {
         setState(() {
           _expanded = !_expanded;
         });
+        if (_expanded) {
+          setState(() {
+            _isLoading = true;
+          });
+          _fetchLocationAddress();
+        }
       },
       child: Padding(
         padding: EdgeInsets.only(right: 3.05 * SizeConfig.widthMultiplier),
@@ -147,8 +173,10 @@ class _SuggestionCardState extends State<SuggestionCard> {
                   SizedBox(
                     width: 1.67 * SizeConfig.widthMultiplier,
                   ),
-                  Text(
-                      '${widget.prefTrip.passengerStop.estWalkTime} from your location'),
+                  widget.prefTrip.passengerStop.distanceFromUser != null
+                      ? Text(
+                          '${widget.prefTrip.passengerStop.distanceFromUser} km away')
+                      : Text('location access rejected!'),
                 ],
               ),
               Icon(
@@ -228,17 +256,32 @@ class _SuggestionCardState extends State<SuggestionCard> {
               SizedBox(
                 width: 5.56 * SizeConfig.widthMultiplier,
               ),
-              Text(
-                widget.prefTrip.mode == TripMode.PICK_UP
-                    ? 'Pick Up Mode'
-                    : 'Drop Off Mode',
-                style: Theme.of(context)
-                    .textTheme
-                    .body2
-                    .copyWith(color: Theme.of(context).accentColor),
-              ),
+              Container(
+                width: 72.9 * SizeConfig.widthMultiplier,
+                child: _isLoading
+                    ? Text('Loading...')
+                    : Text(
+                        widget.prefTrip.passengerStop.stopAddress != null
+                            ? widget.prefTrip.passengerStop.stopAddress
+                            : 'No address available',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+              )
             ],
-          )
+          ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              widget.prefTrip.mode == TripMode.PICK_UP
+                  ? 'Pick Up Mode'
+                  : 'Drop Off Mode',
+              style: Theme.of(context)
+                  .textTheme
+                  .body2
+                  .copyWith(color: Theme.of(context).accentColor),
+            ),
+          ),
         ],
       ),
     );

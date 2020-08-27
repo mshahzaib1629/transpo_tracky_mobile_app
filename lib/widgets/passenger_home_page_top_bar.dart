@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/passenger_pages/passenger_route_selection_page.dart';
 import '../helpers/enums.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
-import '../size_config.dart';
-
 class PassengerHomePageTopBar extends StatefulWidget {
+  final Trip selectedTrip;
+  final Function setSelectedTrip;
+
+  PassengerHomePageTopBar({this.selectedTrip, this.setSelectedTrip});
   @override
   _PassengerHomePageTopBarState createState() =>
       _PassengerHomePageTopBarState();
 }
 
 class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
-  bool _isInit = true;
   bool _showFavoriteOption = false;
+  bool _isInit = true;
 
   Widget _topBarShrinked(BuildContext context) {
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() {
+        _showFavoriteOption = false;
+      });
+    });
     return Text(
       'Select Your Route',
       style: Theme.of(context)
@@ -69,11 +78,25 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
     );
   }
 
-  Widget _topBarExpanded(BuildContext context, Trip selectedTrip) {
-    final routeProvider = Provider.of<RouteProvider>(context);
-    final tripProvider = Provider.of<TripProvider>(context);
+  void showFavoriteOption() {
+    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
+    if (widget.selectedTrip != null) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        if (_isInit == true)
+          setState(() {
+            _showFavoriteOption =
+                !routeProvider.isFavoriteFound(trip: widget.selectedTrip);
+            _isInit = false;
+          });
+      });
+    } else
+      setState(() {
+        _showFavoriteOption = false;
+      });
+  }
 
-    showFavoriteOption(routeProvider, tripProvider);
+  Widget _topBarExpanded(BuildContext context) {
+    showFavoriteOption();
     return Padding(
       padding: EdgeInsets.only(
           top: 1.56 * SizeConfig.heightMultiplier,
@@ -103,9 +126,9 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                         1.38 * SizeConfig.imageSizeMultiplier),
                   ),
                   child: Text(
-                    selectedTrip.mode == TripMode.PICK_UP
-                        ? selectedTrip.passengerStop.name
-                        : selectedTrip.route.stopList[0].name,
+                    widget.selectedTrip.mode == TripMode.PICK_UP
+                        ? widget.selectedTrip.passengerStop.name
+                        : widget.selectedTrip.route.stopList[0].name,
                     style: Theme.of(context)
                         .textTheme
                         .body2
@@ -130,12 +153,14 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
                         1.38 * SizeConfig.imageSizeMultiplier),
                   ),
                   child: Text(
-                    selectedTrip.mode == TripMode.PICK_UP
-                        ? selectedTrip
+                    widget.selectedTrip.mode == TripMode.PICK_UP
+                        ? widget
+                            .selectedTrip
                             .route
-                            .stopList[selectedTrip.route.stopList.length - 1]
+                            .stopList[
+                                widget.selectedTrip.route.stopList.length - 1]
                             .name
-                        : selectedTrip.passengerStop.name,
+                        : widget.selectedTrip.passengerStop.name,
                     style: Theme.of(context)
                         .textTheme
                         .body2
@@ -150,135 +175,123 @@ class _PassengerHomePageTopBarState extends State<PassengerHomePageTopBar> {
     );
   }
 
-  void showFavoriteOption(routeProvider, tripProvider) {
-    if (_isInit) {
-      _showFavoriteOption = !routeProvider.isFavoriteFound(
-          trip: tripProvider.passengerSelectedTrip);
-    }
-    _isInit = false;
-  }
-
   Widget _favoriteOptionBar(BuildContext context) {
-    return Consumer<TripProvider>(
-      builder: (context, tripConsumer, child) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).accentColor.withOpacity(0.1),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(
-              2.78 * SizeConfig.imageSizeMultiplier,
-            ),
-            bottomRight: Radius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).accentColor.withOpacity(0.1),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(
+            2.78 * SizeConfig.imageSizeMultiplier,
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(
-                  FontAwesomeIcons.times,
-                  color: Theme.of(context).accentColor,
-                  size: 5 * SizeConfig.imageSizeMultiplier,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _showFavoriteOption = false;
-                  });
-                }),
-            FlatButton(
-                onPressed: () {
-                  Provider.of<RouteProvider>(context, listen: false)
-                      // --------------------------------------------------------------------------------
-                      // Modification required here, pass the id of current logged in passenger, currently
-                      // passing '1' as the dummy id
-                      .addFavorite(
-                          trip: tripConsumer.passengerSelectedTrip,
-                          currentPassengerId: 1);
-                  // --------------------------------------------------------------------------------
-                  setState(() {
-                    _showFavoriteOption = false;
-                  });
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                          '${tripConsumer.passengerSelectedTrip.passengerStop.name} added to favorites'),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                },
-                child: Text(
-                  '+ Mark Favorite',
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(color: Theme.of(context).accentColor),
-                ))
-          ],
+          bottomRight: Radius.circular(2.78 * SizeConfig.imageSizeMultiplier),
         ),
       ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          IconButton(
+              icon: Icon(
+                FontAwesomeIcons.times,
+                color: Theme.of(context).accentColor,
+                size: 5 * SizeConfig.imageSizeMultiplier,
+              ),
+              onPressed: () {
+                setState(() {
+                  _showFavoriteOption = false;
+                });
+              }),
+          FlatButton(
+              onPressed: () {
+                Provider.of<RouteProvider>(context, listen: false)
+                    // --------------------------------------------------------------------------------
+                    // Modification required here, pass the id of current logged in passenger, currently
+                    // passing '1' as the dummy id
+                    .addFavorite(
+                        trip: widget.selectedTrip,
+                        currentPassengerId: Constants.dummyPassenger.id);
+                // --------------------------------------------------------------------------------
+                setState(() {
+                  _showFavoriteOption = false;
+                });
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        '${widget.selectedTrip.passengerStop.name} added to favorites'),
+                    duration: Duration(seconds: 1),
+                  ),
+                );
+              },
+              child: Text(
+                '+ Mark Favorite',
+                style: Theme.of(context)
+                    .textTheme
+                    .body2
+                    .copyWith(color: Theme.of(context).accentColor),
+              ))
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Row(
+      crossAxisAlignment: widget.selectedTrip == null
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.menu),
+          color: Theme.of(context).iconTheme.color,
+          onPressed: () {
+            Scaffold.of(context).openDrawer();
+          },
+        ),
+        Expanded(
+          child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PassengerRouteSelectionPage(
+                            widget.setSelectedTrip)));
+              },
+              child: widget.selectedTrip == null
+                  ? _topBarShrinked(context)
+                  : _topBarExpanded(context)),
+        )
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TripProvider>(
-      builder: (context, tripConsumer, child) {
-        return Container(
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius:
-                  BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
-                ),
-                BoxShadow(
-                  color: Colors.black12,
-                  offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
-                  blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
-                ),
-              ]),
-          child: Column(
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+              BorderRadius.circular(2.78 * SizeConfig.imageSizeMultiplier),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, 0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+            ),
+            BoxShadow(
+              color: Colors.black12,
+              offset: Offset(0.0, -0.078 * SizeConfig.heightMultiplier),
+              blurRadius: 4.17 * SizeConfig.imageSizeMultiplier,
+            ),
+          ]),
+      child: Column(
+        children: <Widget>[
+          Column(
             children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment:
-                        tripConsumer.passengerSelectedTrip == null
-                            ? CrossAxisAlignment.center
-                            : CrossAxisAlignment.start,
-                    children: <Widget>[
-                      IconButton(
-                        icon: Icon(Icons.menu),
-                        color: Theme.of(context).iconTheme.color,
-                        onPressed: () {
-                          Scaffold.of(context).openDrawer();
-                        },
-                      ),
-                      Expanded(
-                        child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PassengerRouteSelectionPage()));
-                            },
-                            child: tripConsumer.passengerSelectedTrip == null
-                                ? _topBarShrinked(context)
-                                : _topBarExpanded(context,
-                                    tripConsumer.passengerSelectedTrip)),
-                      )
-                    ],
-                  ),
-                  if (_showFavoriteOption == true) _favoriteOptionBar(context),
-                ],
-              ),
+              _buildTopBar(context),
+              if (_showFavoriteOption == true) _favoriteOptionBar(context),
             ],
           ),
-        );
-      },
+        ],
+      ),
     );
   }
 }

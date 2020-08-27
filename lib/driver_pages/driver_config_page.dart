@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
+import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
 import '../helpers/enums.dart';
@@ -10,17 +12,21 @@ import 'package:transpo_tracky_mobile_app/providers/trip_config_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import '../providers/route_model.dart' as r;
 
-import '../size_config.dart';
+import '../helpers/size_config.dart';
 
 class DriverConfigurationPage extends StatefulWidget {
   bool isExpanded;
-  DriverConfigurationPage({this.isExpanded});
+  Function checkIfOnTrip;
+  DriverConfigurationPage({this.isExpanded, this.checkIfOnTrip});
 
   createState() => _DriverConfigurationPageState();
 }
 
 class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   bool takingParnterDriver = false;
+
+  Driver currentDriver;
+  List<r.Route> availableRoutes = [];
 
   var _tripConfig = TripConfig(
       route: null,
@@ -32,27 +38,68 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       mode: TripMode.PICK_UP,
       startTime: null);
 
-  final _driverConfigKey = GlobalKey<FormState>();
+  final _driverConfigFormKey = GlobalKey<FormState>();
   final _driverFocusNode = FocusNode();
 
   final busPlateController = TextEditingController();
   final partnerIdController = TextEditingController();
 
+  bool _isInit = true;
+  bool _isLoading = false;
+  bool _errorEncountered = false;
+
   void initState() {
     super.initState();
-    _tripConfig.route =
-        Provider.of<RouteProvider>(context, listen: false).dummy_routes[0];
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      setState(() {
+       currentDriver =Provider.of<Auth>(context, listen: false).currentUser;
+      });
+      Provider.of<RouteProvider>(context, listen: false)
+          .fetchRoutes()
+          .then((_) {
+        setState(() {
+          availableRoutes =
+              Provider.of<RouteProvider>(context, listen: false).routes;
+        });
+
+        _tripConfig.route = availableRoutes[0];
+        setState(() {
+          _errorEncountered = false;
+          _isLoading = false;
+          _isInit = false;
+        });
+      }).catchError((error) {
+        setState(() {
+          _errorEncountered = true;
+          _isLoading = false;
+          _isInit = false;
+        });
+      });
+      Provider.of<BusProvider>(context, listen: false)
+          .fetchBuses()
+          .catchError((error) {
+        setState(() {
+          _errorEncountered = true;
+          _isLoading = false;
+          _isInit = false;
+        });
+      });
+    }
+    super.didChangeDependencies();
   }
 
   void _saveForm() {
-    _driverConfigKey.currentState.save();
+    _driverConfigFormKey.currentState.save();
     // -----------------------------------------
     // adding dummy driver here for now. Later we take current logged in driver into _tripConfig.currentDriver
-    _tripConfig.currentDriver = Driver(
-        id: 1,
-        registrationID: 'EMP-DR-1',
-        firstName: 'Mushtaq',
-        lastName: 'Ahmed');
+    _tripConfig.currentDriver = currentDriver;
     // -----------------------------------------
   }
 
@@ -67,8 +114,13 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildTopBar(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        widget.checkIfOnTrip();
         setState(() {
           widget.isExpanded = !widget.isExpanded;
+          if (widget.isExpanded) {
+            _isInit = true;
+            didChangeDependencies();
+          }
         });
       },
       child: Container(
@@ -99,19 +151,26 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  r.Route getRoute(int id) {
+    return availableRoutes.firstWhere((route) {
+      return route.id == id;
+    }, orElse: () {
+      return null;
+    });
+  }
+
   Widget _buildAutoConfigCard(BuildContext context, TripConfig config) {
     return GestureDetector(
       onTap: () {
-        final route = Provider.of<RouteProvider>(context, listen: false)
-            .getRoute(config.route.id);
+        final route = getRoute(config.route.id);
         final bus = Provider.of<BusProvider>(context, listen: false)
             .getBus(config.bus.id);
         final partnerDriver = config.partnerDriver != null
             ? Provider.of<DriverProvider>(context, listen: false)
                 .getDriver(config.partnerDriver.id)
             : null;
-        if (route == null || bus == null) {
-          showConfigError(context, config: config, route: route, bus: bus);
+        if (route == null) {
+          showConfigError(context, config: config, route: route);
         } else {
           TripConfig _autoConfig = TripConfig(
             route: route,
@@ -124,7 +183,10 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           _tripConfig.bus = _autoConfig.bus;
 
           _tripConfig.partnerDriver = _autoConfig.partnerDriver;
-          busPlateController.text = _autoConfig.bus.plateNumber;
+          if (_autoConfig.bus != null)
+            busPlateController.text = _autoConfig.bus.plateNumber;
+          else
+            busPlateController.text = '';
           if (_autoConfig.partnerDriver != null) {
             _toggleTakingPartnerDriver(true);
             partnerIdController.text = _autoConfig.partnerDriver.registrationID;
@@ -178,65 +240,68 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 
   Widget _buildAutoConfigs(BuildContext context) {
-    final configProvider = Provider.of<TripConfigProvider>(context);
     return FutureBuilder(
-      // here currently we are passing dummy id of Current Logged IN Driver
-      // later, it should be passed of current logged in user
-      // =====================================================================
-      future: configProvider.fetchAndSetConfigs(currentDriverId: 1),
-      // =====================================================================
-      builder: (context, snapshot) =>
-          configProvider.savedTripConfigs.length != 0
-              ? Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        // here currently we are passing dummy id of Current Logged IN Driver
+        // later, it should be passed of current logged in user
+        // =====================================================================
+        future: Provider.of<TripConfigProvider>(context, listen: false)
+            .fetchAndSetConfigs(currentDriverId: currentDriver.id),
+        // =====================================================================
+        builder: (context, snapshot) => Consumer<TripConfigProvider>(
+              builder: (context, configConsumer, child) {
+                return configConsumer.savedTripConfigs.length != 0
+                    ? Column(
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.only(
-                              left: 0.8 * SizeConfig.widthMultiplier,
-                              bottom: 0.625 * SizeConfig.heightMultiplier,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 0.94 * SizeConfig.heightMultiplier,
                             ),
-                            child: Text(
-                              'AUTO-FILLS',
-                              style: Theme.of(context).textTheme.display2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 0.8 * SizeConfig.widthMultiplier,
+                                    bottom: 0.625 * SizeConfig.heightMultiplier,
+                                  ),
+                                  child: Text(
+                                    'AUTO-FILLS',
+                                    style: Theme.of(context).textTheme.display2,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 0.78 * SizeConfig.heightMultiplier,
+                                ),
+                                Container(
+                                  height: 6.59 * SizeConfig.heightMultiplier,
+                                  // padding: EdgeInsets.only(bottom: 5),
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount:
+                                        configConsumer.savedTripConfigs.length,
+                                    itemBuilder: (context, index) {
+                                      TripConfig config = configConsumer
+                                          .savedTripConfigs[index];
+                                      return _buildAutoConfigCard(
+                                          context, config);
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(
-                            height: 0.78 * SizeConfig.heightMultiplier,
-                          ),
-                          Container(
-                            height: 6.59 * SizeConfig.heightMultiplier,
-                            // padding: EdgeInsets.only(bottom: 5),
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: configProvider.savedTripConfigs.length,
-                              itemBuilder: (context, index) {
-                                TripConfig config =
-                                    configProvider.savedTripConfigs[index];
-                                return _buildAutoConfigCard(context, config);
-                              },
-                            ),
-                          ),
+                          Divider(),
                         ],
-                      ),
-                    ),
-                    Divider(),
-                  ],
-                )
-              : Container(),
-    );
+                      )
+                    : Container();
+              },
+            ));
   }
 
   Widget _routeDropdownButton(BuildContext context) {
-    final routeProvider = Provider.of<RouteProvider>(context, listen: false);
-    List<r.Route> availableRoutes = routeProvider.dummy_routes;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 3.56 * SizeConfig.widthMultiplier,
-        // vertical: 0.93 * SizeConfig.heightMultiplier
       ),
       decoration: BoxDecoration(
         border: Border.all(
@@ -256,7 +321,12 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         items: availableRoutes.map<DropdownMenuItem<r.Route>>((r.Route route) {
           return DropdownMenuItem<r.Route>(
             value: route,
-            child: Text(route.name),
+            child: Container(
+                width: 30.125 * SizeConfig.widthMultiplier,
+                child: Text(
+                  route.name,
+                  overflow: TextOverflow.ellipsis,
+                )),
           );
         }).toList(),
         onChanged: (r.Route value) {
@@ -291,8 +361,8 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         ),
       ),
       child: Container(
-        width: 10.0,
-        height: 10.0,
+        width: 3.125 * SizeConfig.widthMultiplier,
+        height: 1.9 * SizeConfig.heightMultiplier,
         decoration: BoxDecoration(
             shape: BoxShape.circle, color: Theme.of(context).accentColor),
       ));
@@ -342,7 +412,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               ],
             ),
             SizedBox(
-              width: 10.0,
+              width: 3.125 * SizeConfig.widthMultiplier,
             ),
             _toggleMode(context),
           ],
@@ -371,19 +441,27 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(
-          height: 10.0,
+          height: 1.9 * SizeConfig.heightMultiplier,
         ),
         if (takingParnterDriver == true)
           Container(
             decoration: BoxDecoration(
-                border: Border.all(width: 1.0, color: Colors.black12),
-                borderRadius: BorderRadius.circular(8.0)),
-            padding: EdgeInsets.all(5),
+              border: Border.all(
+                  width: 0.31 * SizeConfig.widthMultiplier,
+                  color: Colors.black12),
+              borderRadius:
+                  BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
+            ),
+            padding: EdgeInsets.symmetric(
+              horizontal: 1.56 * SizeConfig.widthMultiplier,
+              vertical: 0.94 * SizeConfig.heightMultiplier,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 TextFormField(
                   controller: partnerIdController,
+                  textCapitalization: TextCapitalization.characters,
                   style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.all(0),
@@ -451,21 +529,48 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  Widget _buildBusSubDetail() {
+    Text message;
+    if (_tripConfig.bus != null) {
+      if (_tripConfig.bus.onTrip == 1)
+        message = Text(
+          'The bus is on another trip!',
+          style: Theme.of(context).textTheme.body2.copyWith(color: Colors.red),
+        );
+      else
+        message = Text(
+          _tripConfig.bus.name,
+          style: Theme.of(context).textTheme.body2,
+        );
+    } else
+      message = Text(
+        'No bus found',
+        style: Theme.of(context).textTheme.body2.copyWith(color: Colors.red),
+      );
+    return message;
+  }
+
   Widget _busDetail(BuildContext context) {
     final busProvider = Provider.of<BusProvider>(context, listen: false);
 
     return Container(
       // width: 120,
-      padding: EdgeInsets.all(5),
+      padding: EdgeInsets.symmetric(
+        horizontal: 1.56 * SizeConfig.widthMultiplier,
+        vertical: 0.94 * SizeConfig.heightMultiplier,
+      ),
       decoration: BoxDecoration(
-        border: Border.all(width: 1.0, color: Colors.black12),
-        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+            width: 0.31 * SizeConfig.widthMultiplier, color: Colors.black12),
+        borderRadius:
+            BorderRadius.circular(2.5 * SizeConfig.imageSizeMultiplier),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           TextFormField(
             controller: busPlateController,
+            textCapitalization: TextCapitalization.characters,
             cursorColor: Colors.black,
             style: TextStyle(color: Colors.black),
             decoration: InputDecoration(
@@ -480,7 +585,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onFieldSubmitted: (value) {
               setState(() {
                 _tripConfig.bus =
-                    busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
+                    busProvider.avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 }, orElse: () {
                   return null;
@@ -491,7 +596,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onSaved: (value) {
               setState(() {
                 _tripConfig.bus =
-                    busProvider.dummy_avalialbeBuses.firstWhere((Bus bus) {
+                    busProvider.avalialbeBuses.firstWhere((Bus bus) {
                   return bus.plateNumber == value;
                 }, orElse: () {
                   return null;
@@ -499,18 +604,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
               });
             },
           ),
-          _tripConfig.bus != null
-              ? Text(
-                  _tripConfig.bus.name,
-                  style: Theme.of(context).textTheme.body2,
-                )
-              : Text(
-                  'No bus found',
-                  style: Theme.of(context)
-                      .textTheme
-                      .body2
-                      .copyWith(color: Colors.red),
-                ),
+          _buildBusSubDetail(),
         ],
       ),
     );
@@ -519,12 +613,12 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   Widget _buildForm(BuildContext context) {
     return Form(
       autovalidate: true,
-      key: _driverConfigKey,
+      key: _driverConfigFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           SizedBox(
-            height: 5,
+            height: 0.94 * SizeConfig.heightMultiplier,
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -534,7 +628,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             ],
           ),
           SizedBox(
-            height: 10,
+            height: 1.9 * SizeConfig.heightMultiplier,
           ),
           _busDetail(context),
           _partnerDriverDetail(context)
@@ -571,17 +665,41 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
           actions: <Widget>[
             FlatButton(
                 onPressed: () {
+                  Navigator.pop(context);
                   _saveForm();
-                  print(meterReadingController.text);
+                  setState(() {
+                    _isLoading = true;
+                  });
                   _tripConfig.meter = BusMeterReading(
                       initialReading:
                           double.parse(meterReadingController.text));
                   Provider.of<TripProvider>(context, listen: false)
-                      .startTrip(config: _tripConfig);
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DriverNavigationPage()));
+                      .startTrip(config: _tripConfig)
+                      .then((_) {
+                    setState(() {
+                      widget.isExpanded = false;
+                      _isLoading = false;
+                    });
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DriverNavigationPage()));
+                  }).catchError((error) {
+                    showDialog(
+                        context: context,
+                        child: AlertDialog(
+                          title: Text('Oh no!'),
+                          content: Text('Something went wrong.'),
+                          actions: [
+                            FlatButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text('Okay'))
+                          ],
+                        ));
+                    setState(() {
+                      _isLoading = false;
+                    });
+                  });
                 },
                 child: Text('Lets Go'))
           ],
@@ -661,6 +779,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             onPressed: () {
               _saveForm();
               if (_tripConfig.bus != null &&
+                  _tripConfig.bus.onTrip == 0 &&
                   (takingParnterDriver == false ||
                       (takingParnterDriver == true &&
                           _tripConfig.partnerDriver != null)))
@@ -677,18 +796,42 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     );
   }
 
+  Widget _showErrorMessage(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Something went wrong!',
+            style: TextStyle(fontSize: 2.63 * SizeConfig.textMultiplier),
+          ),
+          FlatButton(
+              onPressed: () {
+                setState(() {
+                  _isInit = true;
+                });
+                didChangeDependencies();
+              },
+              child: Text(
+                'TRY AGAIN',
+                style: TextStyle(color: Theme.of(context).accentColor),
+              )),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedPositioned(
       duration: Duration(milliseconds: 250),
       top: widget.isExpanded
           ? 3.125 * SizeConfig.heightMultiplier
-          : 77.8 * SizeConfig.heightMultiplier,
-      // top: 20.0,
+          : 77.5 * SizeConfig.heightMultiplier,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height -
-            (14.06 * SizeConfig.heightMultiplier),
+        // height: MediaQuery.of(context).size.height -
+        //     (14.06 * SizeConfig.heightMultiplier),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -708,7 +851,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             topRight: Radius.circular(8.3 * SizeConfig.imageSizeMultiplier),
           ),
         ),
-        child: ListView(
+        child: Column(
           children: <Widget>[
             _buildTopBar(context),
             Padding(
@@ -716,13 +859,17 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
                   horizontal: 3.6 * SizeConfig.widthMultiplier),
               child: Container(
                 height: 75 * SizeConfig.heightMultiplier,
-                child: ListView(
-                  children: <Widget>[
-                    _buildAutoConfigs(context),
-                    _buildForm(context),
-                    _buildBottomBar(context),
-                  ],
-                ),
+                child: _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : (_errorEncountered
+                        ? _showErrorMessage(context)
+                        : Column(
+                            children: <Widget>[
+                              _buildAutoConfigs(context),
+                              Expanded(child: _buildForm(context)),
+                              _buildBottomBar(context),
+                            ],
+                          )),
               ),
             )
           ],
@@ -732,17 +879,13 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
   }
 }
 
-void showConfigError(context, {TripConfig config, r.Route route, Bus bus}) {
-  String nullItem = '';
-  if (route == null)
-    nullItem = 'Route';
-  else if (bus == null) nullItem = 'Bus';
+void showConfigError(context, {TripConfig config, r.Route route}) {
   print('route not found');
   showDialog(
     context: context,
     child: AlertDialog(
       title: Text('Delete \'${config.configName}\'?'),
-      content: Text('Targeted ${nullItem} is no more in the system.'),
+      content: Text('Targeted Route is no more in the system.'),
       actions: <Widget>[
         FlatButton(
           onPressed: () {

@@ -1,4 +1,4 @@
-package com.example.transpo_tracky_mobile_app
+package com.cui.transpo_tracky
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

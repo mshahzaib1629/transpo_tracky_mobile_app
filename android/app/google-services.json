@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "859649411286",
+    "firebase_url": "https://transpo-tracky.firebaseio.com",
+    "project_id": "transpo-tracky",
+    "storage_bucket": "transpo-tracky.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:859649411286:android:72fc0b4b6b6fcbddf2e177",
+        "android_client_info": {
+          "package_name": "com.cui.transpo_tracky"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "859649411286-i8h1o4jnuu1q2jb2g5qenm0fqauof7iq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ1FsLWa4n3LR7MlV1M1Xza8e_9TD1Jgw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "859649411286-i8h1o4jnuu1q2jb2g5qenm0fqauof7iq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

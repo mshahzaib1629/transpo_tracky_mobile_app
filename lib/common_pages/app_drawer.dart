@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:transpo_tracky_mobile_app/common_pages/last_trips_page.dart';
 import 'package:transpo_tracky_mobile_app/common_pages/settings_page.dart';
+import 'package:transpo_tracky_mobile_app/providers/auth.dart';
+
 import './view_all_routes_page.dart';
-import 'package:transpo_tracky_mobile_app/login_page.dart';
+import './login_page.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key key}) : super(key: key);
@@ -59,8 +63,7 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.power_settings_new),
             title: Text('Log out', style: Theme.of(context).textTheme.subhead),
             onTap: () {
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => LoginPage()));
+              Provider.of<Auth>(context, listen: false).logout();
             },
           ),
         ],

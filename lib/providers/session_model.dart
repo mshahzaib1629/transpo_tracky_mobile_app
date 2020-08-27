@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import '../helpers/constants.dart';
 
 class Session {
   int id;
@@ -11,9 +12,9 @@ class Session {
 }
 
 class SessionProvider with ChangeNotifier {
-  Session _dummy_currentSession = Session(id: 1, name: 'Spring-20');
+  Session _currentSession = Constants.dummyCurrentSession;
 
   Session get currentSession {
-    return _dummy_currentSession;
+    return _currentSession;
   }
 }
