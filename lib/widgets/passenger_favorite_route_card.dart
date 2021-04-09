@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/helpers/size_config.dart';
 import 'package:transpo_tracky_mobile_app/providers/route_model.dart';
-import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 
 class FavoriteRouteCard extends StatelessWidget {
   final favorite;
@@ -20,24 +19,25 @@ class FavoriteRouteCard extends StatelessWidget {
       onLongPress: () {
         showDialog(
             context: context,
-            child: AlertDialog(
-              content: Text('Delete \'${favorite.favoriteStop.name}\' card?'),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Cancel')),
-                FlatButton(
-                  onPressed: () {
-                    Provider.of<RouteProvider>(context, listen: false)
-                        .deleteConfig(favorite.id);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Delete'),
-                ),
-              ],
-            ));
+            builder: (_) => AlertDialog(
+                  content:
+                      Text('Delete \'${favorite.favoriteStop.name}\' card?'),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel')),
+                    FlatButton(
+                      onPressed: () {
+                        Provider.of<RouteProvider>(context, listen: false)
+                            .deleteConfig(favorite.id);
+                        Navigator.pop(context);
+                      },
+                      child: Text('Delete'),
+                    ),
+                  ],
+                ));
       },
       child: Container(
         // width: 140.0,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_navigation_page.dart';
-import 'package:transpo_tracky_mobile_app/helpers/constants.dart';
 import 'package:transpo_tracky_mobile_app/providers/auth.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/driver_model.dart';
@@ -59,7 +58,7 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
         _isLoading = true;
       });
       setState(() {
-       currentDriver =Provider.of<Auth>(context, listen: false).currentUser;
+        currentDriver = Provider.of<Auth>(context, listen: false).currentUser;
       });
       Provider.of<RouteProvider>(context, listen: false)
           .fetchRoutes()
@@ -198,24 +197,24 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
       onLongPress: () {
         showDialog(
             context: context,
-            child: AlertDialog(
-              content: Text('Delete auto-fill \'${config.configName}\'?'),
-              actions: <Widget>[
-                FlatButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text('Cancel')),
-                FlatButton(
-                  onPressed: () {
-                    Provider.of<TripConfigProvider>(context, listen: false)
-                        .deleteConfig(config.id);
-                    Navigator.pop(context);
-                  },
-                  child: Text('Delete'),
-                ),
-              ],
-            ));
+            builder: (_) => AlertDialog(
+                  content: Text('Delete auto-fill \'${config.configName}\'?'),
+                  actions: <Widget>[
+                    FlatButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text('Cancel')),
+                    FlatButton(
+                      onPressed: () {
+                        Provider.of<TripConfigProvider>(context, listen: false)
+                            .deleteConfig(config.id);
+                        Navigator.pop(context);
+                      },
+                      child: Text('Delete'),
+                    ),
+                  ],
+                ));
       },
       child: Container(
         width: 22.2 * SizeConfig.widthMultiplier,
@@ -641,69 +640,69 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
     final meterReadingController = TextEditingController();
     showDialog(
         context: context,
-        child: AlertDialog(
-          content: Container(
-            height: 14.47 * SizeConfig.heightMultiplier,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                TextFormField(
-                  controller: meterReadingController,
-                  keyboardType: TextInputType.number,
-                  autovalidate: true,
-                  validator: (value) {
-                    if (value.isEmpty) return 'Reading must not be empty';
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                      labelText: 'Initial Meter Reading',
-                      contentPadding: EdgeInsets.all(0)),
+        builder: (_) => AlertDialog(
+              content: Container(
+                height: 14.47 * SizeConfig.heightMultiplier,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    TextFormField(
+                      controller: meterReadingController,
+                      keyboardType: TextInputType.number,
+                      autovalidate: true,
+                      validator: (value) {
+                        if (value.isEmpty) return 'Reading must not be empty';
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                          labelText: 'Initial Meter Reading',
+                          contentPadding: EdgeInsets.all(0)),
+                    ),
+                  ],
                 ),
+              ),
+              actions: <Widget>[
+                FlatButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _saveForm();
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      _tripConfig.meter = BusMeterReading(
+                          initialReading:
+                              double.parse(meterReadingController.text));
+                      Provider.of<TripProvider>(context, listen: false)
+                          .startTrip(config: _tripConfig)
+                          .then((_) {
+                        setState(() {
+                          widget.isExpanded = false;
+                          _isLoading = false;
+                        });
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DriverNavigationPage()));
+                      }).catchError((error) {
+                        showDialog(
+                            context: context,
+                            builder: (_) => AlertDialog(
+                                  title: Text('Oh no!'),
+                                  content: Text('Something went wrong.'),
+                                  actions: [
+                                    FlatButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('Okay'))
+                                  ],
+                                ));
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      });
+                    },
+                    child: Text('Lets Go'))
               ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _saveForm();
-                  setState(() {
-                    _isLoading = true;
-                  });
-                  _tripConfig.meter = BusMeterReading(
-                      initialReading:
-                          double.parse(meterReadingController.text));
-                  Provider.of<TripProvider>(context, listen: false)
-                      .startTrip(config: _tripConfig)
-                      .then((_) {
-                    setState(() {
-                      widget.isExpanded = false;
-                      _isLoading = false;
-                    });
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DriverNavigationPage()));
-                  }).catchError((error) {
-                    showDialog(
-                        context: context,
-                        child: AlertDialog(
-                          title: Text('Oh no!'),
-                          content: Text('Something went wrong.'),
-                          actions: [
-                            FlatButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: Text('Okay'))
-                          ],
-                        ));
-                    setState(() {
-                      _isLoading = false;
-                    });
-                  });
-                },
-                child: Text('Lets Go'))
-          ],
-        ));
+            ));
   }
 
   void _createAutoFill(BuildContext context) {
@@ -717,32 +716,32 @@ class _DriverConfigurationPageState extends State<DriverConfigurationPage> {
             (takingParnterDriver == true && _tripConfig.partnerDriver != null)))
       showDialog(
           context: context,
-          child: AlertDialog(
-            content: TextField(
-                controller: configNameController,
-                decoration: InputDecoration(labelText: 'Auto-Fill Name'),
-                onSubmitted: (value) {
-                  _tripConfig.configName = configNameController.text;
-                  configProvider.addTripConfig(_tripConfig);
-                  Navigator.pop(context);
-                }),
-            actions: <Widget>[
-              FlatButton(
-                child: Text('CANCEL'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              FlatButton(
-                child: Text('CREATE'),
-                onPressed: () {
-                  _tripConfig.configName = configNameController.text;
-                  configProvider.addTripConfig(_tripConfig);
-                  Navigator.pop(context);
-                },
-              )
-            ],
-          ));
+          builder: (_) => AlertDialog(
+                content: TextField(
+                    controller: configNameController,
+                    decoration: InputDecoration(labelText: 'Auto-Fill Name'),
+                    onSubmitted: (value) {
+                      _tripConfig.configName = configNameController.text;
+                      configProvider.addTripConfig(_tripConfig);
+                      Navigator.pop(context);
+                    }),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('CANCEL'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  FlatButton(
+                    child: Text('CREATE'),
+                    onPressed: () {
+                      _tripConfig.configName = configNameController.text;
+                      configProvider.addTripConfig(_tripConfig);
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
+              ));
   }
 
   Widget _buildBottomBar(BuildContext context) {
@@ -883,7 +882,7 @@ void showConfigError(context, {TripConfig config, r.Route route}) {
   print('route not found');
   showDialog(
     context: context,
-    child: AlertDialog(
+    builder: (_) => AlertDialog(
       title: Text('Delete \'${config.configName}\'?'),
       content: Text('Targeted Route is no more in the system.'),
       actions: <Widget>[
