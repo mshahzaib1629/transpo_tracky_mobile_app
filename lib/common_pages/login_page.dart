@@ -114,33 +114,33 @@ class _LoginPageState extends State<LoginPage> {
     } on ManualException catch (error) {
       showDialog(
           context: context,
-          child: AlertDialog(
-            title: Align(
-                alignment: Alignment.centerLeft, child: Text(error.title)),
-            content: Text(error.message),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'))
-            ],
-          ));
+          builder: (_) => AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft, child: Text(error.title)),
+                content: Text(error.message),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              ));
     } catch (error) {
       showDialog(
           context: context,
-          child: AlertDialog(
-            title:
-                Align(alignment: Alignment.centerLeft, child: Text('Oh no!')),
-            content: Text('Something went wrong.'),
-            actions: <Widget>[
-              FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text('OK'))
-            ],
-          ));
+          builder: (_) => AlertDialog(
+                title: Align(
+                    alignment: Alignment.centerLeft, child: Text('Oh no!')),
+                content: Text('Something went wrong.'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('OK'))
+                ],
+              ));
     }
   }
 
@@ -241,44 +241,45 @@ class _LoginPageState extends State<LoginPage> {
             Provider.of<SessionProvider>(context, listen: false);
         showDialog(
             context: context,
-            child: AlertDialog(
-              content: Text('Sign up as?'),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => DriverSignUpPage()));
-                  },
-                  child: Text('Driver'),
-                ),
-                FlatButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _sessionProvider.currentSession != null
-                        ? Navigator.push(
+            builder: (_) => AlertDialog(
+                  content: Text('Sign up as?'),
+                  actions: <Widget>[
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => PassengerSignUpPage()))
-                        : showDialog(
-                            context: context,
-                            child: AlertDialog(
-                              content: Text('No Active Session found.'),
-                              actions: <Widget>[
-                                FlatButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text('OK'),
-                                )
-                              ],
-                            ),
-                          );
-                  },
-                  child: Text('Passenger'),
-                )
-              ],
-            ));
+                                builder: (context) => DriverSignUpPage()));
+                      },
+                      child: Text('Driver'),
+                    ),
+                    FlatButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _sessionProvider.currentSession != null
+                            ? Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PassengerSignUpPage()))
+                            : showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  content: Text('No Active Session found.'),
+                                  actions: <Widget>[
+                                    FlatButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: Text('OK'),
+                                    )
+                                  ],
+                                ),
+                              );
+                      },
+                      child: Text('Passenger'),
+                    )
+                  ],
+                ));
       },
       child: Text('SIGN UP',
           style: Theme.of(context)

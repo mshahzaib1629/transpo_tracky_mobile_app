@@ -73,14 +73,14 @@ class _PassengerHomePageState extends State<PassengerHomePage> {
         if (passengerSelectedTrip == null) {
           showDialog(
               context: context,
-              child: AlertDialog(
-                content: Text('Select a Route first'),
-                actions: <Widget>[
-                  FlatButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('Okay'))
-                ],
-              ));
+              builder: (_) => AlertDialog(
+                    content: Text('Select a Route first'),
+                    actions: <Widget>[
+                      FlatButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('Okay'))
+                    ],
+                  ));
         } else {
           joinTrip(passengerSelectedTrip);
           print(

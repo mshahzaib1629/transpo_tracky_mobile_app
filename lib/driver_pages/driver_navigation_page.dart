@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transpo_tracky_mobile_app/driver_pages/driver_broadcast_screen.dart';
 import 'package:transpo_tracky_mobile_app/google_maps/driver_navigation_map.dart';
-import 'package:transpo_tracky_mobile_app/providers/broadcast_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/bus_model.dart';
 import 'package:transpo_tracky_mobile_app/providers/trip_model.dart';
 import 'package:transpo_tracky_mobile_app/widgets/driver_navigation_page_detail.dart';
@@ -90,15 +88,15 @@ class _DriverNavigationPageState extends State<DriverNavigationPage> {
                         Navigator.pop(context);
                         showDialog(
                             context: context,
-                            child: AlertDialog(
-                              title: Text('Oh no!'),
-                              content: Text('Something went wrong.'),
-                              actions: [
-                                FlatButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: Text('Okay'))
-                              ],
-                            ));
+                            builder: (_) => AlertDialog(
+                                  title: Text('Oh no!'),
+                                  content: Text('Something went wrong.'),
+                                  actions: [
+                                    FlatButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text('Okay'))
+                                  ],
+                                ));
                       });
                     },
                     child: Text('End Now'))

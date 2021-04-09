@@ -92,14 +92,14 @@ class _DriverNavigationMapState extends State<DriverNavigationMap> {
     } catch (error) {
       showDialog(
           context: context,
-          child: AlertDialog(
-            content: Text('Internet Connection Failed!'),
-            actions: [
-              FlatButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('Try Again'))
-            ],
-          ));
+          builder: (_) => AlertDialog(
+                content: Text('Internet Connection Failed!'),
+                actions: [
+                  FlatButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Try Again'))
+                ],
+              ));
     }
   }
 

@@ -90,37 +90,35 @@ class _DriverSignUpPageState extends State<DriverSignUpPage> {
           )
           .then((_) => showDialog(
               context: context,
-              child: AlertDialog(
-                title: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Thanks for your time')),
-                content: Text(
-                    'Your request is pending for admin approval. You\'ll be notified soon.'),
-                actions: <Widget>[
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                      child: Text('OK'))
-                ],
-              )))
+              builder: (_) => AlertDialog(
+                    title: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Thanks for your time')),
+                    content: Text(
+                        'Your request is pending for admin approval. You\'ll be notified soon.'),
+                    actions: <Widget>[
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: Text('OK'))
+                    ],
+                  )))
           .catchError((error) => showDialog(
               context: context,
-              child: AlertDialog(
-                title: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Oh no!')),
-                content: Text(
-                    'Something went wrong.'),
-                actions: <Widget>[
-                  FlatButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('OK'))
-                ],
-              )));
+              builder: (_) => AlertDialog(
+                    title: Align(
+                        alignment: Alignment.centerLeft, child: Text('Oh no!')),
+                    content: Text('Something went wrong.'),
+                    actions: <Widget>[
+                      FlatButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('OK'))
+                    ],
+                  )));
     }
   }
 
